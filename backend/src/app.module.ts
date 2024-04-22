@@ -9,6 +9,7 @@ import configuration from './config/configuration';
 import { Client } from './clients/entities/client.entity';
 import { User } from './users/entities/user.entity';
 import { DatabaseModule } from './database/database.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { DatabaseModule } from './database/database.module';
     DatabaseModule,
     UsersModule,
     ClientsModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
