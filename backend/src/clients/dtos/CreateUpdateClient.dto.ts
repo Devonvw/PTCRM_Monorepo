@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-export class CreateClientDto {
+export class CreateUpdateClientDto {
   @IsNotEmpty({ message: 'First name is required' })
   @ApiProperty({ type: 'string' })
   firstName: string;
@@ -20,15 +20,15 @@ export class CreateClientDto {
 
   @IsOptional()
   @ApiProperty({ type: 'string' })
-  streetname: string;
+  street: string;
 
   @IsOptional()
   @ApiProperty({ type: 'string' })
-  houseNumber: string;
+  housenumber: string;
 
   @IsOptional()
   @ApiProperty({ type: 'string' })
-  houseNumberExtra: string;
+  housenumberExtra: string;
 
   @IsOptional()
   @ApiProperty({ type: 'string' })

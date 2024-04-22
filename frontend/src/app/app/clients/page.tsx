@@ -1,3 +1,4 @@
+"use client";
 import {
   Card,
   CardContent,
@@ -5,31 +6,23 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import PageHeader from "@/components/ui/page-header";
+import { DataTable } from "@/components/ui/data-table";
+import { columns } from "./columns";
+import { useClients } from "@/stores/useClients";
 
 const Clients = () => {
+  const { getClients, clients, filterOptions } = useClients();
   return (
     <div>
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">Home</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Clients</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-      <h1 className="text-4xl font-semibold mb-10">Clients</h1>
+      <PageHeader title="Clients" breadcrumbs={[{ title: "Clients" }]} />
+      <DataTable
+        columns={columns}
+        data={clients}
+        onChange={getClients}
+        filterOptions={filterOptions}
+      />
     </div>
   );
 };
