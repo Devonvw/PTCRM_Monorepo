@@ -1,4 +1,5 @@
 import { IReload } from "@/interfaces/reload";
+import toastError from "@/utils/toast-error";
 import axios from "axios";
 import { Router } from "next/router";
 import { create } from "zustand";
@@ -31,6 +32,16 @@ export const useClients = create((set: any, get: any) => ({
       return 0;
     }
   },
+  getClient: async (id: string) => {
+    try {
+      const { data } = await axios.get(`/backend/clients/${id}`);
+      set((state: any) => ({
+        client: data,
+      }));
+    } catch (e: any) {
+      toastError(e?.response?.data?.message);
+    }
+  },
   createClient: async (client: any, reload?: IReload) => {
     try {
       await axios.post("/backend/clients", client);
@@ -40,7 +51,7 @@ export const useClients = create((set: any, get: any) => ({
         addModalOpen: false,
       }));
     } catch (e: any) {
-      console.log(e);
+      toastError(e?.response?.data?.message);
     }
   },
   sortOptions: [

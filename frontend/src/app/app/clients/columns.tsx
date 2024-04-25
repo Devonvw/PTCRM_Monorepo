@@ -5,6 +5,8 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
 import { DataTableRowActions } from "@/components/ui/data-table/data-table-row-actions";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 interface IClient {
   id: number;
@@ -63,6 +65,21 @@ export const columns: ColumnDef<IClient>[] = [
         <Badge variant={row?.original?.active ? "green" : "red"}>
           {row?.original?.active ? "Yes" : "No"}
         </Badge>
+      </div>
+    ),
+    enableSorting: false,
+  },
+  {
+    accessorKey: "actions",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="" />,
+    cell: ({ row }) => (
+      <div className="flex justify-end">
+        <Link
+          href={`/app/clients/${row?.original?.id}`}
+          className="hover:text-secondary"
+        >
+          View
+        </Link>
       </div>
     ),
     enableSorting: false,

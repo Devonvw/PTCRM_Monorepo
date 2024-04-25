@@ -12,14 +12,20 @@ import { Fragment } from "react";
 
 interface IPageHeaderProps {
   title: string;
+  description?: string;
   breadcrumbs?: { title: string; href?: string }[];
   children?: React.ReactNode;
 }
 
-const PageHeader = ({ title, breadcrumbs, children }: IPageHeaderProps) => {
+const PageHeader = ({
+  title,
+  description,
+  breadcrumbs,
+  children,
+}: IPageHeaderProps) => {
   const { right } = getChildren(children);
   return (
-    <div className="flex justify-between mb-10">
+    <div className="flex justify-between mb-6">
       <div>
         <Breadcrumb>
           <BreadcrumbList>
@@ -42,7 +48,8 @@ const PageHeader = ({ title, breadcrumbs, children }: IPageHeaderProps) => {
             ))}
           </BreadcrumbList>
         </Breadcrumb>
-        <h1 className="text-4xl font-semibold">{title}</h1>
+        <h1 className="text-4xl font-semibold text-gray-100">{title}</h1>
+        <p className="text-sm text-gray-400">{description}</p>
       </div>
       {right}
     </div>
