@@ -1,9 +1,8 @@
-"use client";
-
-import Image from "next/image";
 import Link from "next/link";
 
-export default function Home() {
+
+export default function Login() {
+
   return (
     <main className="flex min-h-screen flex-col items-center">
       <div className="container px-4 flex flex-col items-center justify-center min-h-screen relative">
@@ -25,23 +24,9 @@ export default function Home() {
             </div>
           </nav>
         </div>
-        <h1 className="text-6xl font-bold text-gray-100">
-          The <span className="font-light">CRM</span> for Personal Trainers
-        </h1>
-        <p className="max-w-3xl text-center mt-4 text-lg">
-          Empower your personal training business with PTCRM, a tailored
-          solution designed exclusively for fitness professionals like you.{" "}
-        </p>
-        <Image
-          src={require("@/assets/personal-trainer.svg")}
-          alt="Personal trainer"
-          className="absolute bottom-0 right-0 w-1/3"
-        />
-        <Image
-          src={require("@/assets/personal-training.svg")}
-          alt="Personal training"
-          className="absolute bottom-0 left-0 w-1/3"
-        />
+        <div className="">
+          
+        </div>
       </div>
     </main>
   );
