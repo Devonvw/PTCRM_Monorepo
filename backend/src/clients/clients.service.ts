@@ -5,6 +5,9 @@ import { EntityManager, Repository } from 'typeorm';
 import { CreateUpdateClientDto } from './dtos/CreateUpdateClient.dto';
 import { GetAllClientsQueryDto } from './dtos/GetAllClientsQuery.dto';
 import Pagination from 'src/utils/pagination';
+import Search from 'src/utils/search';
+import Filters from 'src/utils/filter';
+import OrderBy from 'src/utils/order-by';
 
 @Injectable()
 export class ClientsService {
@@ -44,6 +47,7 @@ export class ClientsService {
 
     if (!client) {
       throw new Error('Client not found');
+      ``;
     }
 
     await this.clientRepository.delete({ id });
@@ -51,12 +55,46 @@ export class ClientsService {
 
   async findAll(query: GetAllClientsQueryDto) {
     const pagination = Pagination(query);
+    const orderBy = OrderBy(query, [
+      {
+        key: 'fullName',
+        fields: ['firstName', 'lastName'],
+      },
+      {
+        key: 'email',
+        fields: ['email'],
+      },
+    ]);
+    const search = Search(query, [
+      {
+        field: 'firstName',
+      },
+      {
+        field: 'lastName',
+      },
+      {
+        field: 'email',
+      },
+    ]);
+
+    const filter = Filters(search, [
+      {
+        condition: query?.active?.length == 1,
+        filter: {
+          active: query?.active?.[0] === 'true',
+        },
+      },
+    ]);
 
     const clients = await this.clientRepository.find({
       ...pagination,
+      where: [...filter],
+      order: orderBy,
     });
 
-    const totalRows = await this.clientRepository.count();
+    const totalRows = await this.clientRepository.count({
+      where: [...filter],
+    });
 
     return { data: clients, totalRows };
   }

@@ -1,3 +1,5 @@
+import { IReload } from "@/interfaces/reload";
+import toastError from "@/utils/toast-error";
 import axios from "axios";
 import { Router } from "next/router";
 import { create } from "zustand";
@@ -30,26 +32,48 @@ export const useClients = create((set: any, get: any) => ({
       return 0;
     }
   },
+  getClient: async (id: string) => {
+    try {
+      const { data } = await axios.get(`/backend/clients/${id}`);
+      set((state: any) => ({
+        client: data,
+      }));
+    } catch (e: any) {
+      toastError(e?.response?.data?.message);
+    }
+  },
+  createClient: async (client: any, reload?: IReload) => {
+    try {
+      await axios.post("/backend/clients", client);
+
+      if (reload) reload();
+      set((state: any) => ({
+        addModalOpen: false,
+      }));
+    } catch (e: any) {
+      toastError(e?.response?.data?.message);
+    }
+  },
   sortOptions: [
     {
       id: 1,
       name: "Naam A-Z",
-      meta: { key: "name", direction: "asc" },
+      meta: { key: "name", direction: "ASC" },
     },
     {
       id: 2,
       name: "Naam Z-A",
-      meta: { key: "name", direction: "desc" },
+      meta: { key: "name", direction: "DESC" },
     },
     {
       id: 3,
       name: "Aantal schepen - Oplopend",
-      meta: { key: "ship_count", direction: "asc" },
+      meta: { key: "ship_count", direction: "ASC" },
     },
     {
       id: 4,
       name: "Aantal schepen - Aflopend",
-      meta: { key: "ship_count", direction: "desc" },
+      meta: { key: "ship_count", direction: "DESC" },
     },
   ],
   filterOptions: [
@@ -71,33 +95,7 @@ export const useClients = create((set: any, get: any) => ({
         },
       ],
     },
-    {
-      id: 2,
-      title: "Type",
-      key: "type",
-      selected: [],
-      options: [
-        {
-          id: 1,
-          title: "Beheerder",
-          meta: { key: "MANAGER" },
-        },
-        {
-          id: 2,
-          title: "VVE",
-          meta: { key: "VVE" },
-        },
-        {
-          id: 3,
-          title: "Zakelijk",
-          meta: { key: "COMPANY" },
-        },
-        {
-          id: 4,
-          title: "Particulier",
-          meta: { key: "PRIVATE" },
-        },
-      ],
-    },
   ],
+  addModalOpen: false,
+  setAddModalOpen: (open: boolean) => set({ addModalOpen: open }),
 }));

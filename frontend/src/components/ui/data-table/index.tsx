@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -40,25 +40,33 @@ interface DataTableProps<TData, TValue> {
     pagination,
     filters,
     search,
+    sort,
   }: IOnChangeProps) => Promise<number>;
-  filterOptions: IFilterProps[];
+  filters: IFilterProps[];
+  setFilters: Dispatch<SetStateAction<IFilterProps[]>>;
+  sorting: SortingState;
+  setSorting: Dispatch<SetStateAction<SortingState>>;
+  pagination: IPaginationProps;
+  setPagination: Dispatch<SetStateAction<IPaginationProps>>;
+  rowCount: number;
+  search: string;
+  setSearch: Dispatch<SetStateAction<string>>;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   onChange,
-  filterOptions,
+  filters,
+  setFilters,
+  sorting,
+  setSorting,
+  pagination,
+  setPagination,
+  rowCount,
+  search,
+  setSearch,
 }: DataTableProps<TData, TValue>) {
-  const [filters, setFilters] = useState<IFilterProps[]>(filterOptions);
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [pagination, setPagination] = useState<IPaginationProps>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
-  const [rowCount, setRowCount] = useState<number>();
-  const [search, setSearch] = useState<string>("");
-
   const table = useReactTable({
     data,
     columns,
@@ -68,26 +76,35 @@ export function DataTable<TData, TValue>({
     },
     getCoreRowModel: getCoreRowModel(),
     enableRowSelection: true,
-    // onSortingChange: setSorting,
+    onSortingChange: (sort) => {
+      console.log(sort);
+      setSorting(sort);
+    },
     onPaginationChange: setPagination,
     manualFiltering: true,
     manualPagination: true,
     rowCount,
-    getSortedRowModel: getSortedRowModel(),
+    manualSorting: true,
   });
 
-  useEffect(() => {
-    let parsedFilters: any = {};
-    filters.forEach((filter) => {
-      parsedFilters[filter.key] = filter.selected.map(
-        (option) => option.meta.key
-      );
-    });
+  // useEffect(() => {
+  //   let parsedFilters: any = {};
+  //   filters.forEach((filter) => {
+  //     parsedFilters[filter.key] = filter.selected.map(
+  //       (option) => option.meta.key
+  //     );
+  //   });
 
-    onChange({ pagination, filters: parsedFilters, search: { search } }).then(
-      (totalRows: number) => setRowCount(totalRows)
-    );
-  }, [pagination, filters, search]);
+  //   onChange({
+  //     pagination,
+  //     filters: parsedFilters,
+  //     search: { search },
+  //     sort: {
+  //       orderByColumn: sorting?.[0]?.id,
+  //       orderDirection: sorting?.[0]?.desc ? "DESC" : "ASC",
+  //     },
+  //   }).then((totalRows: number) => setRowCount(totalRows));
+  // }, [pagination, filters, search, sorting]);
 
   return (
     <div className="space-y-4">

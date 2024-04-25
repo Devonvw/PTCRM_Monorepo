@@ -49,7 +49,7 @@ const Nav = () => {
             <li key={navItem.title}>
               <Link
                 className={cn("text-gray-300 hover:text-gray-100", {
-                  "text-gray-50": pathname === navItem.href,
+                  "text-secondary": pathname === navItem.href,
                 })}
                 href={navItem.href}
               >

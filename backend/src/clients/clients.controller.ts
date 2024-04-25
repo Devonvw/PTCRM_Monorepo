@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ClientsService } from './clients.service';
 import { CreateUpdateClientDto } from './dtos/CreateUpdateClient.dto';
 import { GetAllClientsQueryDto } from './dtos/GetAllClientsQuery.dto';
@@ -10,6 +18,11 @@ export class ClientsController {
   @Get()
   async findAll(@Query() query: GetAllClientsQueryDto) {
     return await this.clientsService.findAll(query);
+  }
+
+  @Get(':id')
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return await this.clientsService.findOne(id);
   }
 
   @Post()

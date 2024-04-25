@@ -1,4 +1,4 @@
-import { PaginationDto } from './pagination.dto';
+import { PaginationDto } from './dto/pagination.dto';
 
 export default function Pagination(query: PaginationDto) {
   return {

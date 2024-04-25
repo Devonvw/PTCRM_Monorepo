@@ -13,9 +13,6 @@ export class Client extends AbstractEntity<Client> {
   email: string;
 
   @Column({ nullable: true })
-  phone: string;
-
-  @Column({ nullable: true })
   street: string;
 
   @Column({ nullable: true })
@@ -32,4 +29,7 @@ export class Client extends AbstractEntity<Client> {
 
   @Column({ nullable: true })
   country: string;
+
+  @Column({ default: true })
+  active: boolean;
 }
