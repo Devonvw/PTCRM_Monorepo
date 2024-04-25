@@ -26,4 +26,5 @@ export interface IOnChangeProps {
   pagination: IPaginationProps;
   filters: IFilterProps[];
   search: { search: string };
+  sort: { orderByColumn: string; orderDirection: string };
 }
