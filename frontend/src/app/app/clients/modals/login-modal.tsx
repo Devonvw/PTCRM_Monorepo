@@ -54,13 +54,15 @@ const LoginModal =({open, onOpenChange} : IModal) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-fit flex flex-col">
+      <DialogHeader>
+          <DialogTitle className="uppercase font-black text-6xl text-gray-100 text-center block">PT<span className="font-thin">CRM</span></DialogTitle>
+          <hr className="m-4"></hr>
+          <DialogDescription className="text-4xl text-center block">
+            Login
+          </DialogDescription>
+        </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 gap-y-2">
-            <span className="uppercase font-black text-6xl text-gray-100 text-center block">
-              PT<span className="font-thin">CRM</span>
-            </span>
-            <hr className="m-4"></hr>
-            <span className="text-4xl text-center block">Login</span>
             <FormField control={form.control} name="email" render={({ field }) => (
               <FormItem>
                 <FormLabel>Email</FormLabel>
