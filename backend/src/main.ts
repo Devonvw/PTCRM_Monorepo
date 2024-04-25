@@ -1,9 +1,29 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ValidationPipe } from '@nestjs/common';
+import * as session from 'express-session';
+import * as passport from 'passport';
+import * as process from 'process';
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+
+  //. Session configuration
+  app.use(
+    session({
+      //TODO: Get these values from environment variables
+      secret: "riaghuiaelhgiulh#$%^asdfghADRFH",
+      resave: false,
+      saveUninitialized: false,
+      cookie: { maxAge: 3600000 },
+    })
+  )
+  app.use(passport.initialize());
+  app.use(passport.session());
+  app.useGlobalPipes(new ValidationPipe());
 
   // const config = new DocumentBuilder()
   //   .setTitle('PTCRM API')
