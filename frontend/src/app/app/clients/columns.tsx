@@ -4,6 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
 import { DataTableRowActions } from "@/components/ui/data-table/data-table-row-actions";
+import { Badge } from "@/components/ui/badge";
 
 interface IClient {
   id: number;
@@ -17,6 +18,7 @@ interface IClient {
   zipCode: string;
   city: string;
   country: string;
+  active: boolean;
 }
 
 export const columns: ColumnDef<IClient>[] = [
@@ -42,12 +44,6 @@ export const columns: ColumnDef<IClient>[] = [
     ),
   },
   {
-    accessorKey: "phone",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Phone" />
-    ),
-  },
-  {
     id: "address",
     accessorFn: (row) =>
       `${row?.street ?? "-"} ${row?.housenumber ?? "-"}${
@@ -56,6 +52,20 @@ export const columns: ColumnDef<IClient>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Address" />
     ),
+  },
+  {
+    accessorKey: "active",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Active" />
+    ),
+    cell: ({ row }) => (
+      <div>
+        <Badge variant={row?.original?.active ? "green" : "red"}>
+          {row?.original?.active ? "Yes" : "No"}
+        </Badge>
+      </div>
+    ),
+    enableSorting: false,
   },
   // {
   //   id: "actions",
