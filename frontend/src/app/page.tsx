@@ -2,8 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import LoginModal from "./app/clients/modals/login-modal";
+import RegisterModal from "./app/clients/modals/register-modal";
 
 export default function Home() {
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [signupModalOpen, setSignupModalOpen] = useState(false);
+
   return (
     <main className="flex min-h-screen flex-col items-center">
       <div className="container px-4 flex flex-col items-center justify-center min-h-screen relative">
@@ -16,12 +22,12 @@ export default function Home() {
               PT<span className="font-thin">CRM</span>
             </Link>
             <div className="flex gap-x-2">
-              <Link href="/login" className="bg-primary text-white py-1 px-5 rounded font-semibold text-lg hover:bg-primary/80">
+              <button onClick={() => setLoginModalOpen(true)} className="bg-primary text-white py-1 px-5 rounded font-semibold text-lg hover:bg-primary/80">
                 Login
-              </Link>
-              <Link href="/signup" className="bg-secondary text-white py-1 px-5 rounded font-semibold text-lg hover:bg-primary/80">
+              </button>
+              <button onClick={() => setSignupModalOpen(true)} className="bg-secondary text-white py-1 px-5 rounded font-semibold text-lg hover:bg-primary/80">
                 Signup
-              </Link>
+              </button>
             </div>
           </nav>
         </div>
@@ -41,6 +47,14 @@ export default function Home() {
           src={require("@/assets/personal-training.svg")}
           alt="Personal training"
           className="absolute bottom-0 left-0 w-1/3"
+        />
+        <LoginModal
+          open={loginModalOpen}
+          onOpenChange={setLoginModalOpen}
+        />
+        <RegisterModal 
+          open={signupModalOpen}
+          onOpenChange={setSignupModalOpen}
         />
       </div>
     </main>
