@@ -6,9 +6,6 @@ import { useState } from "react";
 import RegisterModal from "../components/modals/register-modal";
 
 export default function Home() {
-  const [loginModalOpen, setLoginModalOpen] = useState(false);
-  const [signupModalOpen, setSignupModalOpen] = useState(false);
-
   return (
     <main className="flex min-h-screen flex-col items-center">
       <div className="container px-4 flex flex-col items-center justify-center min-h-screen relative">
