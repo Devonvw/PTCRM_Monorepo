@@ -41,7 +41,7 @@ export class AuthService {
       };
     });
   }
-  async register(body: any): Promise<any> {
+  async signup(body: any): Promise<any> {
     const user: User = await this.userService.create(body);
     return new UserResponseDto(user);
   }

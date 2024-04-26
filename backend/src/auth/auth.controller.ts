@@ -12,9 +12,9 @@ export class AuthController {
     return this.authService.logout(request);
   }
 
-  @Post('register')
-  async register(@Body() body: any){
-    const res = await this.authService.register(body);
+  @Post('signup')
+  async signup(@Body() body: any){
+    const res = await this.authService.signup(body);
     console.log("res: ", res);
     return res;
   }

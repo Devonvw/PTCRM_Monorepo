@@ -16,6 +16,8 @@ import {
 import Image from "next/image";
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
+import axios from "axios";
+import toastError from "@/utils/toast-error";
 
 const formSchema: any = z.object({
   email: z.string().email("This is not a valid email."),
@@ -26,8 +28,12 @@ const formSchema: any = z.object({
       message: "Password must be at least 8 characters.",
     })
     .max(255, { message: "Password cannot be more than 255 characters." }),
-  passwordConfirm: z.string().refine((data) => data === formSchema.password, { message: "Passwords do not match." }),
+  passwordConfirm: z.string(),
   dateOfBirth: z.date(),
+})
+.refine(data => data.password === data.passwordConfirm, {
+  path: ["passwordConfirm"],
+  message: "Passwords do not match",
 });
 
 export function Signup() {
@@ -43,9 +49,27 @@ export function Signup() {
     },
   })
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    //. Call the login function
-    console.log(data);
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    try{
+      console.log("data in onsubmit", data);
+
+      //. Create a new user with the data
+      const user: any = {
+        email: data.email,
+        firstname: data.firstname,
+        lastname: data.lastname,
+        password: data.password,
+        dateOfBirth: data.dateOfBirth,
+      
+      }
+
+      //. Call the signup function
+      const res = await axios.post("/backend/auth/signup", user);
+    } catch (e: any) {
+      toastError(e?.response?.data?.message);
+    }
+      
+      
   }
   return (
     <main className="flex min-h-screen flex-col items-center">
