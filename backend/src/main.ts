@@ -7,6 +7,7 @@ import passport from 'passport';
 import * as process from 'process';
 
 import helmet from 'helmet';
+import { AuthenticatedGuard } from './guards/authenticated.guard';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -24,6 +25,7 @@ async function bootstrap() {
   )
   app.use(passport.initialize());
   app.use(passport.session());
+  app.useGlobalGuards(new AuthenticatedGuard());
   app.useGlobalPipes(new ValidationPipe());
 
   // const config = new DocumentBuilder()
