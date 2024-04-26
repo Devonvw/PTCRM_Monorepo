@@ -22,12 +22,12 @@ export default function Home() {
               PT<span className="font-thin">CRM</span>
             </Link>
             <div className="flex gap-x-2">
-              <button onClick={() => setLoginModalOpen(true)} className="bg-primary text-white py-1 px-5 rounded font-semibold text-lg hover:bg-primary/80">
+              <Link href="/login" className="bg-primary text-white py-1 px-5 rounded font-semibold text-lg hover:bg-primary/80">
                 Login
-              </button>
-              <button onClick={() => setSignupModalOpen(true)} className="bg-secondary text-white py-1 px-5 rounded font-semibold text-lg hover:bg-primary/80">
+              </Link>
+              <Link href="/signup" className="bg-secondary text-white py-1 px-5 rounded font-semibold text-lg hover:bg-primary/80">
                 Signup
-              </button>
+              </Link>
             </div>
           </nav>
         </div>
@@ -48,14 +48,7 @@ export default function Home() {
           alt="Personal training"
           className="absolute bottom-0 left-0 w-1/3"
         />
-        <LoginModal
-          open={loginModalOpen}
-          onOpenChange={setLoginModalOpen}
-        />
-        <RegisterModal 
-          open={signupModalOpen}
-          onOpenChange={setSignupModalOpen}
-        />
+        
       </div>
     </main>
   );

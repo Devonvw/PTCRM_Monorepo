@@ -13,25 +13,33 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
 import Image from "next/image";
 import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
 
-const formSchema = z.object({
+const formSchema: any = z.object({
   email: z.string().email("This is not a valid email."),
-  password: z.string().min(8, {
-    message: "Password must be at least 8 characters.",
-  }).max(255, { message: "Password cannot be more than 255 characters." }),
-  remember: z.boolean().optional(),
+  firstname: z.string().min(2, { message: "First name must be at least 2 characters." }),
+  lastname: z.string().min(2, { message: "Last name must be at least 2 characters." }),
+  password: z.string()
+    .min(8, {
+      message: "Password must be at least 8 characters.",
+    })
+    .max(255, { message: "Password cannot be more than 255 characters." }),
+  passwordConfirm: z.string().refine((data) => data === formSchema.password, { message: "Passwords do not match." }),
+  dateOfBirth: z.date(),
 });
 
-export function Login() {
+export function Signup() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
+      firstname: "",
+      lastname: "",
       password: "",
-      remember: false,
+      passwordConfirm: "",
+      dateOfBirth: new Date(),
     },
   })
 
@@ -61,17 +69,37 @@ export function Login() {
         </div>
         <div className="">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className=" w-fit dark:bg-slate-950 p-6 border dark:border-slate-800 rounded-lg grid grid-cols-1 gap-y-1">
-              <span className="uppercase font-black text-6xl text-gray-100 text-center">
-                PT<span className="font-thin">CRM</span>
-              </span>
-              <hr className="m-4"></hr>
-              <span className="text-4xl text-center  text-gray-300">Login</span>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-2 gap-x-4 gap-y-2 w-fit dark:bg-slate-950 p-6 border dark:border-slate-800 rounded-lg -mt-20">
+              <div className="w-full flex flex-col col-span-2">
+                <span className="uppercase font-black text-6xl text-gray-100 text-center">
+                  PT<span className="font-thin">CRM</span>
+                </span>
+                <hr className="m-4"></hr>
+                <span className="text-4xl text-center text-gray-300">Sign up</span>
+              </div>
               <FormField control={form.control} name="email" render={({ field }) => (
-                <FormItem>
+                <FormItem className="col-span-2">
                   <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input placeholder="Email" {...field} type="email" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="firstname" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Firstname</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Firstname" {...field} type="text" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="lastname" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Lastname</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Lastname" {...field} type="text" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -85,25 +113,17 @@ export function Login() {
                   <FormMessage />
                 </FormItem>
               )} />
-              <FormField
-                control={form.control}
-                name="remember"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 mt-4">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>
-                        Remember me
-                      </FormLabel>
-                    </div>
-                  </FormItem>
-                )} />
-              <Button className="w-full mt-8" type="submit">Login</Button>
+              <FormField control={form.control} name="passwordConfirm" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Password" {...field} type="password" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+
+              <Button className="w-full mt-8 col-span-2" type="submit">Register</Button>
             </form>
           </Form>
         </div>
@@ -122,4 +142,4 @@ export function Login() {
   );
 }
 
-export default Login;
+export default Signup;
