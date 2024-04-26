@@ -3,8 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import LoginModal from "./app/clients/modals/login-modal";
-import RegisterModal from "./app/clients/modals/register-modal";
+import RegisterModal from "../components/modals/register-modal";
 
 export default function Home() {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
