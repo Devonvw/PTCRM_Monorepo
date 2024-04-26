@@ -38,12 +38,12 @@ export default function Home() {
           solution designed exclusively for fitness professionals like you.{" "}
         </p>
         <Image
-          src={require("@/assets/personal-trainer.svg")}
+          src={require("@/app/assets/personal-trainer.svg")}
           alt="Personal trainer"
           className="absolute bottom-0 right-0 w-1/3"
         />
         <Image
-          src={require("@/assets/personal-training.svg")}
+          src={require("@/app/assets/personal-training.svg")}
           alt="Personal training"
           className="absolute bottom-0 left-0 w-1/3"
         />

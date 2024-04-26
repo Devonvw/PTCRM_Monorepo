@@ -16,8 +16,11 @@ import {
 import Image from "next/image";
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import toastError from "@/utils/toast-error";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import InfoBox from "../app/_components/infoBox";
 
 const formSchema: any = z.object({
   email: z.string().email("This is not a valid email."),
@@ -31,12 +34,14 @@ const formSchema: any = z.object({
   passwordConfirm: z.string(),
   dateOfBirth: z.date(),
 })
-.refine(data => data.password === data.passwordConfirm, {
-  path: ["passwordConfirm"],
-  message: "Passwords do not match",
-});
+  .refine(data => data.password === data.passwordConfirm, {
+    path: ["passwordConfirm"],
+    message: "Passwords do not match",
+  });
 
 export function Signup() {
+  const [infoMessage, setInfoMessage] = useState<([string, boolean] | undefined)>(undefined);
+  const { push } = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,9 +55,8 @@ export function Signup() {
   })
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
-    try{
-      console.log("data in onsubmit", data);
-
+    setInfoMessage(undefined);
+    try {
       //. Create a new user with the data
       const user: any = {
         email: data.email,
@@ -60,16 +64,22 @@ export function Signup() {
         lastname: data.lastname,
         password: data.password,
         dateOfBirth: data.dateOfBirth,
-      
+
       }
 
       //. Call the signup function
-      const res = await axios.post("/backend/auth/signup", user);
+      const res: AxiosResponse | null = await axios.post("/backend/auth/signup", user);
+
+      if (res?.status !== 201) {
+        throw new Error();
+      }
+
+      setInfoMessage(["You have successfully signed up, you can now login", false]);
     } catch (e: any) {
-      toastError(e?.response?.data?.message);
+      setInfoMessage(["Something went wrong while signing you up, please try again", true]);
     }
-      
-      
+
+
   }
   return (
     <main className="flex min-h-screen flex-col items-center">
@@ -101,6 +111,7 @@ export function Signup() {
                 <hr className="m-4"></hr>
                 <span className="text-4xl text-center text-gray-300">Sign up</span>
               </div>
+              <InfoBox extraClasses="col-span-2" message={infoMessage?.[0]} isError={infoMessage?.[1]} />
               <FormField control={form.control} name="email" render={({ field }) => (
                 <FormItem className="col-span-2">
                   <FormLabel>Email</FormLabel>
@@ -152,12 +163,12 @@ export function Signup() {
           </Form>
         </div>
         <Image
-          src={require("@/assets/personal-trainer.svg")}
+          src={require("@/app/assets/personal-trainer.svg")}
           alt="Personal trainer"
           className="absolute bottom-0 right-0 w-1/3"
         />
         <Image
-          src={require("@/assets/personal-training.svg")}
+          src={require("@/app/assets/personal-training.svg")}
           alt="Personal training"
           className="absolute bottom-0 left-0 w-1/3"
         />

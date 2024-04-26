@@ -2,7 +2,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { unknown, z } from "zod";
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -16,6 +16,12 @@ import {
 import { Input } from "@/components/ui/input"
 import Image from "next/image";
 import { Checkbox } from "@/components/ui/checkbox"
+import axios, { AxiosResponse } from "axios";
+import { useUser } from "@/stores/useUser";
+import { useRouter } from "next/navigation";
+import toastError from "@/utils/toast-error";
+import { useState } from "react";
+import InfoBox from "../app/_components/infoBox";
 
 const formSchema = z.object({
   email: z.string().email("This is not a valid email."),
@@ -26,6 +32,8 @@ const formSchema = z.object({
 });
 
 export function Login() {
+  const [infoMessage, setInfoMessage] = useState<([string, boolean] | undefined)>(undefined);
+  const {push} = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -35,9 +43,30 @@ export function Login() {
     },
   })
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    //. Call the login function
-    console.log(data);
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    setInfoMessage(undefined);
+    try {
+      //. Call the login API
+      const res: AxiosResponse | null = await axios.post('/backend/auth/login', data);
+      if (res?.status !== 200) {
+        //. Login failed
+        throw new Error("Something went wrong while logging you in, please try again later");
+      }
+
+      //. Set the user in the store
+      useUser.setState({ user: res?.data });
+
+      //. Redirect to the dashboard
+      push('/app');
+
+    } catch (e: any) {
+      if (e?.response?.status === 401) {
+        setInfoMessage(["Invalid email or password", true]);
+      } else {
+        // toastError(e?.response?.data?.message);
+        setInfoMessage(["Something went wrong while logging you in, please try again later", true]);
+      }
+    }
   }
   return (
     <main className="flex min-h-screen flex-col items-center">
@@ -67,6 +96,7 @@ export function Login() {
               </span>
               <hr className="m-4"></hr>
               <span className="text-4xl text-center  text-gray-300">Login</span>
+              <InfoBox message={infoMessage?.[0]} isError={infoMessage?.[1]}/>
               <FormField control={form.control} name="email" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Email</FormLabel>
@@ -108,12 +138,12 @@ export function Login() {
           </Form>
         </div>
         <Image
-          src={require("@/assets/personal-trainer.svg")}
+          src={require("@/app/assets/personal-trainer.svg")}
           alt="Personal trainer"
           className="absolute bottom-0 right-0 w-1/3"
         />
         <Image
-          src={require("@/assets/personal-training.svg")}
+          src={require("@/app/assets/personal-training.svg")}
           alt="Personal training"
           className="absolute bottom-0 left-0 w-1/3"
         />
@@ -121,5 +151,4 @@ export function Login() {
     </main>
   );
 }
-
 export default Login;

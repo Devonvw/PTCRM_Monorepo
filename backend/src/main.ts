@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import session from 'express-session';
-import * as passport from 'passport';
+import passport from 'passport';
 import * as process from 'process';
 
 import helmet from 'helmet';
