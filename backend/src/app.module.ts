@@ -10,6 +10,7 @@ import { Client } from './clients/entities/client.entity';
 import { User } from './users/entities/user.entity';
 import { DatabaseModule } from './database/database.module';
 import { PaymentModule } from './payment/payment.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { PaymentModule } from './payment/payment.module';
     UsersModule,
     ClientsModule,
     PaymentModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
