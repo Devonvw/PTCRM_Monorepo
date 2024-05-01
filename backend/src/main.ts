@@ -8,12 +8,16 @@ import * as process from 'process';
 
 import helmet from 'helmet';
 import { AuthenticatedGuard } from './guards/authenticated.guard';
+import { TypeormStore } from 'connect-typeorm';
+import { SessionEntity } from './domain/session.entity';
+import { DataSource } from 'typeorm';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-
   //. Session configuration
+  const sessionRepository = app.get(DataSource).getRepository(SessionEntity);
+
   app.use(
     session({
       //TODO: Get these values from environment variables
@@ -21,6 +25,11 @@ async function bootstrap() {
       resave: false,
       saveUninitialized: false,
       cookie: { maxAge: 3600000 },
+      store: new TypeormStore({
+        cleanupLimit: 2,
+        limitSubquery: false, // If using MariaDB.
+        ttl: 86400,
+      }).connect(sessionRepository),
     })
   )
   app.use(passport.initialize());

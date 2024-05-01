@@ -9,7 +9,7 @@ import { Request } from 'express';
 export class AuthService {
   constructor(private readonly userService: UsersService) { }
   async validateUser(email: string, password: string): Promise<any> {
-    const user: User = await this.userService.findByEmail(email);
+    const user = await this.userService.findByEmail(email);
 
     if (!user) {
       //TODO: throw an exception
