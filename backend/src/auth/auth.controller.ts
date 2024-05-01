@@ -41,7 +41,7 @@ export class AuthController {
     return "I am authenticated";
   }
   @Get('test2')
-  // @Roles(['admin'])
+  @Roles([EnumRoles.ADMIN])
   getProfile2(){
     return "I am authenticated as admin";
   }

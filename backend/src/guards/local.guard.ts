@@ -12,9 +12,9 @@ export class LocalGuard extends AuthGuard('local') {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.get<boolean>("isPublic", context.getHandler());
 
-    if (isPublic) {
-      return true;
-    }
+    // if (isPublic) {
+    //   return true;
+    // }
     const result: boolean = (await super.canActivate(context)) as boolean;
     await super.logIn(context.switchToHttp().getRequest());
     return result;
