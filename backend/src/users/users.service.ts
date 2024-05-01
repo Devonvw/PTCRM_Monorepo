@@ -15,6 +15,7 @@ export class UsersService {
     return this.userRepository.findOneBy({ email });
   }
   async create(body: any): Promise<User> {
+    console.log("body", body);
     //. Create a new user
     var userCreate: User = new User(body);
 
