@@ -1,4 +1,4 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
@@ -34,7 +34,7 @@ async function bootstrap() {
   )
   app.use(passport.initialize());
   app.use(passport.session());
-  app.useGlobalGuards(new AuthenticatedGuard());
+  app.useGlobalGuards(new AuthenticatedGuard(new Reflector));
   app.useGlobalPipes(new ValidationPipe());
 
   // const config = new DocumentBuilder()

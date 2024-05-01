@@ -4,6 +4,7 @@ import {Request} from 'express'
 import { LocalGuard } from 'src/guards/local.guard';
 import { AuthenticatedGuard } from 'src/guards/authenticated.guard';
 import { Roles } from 'src/decorators/roles.decorator';
+import { Public } from 'src/decorators/public.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -14,6 +15,7 @@ export class AuthController {
     return this.authService.logout(request);
   }
 
+  @Public()
   @Post('signup')
   async signup(@Body() body: any){
     const res = await this.authService.signup(body);
@@ -21,6 +23,7 @@ export class AuthController {
   }
 
   @UseGuards(LocalGuard)
+  @Public()
   @Post('login')
   @HttpCode(200)
   async login(@Body() body: any): Promise<any>{
