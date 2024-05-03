@@ -15,16 +15,23 @@ export async function generateMetadata({
 }: IPage): Promise<Metadata> {
   const { id } = params;
 
-  const data = await fetch(`${API_URL}/clients/${id}`, {
-    headers: {
-      "X-API-KEY": `${process.env.API_KEY}`,
-    },
-  }).then((res) => res.json());
+  try {
+    const data = await fetch(`${API_URL}/clients/${id}`, {
+      headers: {
+        "X-API-KEY": `${process.env.API_KEY}`,
+      },
+    }).then((res) => res.json());
 
-  return {
-    title: `${data?.firstName} ${data?.lastName}`,
-    description: `Manage ${data?.firstName} ${data?.lastName} details.`,
-  };
+    return {
+      title: `${data?.firstName} ${data?.lastName}`,
+      description: `Manage ${data?.firstName} ${data?.lastName} details.`,
+    };
+  } catch (e: any) {
+    return {
+      title: "Client",
+      description: "Manage client details.",
+    };
+  }
 }
 
 const sidebarNavItems = (id: string) => [
@@ -45,8 +52,8 @@ const sidebarNavItems = (id: string) => [
     href: `/app/clients/${id}/preferences`,
   },
   {
-    title: "Contact information",
-    href: `/app/clients/${id}/contact-information`,
+    title: "Information",
+    href: `/app/clients/${id}/information`,
   },
 ];
 
@@ -56,11 +63,16 @@ interface ClientDetailLayoutProps {
 }
 
 const getData = async (id: string) => {
-  return await fetch(`${API_URL}/clients/${id}`, {
-    headers: {
-      "X-API-KEY": `${process.env.API_KEY}`,
-    },
-  }).then((res) => res.json());
+  try {
+    const data = await fetch(`${API_URL}/clients/${id}`, {
+      headers: {
+        "X-API-KEY": `${process.env.API_KEY}`,
+      },
+    }).then((res) => res.json());
+    return data;
+  } catch (e: any) {
+    return {};
+  }
 };
 
 export default async function ClientDetailLayout({
@@ -96,7 +108,7 @@ export default async function ClientDetailLayout({
             { title: `${client?.firstName} ${client?.lastName}` },
           ]}
         ></PageHeader>
-        <Separator className="!bg-light" />
+        <Separator />
         <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
           <aside className="-mx-4 lg:w-1/5">
             <SidebarNav items={sidebarNavItems(id)} />

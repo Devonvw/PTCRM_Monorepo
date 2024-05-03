@@ -2,6 +2,7 @@ import { IReload } from "@/interfaces/reload";
 import toastError from "@/utils/toast-error";
 import axios from "axios";
 import { Router } from "next/router";
+import toast from "react-hot-toast";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
@@ -32,7 +33,8 @@ export const useClients = create((set: any, get: any) => ({
       return 0;
     }
   },
-  getClient: async (id: string) => {
+  getClient: async (id: string, initialLoad?: boolean) => {
+    if (initialLoad) set({ loading: true });
     try {
       const { data } = await axios.get(`/backend/clients/${id}`);
       set((state: any) => ({
@@ -40,6 +42,8 @@ export const useClients = create((set: any, get: any) => ({
       }));
     } catch (e: any) {
       toastError(e?.response?.data?.message);
+    } finally {
+      set({ loading: false });
     }
   },
   createClient: async (client: any, reload?: IReload) => {
@@ -50,6 +54,19 @@ export const useClients = create((set: any, get: any) => ({
       set((state: any) => ({
         addModalOpen: false,
       }));
+    } catch (e: any) {
+      toastError(e?.response?.data?.message);
+    }
+  },
+  updateClient: async (id: string, client: any, reload?: IReload) => {
+    try {
+      await axios.put(`/backend/clients/${id}`, client);
+
+      if (reload) reload();
+      set((state: any) => ({
+        addModalOpen: false,
+      }));
+      toast.success("Client updated successfully.");
     } catch (e: any) {
       toastError(e?.response?.data?.message);
     }
@@ -79,7 +96,7 @@ export const useClients = create((set: any, get: any) => ({
   filterOptions: [
     {
       id: 1,
-      title: "Actief",
+      title: "Active",
       key: "active",
       selected: [],
       options: [
