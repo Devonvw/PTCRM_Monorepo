@@ -9,7 +9,7 @@ import { Request } from 'express';
 export class AuthService {
   constructor(private readonly userService: UsersService) { }
   async validateUser(email: string, password: string): Promise<any> {
-    const user: User = await this.userService.findByEmail(email);
+    const user = await this.userService.findByEmail(email);
 
     if (!user) {
       //TODO: throw an exception
@@ -24,7 +24,7 @@ export class AuthService {
       return;
     }
 
-    return new UserResponseDto(user);
+    return {email: user.email, firstname: user.firstname, lastname: user.lastname, dateOfBirth: user.dateOfBirth, role: user.role};
 
   }
 
@@ -33,8 +33,8 @@ export class AuthService {
   }
 
   async login(email: string): Promise<any> {
-    const res = await this.userService.findByEmail(email);
-    return res ? new UserResponseDto(res) : null;
+    const user  = await this.userService.findByEmail(email);
+    return {email: user.email, firstname: user.firstname, lastname: user.lastname, dateOfBirth: user.dateOfBirth, role: user.role};
   }
   //TODO: This request object should be of type 'Request' but for some reason it doesn't have the session property
   async logout(@Req() request: any): Promise<any> {
@@ -47,6 +47,6 @@ export class AuthService {
   }
   async signup(body: any): Promise<any> {
     const user: User = await this.userService.create(body);
-    return new UserResponseDto(user);
+    return {email: user.email, firstname: user.firstname, lastname: user.lastname, dateOfBirth: user.dateOfBirth, role: user.role};
   }
 }
