@@ -12,7 +12,6 @@ import { DatabaseModule } from './database/database.module';
 import { PaymentModule } from './payment/payment.module';
 import { AuthModule } from './auth/auth.module';
 import { SessionEntity } from './domain/session.entity';
-import { AuthenticatedGuard } from './guards/authenticated.guard';
 
 @Module({
   imports: [

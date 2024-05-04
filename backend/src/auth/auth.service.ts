@@ -8,7 +8,7 @@ import { Request } from 'express';
 @Injectable()
 export class AuthService {
   constructor(private readonly userService: UsersService) { }
-  async validateUser(email: string, password: string): Promise<any> {
+  async validateUser(email: string, providedPassword: string): Promise<any> {
     const user = await this.userService.findByEmail(email);
 
     if (!user) {
@@ -16,16 +16,14 @@ export class AuthService {
       return;
     }
 
-    const passwordMatch: boolean = user.password === password;
+    const passwordMatch: boolean = user.password === providedPassword;
     // const passwordMatch: boolean = await this.passwordMatch(password, user.password);
 
     if (!passwordMatch) {
       //TODO: throw an exception
       return;
     }
-
-    return {email: user.email, firstname: user.firstname, lastname: user.lastname, dateOfBirth: user.dateOfBirth, role: user.role};
-
+    return (({ id, password, ...returnUser }) => returnUser)(user);
   }
 
   async passwordMatch(password: string, userPassword: string): Promise<boolean> {
@@ -34,10 +32,10 @@ export class AuthService {
 
   async login(email: string): Promise<any> {
     const user  = await this.userService.findByEmail(email);
-    return {email: user.email, firstname: user.firstname, lastname: user.lastname, dateOfBirth: user.dateOfBirth, role: user.role};
+    return (({ id, password, ...returnUser }) => returnUser)(user);
   }
   //TODO: This request object should be of type 'Request' but for some reason it doesn't have the session property
-  async logout(@Req() request: any): Promise<any> {
+  async logout(@Req() request: Request): Promise<any> {
     request.session.destroy(() => {
       return {
         message: 'Logout successful',
@@ -47,6 +45,6 @@ export class AuthService {
   }
   async signup(body: any): Promise<any> {
     const user: User = await this.userService.create(body);
-    return {email: user.email, firstname: user.firstname, lastname: user.lastname, dateOfBirth: user.dateOfBirth, role: user.role};
+    return (({ id, password, ...returnUser }) => returnUser)(user);
   }
 }

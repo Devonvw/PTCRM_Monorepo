@@ -2,7 +2,6 @@ import { Controller, Get, Post,Req,UseGuards, Body, HttpCode } from '@nestjs/com
 import { AuthService } from './auth.service';
 import {Request} from 'express'
 import { LocalGuard } from 'src/guards/local.guard';
-import { AuthenticatedGuard } from 'src/guards/authenticated.guard';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Public } from 'src/decorators/public.decorator';
 import { RolesGuard } from 'src/guards/roles.guard';
@@ -35,7 +34,7 @@ export class AuthController {
 
   // @UseGuards(AuthenticatedGuard)
   @Get('test')
-  @UseGuards(RolesGuard)
+  // @UseGuards(RolesGuard)
   @Roles([EnumRoles.ADMIN])
   getProfile(){
     return "I am authenticated";

@@ -7,10 +7,10 @@ import passport from 'passport';
 import * as process from 'process';
 
 import helmet from 'helmet';
-import { AuthenticatedGuard } from './guards/authenticated.guard';
 import { TypeormStore } from 'connect-typeorm';
 import { SessionEntity } from './domain/session.entity';
 import { DataSource } from 'typeorm';
+import { RolesGuard } from './guards/roles.guard';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -34,7 +34,7 @@ async function bootstrap() {
   )
   app.use(passport.initialize());
   app.use(passport.session());
-  app.useGlobalGuards(new AuthenticatedGuard(new Reflector));
+  app.useGlobalGuards(new RolesGuard(new Reflector));
   app.useGlobalPipes(new ValidationPipe());
 
   // const config = new DocumentBuilder()
