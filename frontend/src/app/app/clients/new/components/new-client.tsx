@@ -61,7 +61,7 @@ const formSchema = z.object({
   country: z.string({
     message: "Don't forget to fill in the clients country.",
   }),
-  subscription: z.string(),
+  subscription: z.number(),
 });
 
 const NewClient = () => {
@@ -92,7 +92,7 @@ const NewClient = () => {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values);
-    // createClient(values, reload);
+    createClient(values);
   }
 
   return (

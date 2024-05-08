@@ -8,15 +8,22 @@ import Pagination from 'src/utils/pagination';
 import Search from 'src/utils/search';
 import Filters from 'src/utils/filter';
 import OrderBy from 'src/utils/order-by';
+import { CreateShortClientDto } from './dtos/CreateShortClient.dto';
+import { User } from 'src/users/entities/user.entity';
+import { v4 as uuidv4 } from 'uuid';
+import { MailService } from 'src/mail/mail.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ClientsService {
   constructor(
     @InjectRepository(Client) private clientRepository: Repository<Client>,
     private readonly entityManager: EntityManager,
+    private mailService: MailService,
+    private userService: UsersService,
   ) {}
 
-  async create(body: CreateUpdateClientDto) {
+  async create(body: CreateUpdateClientDto, userId: number) {
     const clientExists = await this.clientRepository.findOneBy({
       email: body.email,
     });
@@ -25,14 +32,50 @@ export class ClientsService {
       throw new ConflictException('Client already exists');
     }
 
-    const client = new Client(body);
+    const paymentToken = uuidv4();
+
+    const client = new Client({
+      ...body,
+      paymentToken,
+      user: { id: userId } as User,
+    });
+
+    await this.entityManager.save(client);
+
+    const user = await this.userService.findById(userId);
+
+    this.mailService.sendClientSignupEmail(
+      body.email,
+      user.company,
+      client,
+      paymentToken,
+    );
+    //Send email to client
+  }
+
+  async createShort(body: CreateShortClientDto, userId: number) {
+    const clientExists = await this.clientRepository.findOneBy({
+      email: body.email,
+    });
+
+    if (clientExists) {
+      throw new ConflictException('Client already exists');
+    }
+
+    const signupToken = uuidv4();
+
+    const client = new Client({
+      ...body,
+      signupToken,
+      user: { id: userId } as User,
+    });
 
     await this.entityManager.save(client);
 
     //Send email to client
   }
 
-  async update(id: number, body: CreateUpdateClientDto) {
+  async update(id: number, body: CreateUpdateClientDto, userId: number) {
     const client = await this.clientRepository.findOneBy({ id });
 
     if (!client) {
@@ -42,7 +85,7 @@ export class ClientsService {
     await this.clientRepository.update({ id }, body);
   }
 
-  async delete(id: number) {
+  async delete(id: number, userId: number) {
     const client = await this.clientRepository.findOneBy({ id });
 
     if (!client) {
@@ -52,7 +95,8 @@ export class ClientsService {
     await this.clientRepository.delete({ id });
   }
 
-  async findAll(query: GetAllClientsQueryDto) {
+  async findAll(query: GetAllClientsQueryDto, userId: number) {
+    console.log(userId);
     const pagination = Pagination(query);
     const orderBy = OrderBy(query, [
       {
@@ -83,7 +127,15 @@ export class ClientsService {
           active: query?.active?.[0] === 'true',
         },
       },
+      {
+        condition: true,
+        filter: {
+          user: { id: userId },
+        },
+      },
     ]);
+
+    console.log(filter);
 
     const clients = await this.clientRepository.find({
       ...pagination,
@@ -98,7 +150,7 @@ export class ClientsService {
     return { data: clients, totalRows };
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, userId: number) {
     return await this.clientRepository.findOneBy({ id });
   }
 }
