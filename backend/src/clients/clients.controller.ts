@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { ClientsService } from './clients.service';
@@ -28,5 +29,13 @@ export class ClientsController {
   @Post()
   async create(@Body() body: CreateUpdateClientDto) {
     return await this.clientsService.create(body);
+  }
+
+  @Put(':id')
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: CreateUpdateClientDto,
+  ) {
+    return await this.clientsService.update(id, body);
   }
 }

@@ -1,5 +1,6 @@
 import { AbstractEntity } from 'src/database/abstract.entity';
-import { Column, Entity } from 'typeorm';
+import { Subscription } from 'src/payment/entities/subscription.entity';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity()
 export class Client extends AbstractEntity<Client> {
@@ -32,4 +33,8 @@ export class Client extends AbstractEntity<Client> {
 
   @Column({ default: true })
   active: boolean;
+
+  @ManyToOne((type) => Subscription)
+  @JoinColumn()
+  subscription: Subscription;
 }

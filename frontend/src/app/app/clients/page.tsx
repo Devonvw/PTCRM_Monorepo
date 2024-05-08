@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import CreateClientModal from "./modals/create-modal";
 import useTable from "@/hooks/useTable";
+import Link from "next/link";
 
 const Clients = () => {
   const { getClients, clients, filterOptions, addModalOpen, setAddModalOpen } =
@@ -25,14 +26,11 @@ const Clients = () => {
     <div>
       <PageHeader title="Clients" breadcrumbs={[{ title: "Clients" }]}>
         <PageHeader.Right className="flex flex-col items-end">
-          <Button
-            size="sm"
-            variant="light"
-            className=""
-            onClick={() => setAddModalOpen(true)}
-          >
-            Add <PlusCircle className="h-5 w-5" />
-          </Button>
+          <Link href="/app/clients/new">
+            <Button size="sm" variant="light" className="">
+              Add <PlusCircle className="h-5 w-5" />
+            </Button>
+          </Link>
         </PageHeader.Right>
       </PageHeader>
       <DataTable
