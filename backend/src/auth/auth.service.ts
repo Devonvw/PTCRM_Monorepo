@@ -7,7 +7,7 @@ import { Request } from 'express';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UsersService) { }
+  constructor(private readonly userService: UsersService) {}
   async validateUser(email: string, providedPassword: string): Promise<any> {
     const user = await this.userService.findByEmail(email);
 
@@ -26,14 +26,17 @@ export class AuthService {
     return (({ id, password, ...returnUser }) => returnUser)(user);
   }
 
-  async passwordMatch(password: string, userPassword: string): Promise<boolean> {
+  async passwordMatch(
+    password: string,
+    userPassword: string,
+  ): Promise<boolean> {
     return await bcrypt.compare(password, userPassword);
   }
 
-  async login(email: string): Promise<any> {
-    const user  = await this.userService.findByEmail(email);
-    return (({ id, password, ...returnUser }) => returnUser)(user);
+  async login(email: string): Promise<UserResponseDto> {
+    return await this.userService.findByEmail(email);
   }
+
   //TODO: This request object should be of type 'Request' but for some reason it doesn't have the session property
   async logout(@Req() request: Request): Promise<any> {
     request.session.destroy(() => {
