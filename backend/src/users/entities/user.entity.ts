@@ -6,19 +6,22 @@ import { Column, Entity } from 'typeorm';
 export class User extends AbstractEntity<User> {
   @Column({ unique: true })
   email: string;
-  
+
   @Column()
   password: string;
-  
+
   @Column()
   firstname: string;
 
   @Column()
   lastname: string;
-  
+
   @Column()
   dateOfBirth: Date;
 
-  @Column({default: true})
+  @Column()
+  company: string;
+
+  @Column({ default: true })
   role: EnumRoles = EnumRoles.USER;
 }

@@ -17,7 +17,7 @@ export class GetAllClientsQueryDto extends IntersectionType(
 ) {
   @IsArray()
   @IsEnum(['true', 'false'], {
-    message: 'De acieve status moet true of false zijn',
+    message: 'The active field must be either true or false',
   })
   @IsOptional()
   @ApiProperty()

@@ -13,6 +13,7 @@ import { PaymentModule } from './payment/payment.module';
 import { AuthModule } from './auth/auth.module';
 import { SessionEntity } from './domain/session.entity';
 import { AuthenticatedGuard } from './guards/authenticated.guard';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -21,13 +22,13 @@ import { AuthenticatedGuard } from './guards/authenticated.guard';
       isGlobal: true,
     }),
     DatabaseModule,
+    MailModule,
     UsersModule,
     ClientsModule,
     PaymentModule,
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService]
-
+  providers: [AppService],
 })
 export class AppModule {}
