@@ -14,6 +14,8 @@ import { AuthModule } from './auth/auth.module';
 import { SessionEntity } from './domain/session.entity';
 import { GoalsModule } from './goals/goals.module';
 import { ClientGoalsModule } from './client-goals/client-goals.module';
+import { AuthenticatedGuard } from './guards/authenticated.guard';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -22,6 +24,7 @@ import { ClientGoalsModule } from './client-goals/client-goals.module';
       isGlobal: true,
     }),
     DatabaseModule,
+    MailModule,
     UsersModule,
     ClientsModule,
     PaymentModule,
@@ -30,7 +33,6 @@ import { ClientGoalsModule } from './client-goals/client-goals.module';
     ClientGoalsModule,
   ],
   controllers: [AppController],
-  providers: [AppService]
-
+  providers: [AppService],
 })
 export class AppModule {}

@@ -1,3 +1,5 @@
+import { from } from 'rxjs';
+
 export default () => ({
   port: 8080,
   database: {
@@ -25,5 +27,14 @@ export default () => ({
       password: process.env.DATABASE_PRODUCTION_PASSWORD,
       database: process.env.DATABASE_PRODUCTION_NAME,
     },
+  },
+  aws: {
+    accessKeyId: process.env.AWS_ACCESS_KEY,
+    secretAccessKey: process.env.AWS_SECRET_KEY,
+    region: process.env.AWS_REGION,
+  },
+  mail: {
+    fromName: process.env.MAIL_FROM_NAME,
+    fromAddress: process.env.MAIL_FROM_ADDRESS,
   },
 });

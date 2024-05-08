@@ -8,14 +8,18 @@ import bcrypt from 'bcrypt';
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>
-  ) { }
+    private readonly userRepository: Repository<User>,
+  ) {}
+
+  async findById(id: number): Promise<User | null> {
+    return this.userRepository.findOneBy({ id });
+  }
 
   async findByEmail(email: string): Promise<User | null> {
     return this.userRepository.findOneBy({ email });
   }
   async create(body: any): Promise<User> {
-    console.log("body", body);
+    console.log('body', body);
     //. Create a new user
     var userCreate: User = new User(body);
 
@@ -34,7 +38,7 @@ export class UsersService {
 
     //. Save the user in the database
     this.userRepository.save(user);
-    console.log("user", user);
+    console.log('user', user);
 
     return user;
   }
