@@ -42,6 +42,7 @@ export class Client extends AbstractEntity<Client> {
   @Column({ nullable: true })
   signupToken: string;
 
+  //. This user is the coach of the client.
   @ManyToOne((type) => User)
   @JoinColumn()
   user: User;
@@ -53,7 +54,6 @@ export class Client extends AbstractEntity<Client> {
   @OneToMany((type) => ClientGoal, (clientGoal) => clientGoal.client)
   clientGoals: ClientGoal[];
 
-  //. This user is the coach of the client.
-  @ManyToOne(() => User, (user) => user.clients)
-  user: User;
+  // @ManyToOne(() => User, (user) => user.clients)
+  // user: User;
 }

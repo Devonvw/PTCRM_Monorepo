@@ -1,6 +1,7 @@
 import { Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, Req } from '@nestjs/common';
 import { ClientGoalsService } from './client-goals.service';
 import { GetAllClientGoalsQueryDto } from './dtos/GetClientGoalsQueryDto';
+import { Request } from 'express';
 
 @Controller('client-goals')
 export class ClientGoalsController {
@@ -8,7 +9,9 @@ export class ClientGoalsController {
 
   @Post()
   async create(@Req() request: Request) {
-    
+    //. Retrieve the user id from the request object
+    const userId = request.user.id;
+    return await this.clientGoalsService.create(userId, request.body);
   }
   @Put(':id')
   async update(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {

@@ -6,7 +6,7 @@ import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 @Entity({name: 'client_goal'})
 export class ClientGoal extends AbstractEntity<ClientGoal> {
   @Column()
-  startValue: number;
+  startValue: number = 0;
 
   @Column()
   currentValue: number;
@@ -15,7 +15,7 @@ export class ClientGoal extends AbstractEntity<ClientGoal> {
   completedValue: number;
 
   @Column()
-  completed: boolean;
+  completed: boolean = false;
 
   //. A client can have multiple client goals, but a client goal can only belong to one client.
   @ManyToOne(() => Client, (client) => client.clientGoals)
