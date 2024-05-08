@@ -6,6 +6,7 @@ import Pagination from 'src/utils/pagination';
 import OrderBy from 'src/utils/order-by';
 import Search from 'src/utils/search';
 import Filters from 'src/utils/filter';
+import { GetAllGoalsQueryDto } from './dtos/GetAllGoalsQuery.dto';
 
 @Injectable()
 export class GoalsService {
@@ -42,7 +43,7 @@ export class GoalsService {
     //. Delete the goal object
     return await this.goalRepository.delete(body.id);
   }
-  async findAll(query: any): Promise<any> {
+  async findAll(query: GetAllGoalsQueryDto, userId: number): Promise<any> {
     //TODO: If the user is not an admin, only return the goals that have the same userId as the request's userId or the goals that have no userId (aka global goals)
 
     const pagination = Pagination(query);
@@ -60,9 +61,15 @@ export class GoalsService {
     //TODO: Allow filtering by only custom goals or by only global goals
     // const filter = Filters(search, [
     //   {
-    //     condition: query?.userId?.length == 1,
+    //     condition: query?.onlyCustom?.length == 1,
     //     filter:{
-    //       userId: query?.userId?.[0] === 
+    //       userId: query?.onlyCustom?.[0] === 'true' ? userId : null,
+    //     }
+    //   },
+    //   {
+    //     condition: query?.onlyGlobal?.length == 1,
+    //     filter:{
+    //       onlyGlobal: query?.onlyGlobal?.[0] === 'true',
     //     }
     //   }
     // ])

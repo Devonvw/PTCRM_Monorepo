@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, Req } from '@nestjs/common';
 import { GoalsService } from './goals.service';
 import { CreateUpdateGoalDto } from './dtos/CreateUpdateGoalDto';
 import { GetAllGoalsQueryDto } from './dtos/GetAllGoalsQuery.dto';
+import { Request } from 'express';
 
 @Controller('goals')
 export class GoalsController {
@@ -20,8 +21,9 @@ export class GoalsController {
     return await this.goalsService.deleteGoal(body);
   }
   @Get()
-  async findAll(@Query() query: GetAllGoalsQueryDto) {
-    return await this.goalsService.findAll(query);
+  async findAll(@Req() request: Request, @Query() query: GetAllGoalsQueryDto) {
+    const userId : number = request.user.userId;
+    return await this.goalsService.findAll(query, userId);
   }
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number){
