@@ -35,6 +35,7 @@ async function bootstrap() {
   app.use(passport.initialize());
   app.use(passport.session());
   app.useGlobalGuards(new RolesGuard(new Reflector()));
+  //. 
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

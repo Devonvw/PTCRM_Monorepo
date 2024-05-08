@@ -6,6 +6,7 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { Public } from 'src/decorators/public.decorator';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { EnumRoles } from 'src/types/roles.enums';
+import { UserResponseDto } from './dto/UserResponse.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -27,9 +28,11 @@ export class AuthController {
   @Public()
   @Post('login')
   @HttpCode(200)
-  async login(@Body() body: any): Promise<any>{
+  async login(@Body() body: any) : Promise<UserResponseDto>{
     // const res : Response = await this.authService.login(body.email);
-    return await this.authService.login(body.email);
+    const res = await this.authService.login(body.email);
+    console.log("res",res)
+    return res;
   }
 
   @Get('test')
