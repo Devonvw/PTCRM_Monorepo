@@ -32,10 +32,7 @@ export class AuthController {
     return await this.authService.login(body.email);
   }
 
-  // @UseGuards(AuthenticatedGuard)
   @Get('test')
-  // @UseGuards(RolesGuard)
-  @Roles([EnumRoles.ADMIN])
   getProfile(){
     return "I am authenticated";
   }

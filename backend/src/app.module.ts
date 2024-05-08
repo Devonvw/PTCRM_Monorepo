@@ -12,6 +12,7 @@ import { DatabaseModule } from './database/database.module';
 import { PaymentModule } from './payment/payment.module';
 import { AuthModule } from './auth/auth.module';
 import { SessionEntity } from './domain/session.entity';
+import { GoalsModule } from './goals/goals.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { SessionEntity } from './domain/session.entity';
     ClientsModule,
     PaymentModule,
     AuthModule,
+    GoalsModule,
   ],
   controllers: [AppController],
   providers: [AppService]

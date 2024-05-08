@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -23,7 +23,7 @@ export class UsersService {
     const existingUser: User = await this.findByEmail(userCreate.email);
     if (existingUser) {
       //TODO: throw an exception saying that the user already exists
-      return null;
+      throw new ConflictException('User already exists');
     }
 
     //TODO: Hash the password
