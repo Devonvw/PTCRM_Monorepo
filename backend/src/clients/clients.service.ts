@@ -47,7 +47,6 @@ export class ClientsService {
 
     if (!client) {
       throw new Error('Client not found');
-      ``;
     }
 
     await this.clientRepository.delete({ id });

@@ -21,17 +21,17 @@ async function bootstrap() {
   app.use(
     session({
       //TODO: Get these values from environment variables
-      secret: "riaghuiaelhgiulh#$%^asdfghADRFH",
+      secret: 'riaghuiaelhgiulh#$%^asdfghADRFH',
       resave: false,
       saveUninitialized: false,
-      cookie: { maxAge: 3600000 },
+      cookie: { maxAge: 604800000 },
       store: new TypeormStore({
         cleanupLimit: 2,
         limitSubquery: false, // If using MariaDB.
         ttl: 86400,
       }).connect(sessionRepository),
-    })
-  )
+    }),
+  );
   app.use(passport.initialize());
   app.use(passport.session());
   app.useGlobalGuards(new RolesGuard(new Reflector));
