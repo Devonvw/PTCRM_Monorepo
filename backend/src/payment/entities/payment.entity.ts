@@ -1,35 +1,30 @@
 import { AbstractEntity } from 'src/database/abstract.entity';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
+import { Subscription } from './subscription.entity';
+import { Invoice } from './invoice.entity';
 
 @Entity()
 export class Payment extends AbstractEntity<Payment> {
-  @Column()
-  firstName: string;
+  @Column({ type: 'date' })
+  date: Date;
 
-  @Column()
-  lastName: string;
+  @Column({ type: 'decimal', precision: 15, scale: 2 })
+  price: number;
 
-  @Column({ unique: true })
-  email: string;
+  @Column({ type: 'decimal', precision: 15, scale: 2 })
+  vatPrice: number;
 
-  @Column({ nullable: true })
-  phone: string;
+  @Column({ default: false })
+  paid: boolean;
 
-  @Column({ nullable: true })
-  street: string;
+  @Column({ type: 'datetime', nullable: true })
+  paymentDate: Date;
 
-  @Column({ nullable: true })
-  housenumber: string;
+  @OneToOne((type) => Invoice, (invoice) => invoice.payment)
+  @JoinColumn() // this decorator is optional for @ManyToOne, but required for @OneToOne
+  invoice: Invoice;
 
-  @Column({ nullable: true })
-  housenumberExtra: string;
-
-  @Column({ nullable: true })
-  city: string;
-
-  @Column({ nullable: true })
-  zipCode: string;
-
-  @Column({ nullable: true })
-  country: string;
+  @ManyToOne((type) => Subscription)
+  @JoinColumn()
+  subscription: Subscription;
 }
