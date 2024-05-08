@@ -31,7 +31,6 @@ export class AuthController {
   async login(@Body() body: any) : Promise<UserResponseDto>{
     // const res : Response = await this.authService.login(body.email);
     const res = await this.authService.login(body.email);
-    console.log("res",res)
     return res;
   }
 

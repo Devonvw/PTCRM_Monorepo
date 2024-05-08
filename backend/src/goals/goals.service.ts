@@ -1,51 +1,44 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Equal, IsNull, Or, Repository } from 'typeorm';
 import { Goal } from './entities/goal.entity';
 import Pagination from 'src/utils/pagination';
 import OrderBy from 'src/utils/order-by';
 import Search from 'src/utils/search';
 import Filters from 'src/utils/filter';
 import { GetAllGoalsQueryDto } from './dtos/GetAllGoalsQuery.dto';
+import { CreateUpdateGoalDto } from './dtos/CreateUpdateGoalDto';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class GoalsService {
-  constructor(@InjectRepository(Goal) private readonly goalRepository: Repository<Goal>) { }
+  constructor(@InjectRepository(Goal) private readonly goalRepository: Repository<Goal>, @InjectRepository(User) private readonly userRepository: Repository<User>) { }
 
-  async createGoal(body: any): Promise<any> {
+  async createGoal(userId: number, body: CreateUpdateGoalDto): Promise<any> {
     //. Create a new goal object
     const goal = new Goal(body);
-    //TODO: Check if the user is an admin, if not, check if the userId is filled in, and is the same as the request's userId
-
+    //. Add the user to the goal object
+    goal.user = await this.userRepository.findOneBy({ id: userId });
     
+    console.log("goal object:", goal);
     return await this.goalRepository.save(goal);
   }
-  async updateGoal(body: any): Promise<any> {
-    //TODO: Check if the user is an admin, if not, check if the userId is filled in, and is the same as the request's userId
+  async updateGoal(goalId, userId, body: CreateUpdateGoalDto): Promise<any> {
+    await this.goalExistsAndBelongsToUser(goalId, userId);
 
-
-    //. Check if the goal exists
-    const goalExists = await this.goalRepository.findOne(body.id);
-    if (!goalExists) {
-      throw new Error('Goal not found');
-    }
     //. Update the goal object
-    return await this.goalRepository.update(body.id, body);
-  }
-  async deleteGoal(body: any): Promise<any> {
-    //TODO: Check if the user is an admin, if not, check if the userId of the to-be-deleted goal is the same as the request's userId
+    await this.goalRepository.update(goalId, body);
 
-    //. Check if the goal exists
-    const goalExists = await this.goalRepository.findOne(body.id);
-    if (!goalExists) {
-      throw new Error('Goal not found');
-    }
+    return await this.goalRepository.findOneBy({ id: goalId });
+  }
+  async deleteGoal(userId: number, goalId: number): Promise<any> {
+    const goal: Goal = await this.goalExistsAndBelongsToUser(goalId, userId);
+
     //. Delete the goal object
-    return await this.goalRepository.delete(body.id);
+    await this.goalRepository.delete({ id: goal.id });
+    return { message: 'Goal deleted' };
   }
   async findAll(query: GetAllGoalsQueryDto, userId: number): Promise<any> {
-    //TODO: If the user is not an admin, only return the goals that have the same userId as the request's userId or the goals that have no userId (aka global goals)
-
     const pagination = Pagination(query);
     const orderBy = OrderBy(query, [
       {
@@ -58,37 +51,67 @@ export class GoalsService {
       }
     ]);
     const search = Search(query, [{ field: 'name' }]);
-    //TODO: Allow filtering by only custom goals or by only global goals
-    // const filter = Filters(search, [
-    //   {
-    //     condition: query?.onlyCustom?.length == 1,
-    //     filter:{
-    //       userId: query?.onlyCustom?.[0] === 'true' ? userId : null,
-    //     }
-    //   },
-    //   {
-    //     condition: query?.onlyGlobal?.length == 1,
-    //     filter:{
-    //       onlyGlobal: query?.onlyGlobal?.[0] === 'true',
-    //     }
-    //   }
-    // ])
-
+    console.log('query', query);
+    //. Create the filter
+    const filter = Filters(search, [
+      {
+        //. If the onlyCustom query is true, only return the goals that have the same user.id as the request's userId
+        condition: query?.show === 'private',
+        filter: {
+          'user.id': userId,
+        }
+      },
+      {
+        //. If the onlyGlobal query is true, only return the goals that have no userId (aka global goals)
+        condition: query?.show === 'global',
+        filter: {
+          'user.id': IsNull(),
+        }
+      },
+      {
+        //. If neither onlyCustom nor onlyGlobal are true, return all global and user goals
+        condition: !query?.show || query?.show === 'all',
+        filter: {
+          'user.id': Or(Equal(userId), IsNull())
+        }
+      }
+    ])
     //. Get the goals
     const goals = await this.goalRepository.find({
       ...pagination,
-      where: search,
+      where: [...filter],
       order: orderBy,
     })
 
+    //. Get the total number of rows
     const totalRows = await this.goalRepository.count({
-      where: search,
+      where: [...filter],
     });
 
     return { data: goals, totalRows };
   }
 
-  async findOne(id: number): Promise<any> {
-    return await this.goalRepository.findOneBy({ id });
+  async findOne(id: number, userId: number): Promise<Goal> {
+    try {
+      return await this.goalExistsAndBelongsToUser(id, userId);
+    } catch (e) {
+      //. All exceptions are caught and rethrown as a NotFoundException to avoid leaking information
+      throw new NotFoundException('Goal not found');
+    }
   }
+  private async goalExistsAndBelongsToUser(goalId: number, userId: number): Promise<Goal> {
+    //. Check if the goal exists
+    const goal = await this.goalRepository.findOne({relations: ['user'], where: { id: goalId }});
+    console.log("goal", goal);
+    if (!goal) {
+      throw new NotFoundException('Goal not found');
+    }
+
+    //. Check if the goal belongs to the user (users may only delete their own goals)
+    if (goal.user.id !== userId) {
+      throw new UnauthorizedException('Unauthorized');
+    }
+    return goal;
+  }
+
 }

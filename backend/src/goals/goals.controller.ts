@@ -9,25 +9,29 @@ export class GoalsController {
   constructor(private readonly goalsService: GoalsService) { }
 
   @Post()
-  async createGoal(@Body() body: CreateUpdateGoalDto) {
-    return await this.goalsService.createGoal(body);
+  async createGoal(@Req() request: Request) {
+    const userId = request.user.id;
+    return await this.goalsService.createGoal(userId, request.body);
   }
-  @Put()
-  async updateGoal(@Body() body: CreateUpdateGoalDto) {
-    return await this.goalsService.updateGoal(body);
+  @Put(':id')
+  async updateGoal(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {
+    const userId: number = request.user.id;
+    return await this.goalsService.updateGoal(id, userId, request.body);
   }
-  @Delete()
-  async deleteGoal(@Body() body: CreateUpdateGoalDto) {
-    return await this.goalsService.deleteGoal(body);
+  @Delete(':id')
+  async deleteGoal(@Req() request: Request, @Param('id', ParseIntPipe) id: number) {
+    const userId: number = request.user.id;
+    return await this.goalsService.deleteGoal(userId, id);
   }
   @Get()
   async findAll(@Req() request: Request, @Query() query: GetAllGoalsQueryDto) {
-    const userId : number = request.user.userId;
+    const userId: number = request.user.id;
     return await this.goalsService.findAll(query, userId);
   }
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number){
-    return await this.goalsService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {
+    const userId = request.user.id;
+    return await this.goalsService.findOne(id, userId);
   }
 
 

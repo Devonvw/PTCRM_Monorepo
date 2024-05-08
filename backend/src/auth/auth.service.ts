@@ -23,7 +23,11 @@ export class AuthService {
       //TODO: throw an exception
       return;
     }
-    return (({ id, password, ...returnUser }) => returnUser)(user);
+    //. Remove the password from the user object
+    delete user.password;
+
+    //. Return the user's id, role and email (this will be set in the request object)
+    return { id: user.id, email: user.email, role: user.role};
   }
 
   async passwordMatch(

@@ -13,6 +13,7 @@ import { PaymentModule } from './payment/payment.module';
 import { AuthModule } from './auth/auth.module';
 import { SessionEntity } from './domain/session.entity';
 import { GoalsModule } from './goals/goals.module';
+import { ClientGoalsModule } from './client-goals/client-goals.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { GoalsModule } from './goals/goals.module';
     PaymentModule,
     AuthModule,
     GoalsModule,
+    ClientGoalsModule,
   ],
   controllers: [AppController],
   providers: [AppService]

@@ -3,6 +3,11 @@ import { IsNotEmpty, IsOptional } from "class-validator";
 import { Column } from "typeorm";
 
 export class CreateUpdateGoalDto {
+  // @Column()
+  // @IsOptional()
+  // @ApiProperty({ type: 'number' })
+  // id: number;
+
   @Column()
   @IsNotEmpty({ message: 'Name is required' })
   @ApiProperty({ type: 'string' })

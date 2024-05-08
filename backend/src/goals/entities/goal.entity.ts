@@ -1,5 +1,6 @@
 import { AbstractEntity } from "src/database/abstract.entity";
-import { Column, Entity } from "typeorm";
+import { User } from "src/users/entities/user.entity";
+import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 
 @Entity()
 export class Goal extends AbstractEntity<Goal> {
@@ -15,6 +16,6 @@ export class Goal extends AbstractEntity<Goal> {
   @Column()
   measurementUnit: string;
 
-  @Column({nullable: true})
-  userId: number;
+  @ManyToOne(() => User, (user) => user.goals)
+  user: User;
 }

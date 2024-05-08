@@ -4,11 +4,11 @@ import { OrderByDto } from "src/utils/dto/order-by.dto";
 import { PaginationDto } from "src/utils/dto/pagination.dto";
 import { SearchDto } from "src/utils/dto/search.dto";
 
-export class GetAllGoalsQueryDto extends IntersectionType(PaginationDto, OrderByDto, SearchDto){
-  @IsEnum(['all', 'private', 'global'], {
-    message: `Show must be 'all', 'private' or 'global'.`,
+export class GetAllClientGoalsQueryDto extends IntersectionType(PaginationDto, OrderByDto, SearchDto){
+  @IsEnum(['all', 'completed', 'uncompleted'], {
+    message: `Show must be 'all', 'completed' or 'uncompleted'.`,
   })
   @IsOptional()
   @ApiProperty()
-  show: 'all' | 'private' | 'global';
+  show: 'all' | 'completed' | 'uncompleted';
 }
