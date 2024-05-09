@@ -25,10 +25,15 @@ const Clients = () => {
   return (
     <div>
       <PageHeader title="Clients" breadcrumbs={[{ title: "Clients" }]}>
-        <PageHeader.Right className="flex flex-col items-end">
+        <PageHeader.Right className="flex items-end justify-end gap-x-2">
           <Link href="/app/clients/new">
             <Button size="sm" variant="light" className="">
               Add <PlusCircle className="h-5 w-5" />
+            </Button>
+          </Link>
+          <Link href="/app/clients/new-signup">
+            <Button size="sm" variant="primary" className="">
+              Add by sign up <PlusCircle className="h-5 w-5" />
             </Button>
           </Link>
         </PageHeader.Right>
