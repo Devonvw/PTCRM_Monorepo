@@ -14,6 +14,7 @@ import { AuthModule } from './auth/auth.module';
 import { SessionEntity } from './domain/session.entity';
 import { AuthenticatedGuard } from './guards/authenticated.guard';
 import { MailModule } from './mail/mail.module';
+import { MollieService } from './mollie/mollie.service';
 
 @Module({
   imports: [
@@ -29,6 +30,6 @@ import { MailModule } from './mail/mail.module';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, MollieService],
 })
 export class AppModule {}
