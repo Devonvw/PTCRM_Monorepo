@@ -1,6 +1,7 @@
 import { IReload } from "@/interfaces/reload";
 import toastError from "@/utils/toast-error";
 import axios from "axios";
+import { error } from "console";
 import { Router } from "next/router";
 import toast from "react-hot-toast";
 import { create } from "zustand";
@@ -10,6 +11,8 @@ export const useClients = create((set: any, get: any) => ({
   client: {} as any,
   clients: [],
   loading: undefined,
+  signUpDetails: {} as any,
+  signUpErrorMsg: "",
   getClients: async (modules: {
     pagination?: any;
     search?: any;
@@ -51,9 +54,16 @@ export const useClients = create((set: any, get: any) => ({
       await axios.post("/backend/clients", client);
 
       if (reload) reload();
-      set((state: any) => ({
-        addModalOpen: false,
-      }));
+    } catch (e: any) {
+      toastError(e?.response?.data?.message);
+    }
+  },
+  createClientSignUp: async (client: any, reload?: IReload) => {
+    try {
+      const { data } = await axios.post("/backend/clients/sign-up", client);
+
+      if (reload) reload();
+      toast.success(data?.message);
     } catch (e: any) {
       toastError(e?.response?.data?.message);
     }
@@ -67,6 +77,34 @@ export const useClients = create((set: any, get: any) => ({
         addModalOpen: false,
       }));
       toast.success("Client updated successfully.");
+    } catch (e: any) {
+      toastError(e?.response?.data?.message);
+    }
+  },
+  getClientSignUpDetails: async (token: string) => {
+    set({ loading: true });
+    try {
+      const { data } = await axios.get(`/backend/clients/sign-up/${token}`);
+
+      set((state: any) => ({
+        signUpDetails: data,
+      }));
+    } catch (e: any) {
+      set((state: any) => ({
+        signUpErrorMsg: e?.response?.data?.message,
+      }));
+    } finally {
+      set({ loading: false });
+    }
+  },
+  signUpClient: async (token: string, client: any, redirect: any) => {
+    try {
+      const { data } = await axios.put(
+        `/backend/clients/sign-up/${token}`,
+        client
+      );
+      toast.success(data?.message);
+      redirect();
     } catch (e: any) {
       toastError(e?.response?.data?.message);
     }
