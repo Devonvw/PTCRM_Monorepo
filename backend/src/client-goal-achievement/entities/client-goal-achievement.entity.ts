@@ -1,6 +1,6 @@
 import { ClientGoal } from "src/client-goals/entities/client-goal.entity";
 import { AbstractEntity } from "src/database/abstract.entity";
-import { Column, Entity, ManyToOne } from "typeorm";
+import { Column, Entity, IsNull, ManyToOne } from "typeorm";
 
 @Entity({name: 'client_goal_achievement'})
 export class ClientGoalAchievement extends AbstractEntity<ClientGoalAchievement> {
@@ -10,7 +10,7 @@ export class ClientGoalAchievement extends AbstractEntity<ClientGoalAchievement>
   @Column()
   achieved: boolean;
 
-  @Column()
+  @Column({nullable: true})
   achievedAt?: Date = null;
 
   @Column()

@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { Client } from 'src/clients/entities/client.entity';
 import { UpdateClientGoalDto } from './dtos/UpdateClientGoal';
 import { Goal } from 'src/goals/entities/goal.entity';
-import { GetAllClientGoalsQueryDto } from './dtos/GetClientGoalsQueryDto';
+import { GetClientGoalsQueryDto } from './dtos/GetClientGoalsQueryDto';
 import Pagination from 'src/utils/pagination';
 import OrderBy from 'src/utils/order-by';
 import Filters from 'src/utils/filter';
@@ -57,7 +57,7 @@ export class ClientGoalsService {
 
     return await this.clientGoalRepository.findOneBy({ id });
   }
-  async findAll(userId: number, query: GetAllClientGoalsQueryDto): Promise<any> {
+  async findAll(userId: number, query: GetClientGoalsQueryDto): Promise<any> {
     //. Make sure the client belongs to the coach (user)
     const client = await this.clientRepository.findOne({
       where: {

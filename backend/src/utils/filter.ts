@@ -15,7 +15,7 @@ export default function Filters(
     if (filter.condition) filtersOut = { ...filtersOut, ...filter.filter };
   });
 
-  if (search.length > 0) {
+  if (search?.length > 0) {
     return search.map((s) => ({ ...s, ...filtersOut }));
   }
 

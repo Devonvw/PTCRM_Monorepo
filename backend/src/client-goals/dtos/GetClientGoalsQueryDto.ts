@@ -5,8 +5,8 @@ import { OrderByDto } from "src/utils/dto/order-by.dto";
 import { PaginationDto } from "src/utils/dto/pagination.dto";
 import { SearchDto } from "src/utils/dto/search.dto";
 
-export class GetAllClientGoalsQueryDto extends IntersectionType(PaginationDto, OrderByDto){
-  @IsInt({ message: `The clinet id can only be a number.`})
+export class GetClientGoalsQueryDto extends IntersectionType(PaginationDto, OrderByDto){
+  @IsInt({ message: `The client id can only be a number.`})
   @Type(() => Number)
   @ApiProperty()
   clientId: number;

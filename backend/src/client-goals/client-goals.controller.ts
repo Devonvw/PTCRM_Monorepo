@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, Req } from '@nestjs/common';
 import { ClientGoalsService } from './client-goals.service';
-import { GetAllClientGoalsQueryDto } from './dtos/GetClientGoalsQueryDto';
+import { GetClientGoalsQueryDto } from './dtos/GetClientGoalsQueryDto';
 import { Request } from 'express';
 import { CreateClientGoalDto } from './dtos/CreateClientGoalDto';
 import { UpdateClientGoalDto } from './dtos/UpdateClientGoal';
@@ -26,7 +26,7 @@ export class ClientGoalsController {
   }
   //. This route will be used to retrieve all the client goals of a specific client
   @Get()
-  async findAll(@Req() request: Request, @Query() query: GetAllClientGoalsQueryDto) {
+  async findAll(@Req() request: Request, @Query() query: GetClientGoalsQueryDto) {
     const userId: number = request.user.id;
     return await this.clientGoalsService.findAll(userId, query);
   }

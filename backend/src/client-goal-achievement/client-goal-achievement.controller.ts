@@ -1,7 +1,9 @@
-import { Body, Controller, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
 import { Request } from 'express';
 import { CreateAchievementDto } from './dtos/CreateAchievementDto';
 import { ClientGoalAchievementService } from './client-goal-achievement.service';
+import { UpdateAchievementDto } from './dtos/UpdateAchievementDto';
+import { GetAchievementsQueryDto } from './dtos/GetAchievementsQueryDto';
 
 @Controller('achievements')
 export class ClientGoalAchievementController {
@@ -11,5 +13,23 @@ export class ClientGoalAchievementController {
   async create(@Req() request: Request, @Body() body: CreateAchievementDto){
     const userId = request.user.id;
     return await this.clientGoalAchievementService.create(userId, body);
+  }
+
+  @Put(':id')
+  async update(@Req() request: Request, @Body() body: UpdateAchievementDto, @Param('id') id: number){
+    const userId = request.user.id;
+    return await this.clientGoalAchievementService.update(userId, id, body);
+  }
+
+  @Get()
+  async findAll(@Req() request: Request, @Query() query: GetAchievementsQueryDto){
+    const userId = request.user.id;
+    return await this.clientGoalAchievementService.findAll(userId, query);
+  }
+
+  @Get(':id')
+  async find(@Req() request: Request, @Param('id') achievementId: number){
+    const userId = request.user.id;
+    return await this.clientGoalAchievementService.find(userId, achievementId);
   }
 }
