@@ -3,18 +3,25 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ClientGoal } from './entities/client-goal.entity';
 import { Repository } from 'typeorm';
 import { Client } from 'src/clients/entities/client.entity';
+import { UpdateClientGoalDto } from './dtos/UpdateClientGoal';
+import { Goal } from 'src/goals/entities/goal.entity';
+import { GetAllClientGoalsQueryDto } from './dtos/GetClientGoalsQueryDto';
+import Pagination from 'src/utils/pagination';
+import OrderBy from 'src/utils/order-by';
+import Filters from 'src/utils/filter';
 
 @Injectable()
 export class ClientGoalsService {
   constructor(@InjectRepository(ClientGoal) private readonly clientGoalRepository: Repository<ClientGoal>, @InjectRepository(Client) private readonly clientRepository: Repository<Client>) { }
-  async create(userId: number, body: any) {
+  async create(userId: number, body: any): Promise<any> {
+
     //. Make sure the client belongs to the coach (user)
     const client = await this.clientRepository.findOne({
       where: {
         id: body.clientId,
         user: { id: userId }
-    },
-    relations: ['user']
+      },
+      relations: ['user']
     });
 
     if (!client) {
@@ -22,11 +29,111 @@ export class ClientGoalsService {
     }
 
     //. Create a new client goal object
-    const clientGoal = new ClientGoal(body);
-    //. Set the default values
-    clientGoal.currentValue = clientGoal.startValue;
-    clientGoal.completed = clientGoal.currentValue === clientGoal.completedValue;
+    const clientGoal = new ClientGoal({
+      ...body,
+      client: { id: body.clientId } as Client,
+      goal: { id: body.goalId } as Goal,
+      currentValue: body.startValue,
+      completed: body.startValue === body.completedValue
+    });
 
     return await this.clientGoalRepository.save(clientGoal);
+  }
+
+  async update(id: number, userId: number, body: UpdateClientGoalDto): Promise<any> {
+    //. Make sure the client, which the client goal belongs to, belongs to the coach (user)
+    var clientGoal = await this.clientGoalExistsAndBelongsToUser(id, userId);
+
+    //. Update the currentValue
+    clientGoal.currentValue = body.newValue;
+
+    //. Check if the currentValue is greater than or equal to the completedValue, and if so, set the completed property to true
+    if (body.newValue >= clientGoal.completedValue) {
+      clientGoal.completed = true;
+    }
+
+    //. Update the client goal object
+    await this.clientGoalRepository.update(id, clientGoal);
+
+    return await this.clientGoalRepository.findOneBy({ id });
+  }
+  async findAll(userId: number, query: GetAllClientGoalsQueryDto): Promise<any> {
+    //. Make sure the client belongs to the coach (user)
+    const client = await this.clientRepository.findOne({
+      where: {
+        id: query.clientId,
+        user: { id: userId }
+      }
+    });
+
+    if (!client) {
+      throw new NotFoundException('This client does not exist or does not belong to you.');
+    }
+
+    const pagination = Pagination(query);
+    const orderBy = OrderBy(query, [
+      {
+        key: 'updatedAt',
+        fields: ['updatedAt'],
+      }
+    ]);
+    const filter = Filters(null, [
+      {
+        //. If the show query is uncompleted or not provided, only return the client goals that are not completed
+        condition: query?.show === 'uncompleted' || !query?.show,
+        filter: {
+          completed: false
+        }
+      },
+      {
+        //. If the show query is completed, only return the client goals that are completed
+        condition: query?.show === 'completed',
+        filter: {
+          completed: true
+        }
+      },
+      {
+        //. If the show query is all, return all client goals
+        condition: query?.show === 'all',
+        filter: {}
+      }
+    ]);
+
+    //. Get the client goals
+    const clientGoals = await this.clientGoalRepository.find({
+      ...pagination,
+      where: [...filter],
+      order: orderBy,
+    });
+
+    //. Get the total number of rows
+    const totalRows = await this.clientGoalRepository.count({ where: [...filter] });
+
+    return { data: clientGoals, totalRows };
+  }
+
+  async findOne(userId: number, id: number): Promise<any> {
+    return await this.clientGoalExistsAndBelongsToUser(id, userId);
+  }
+  async delete(userId: number, id: number): Promise<any> {
+    const clientGoal = await this.clientGoalExistsAndBelongsToUser(id, userId);
+
+    await this.clientGoalRepository.delete({ id: clientGoal.id });
+    return { message: 'Client goal deleted' };
+  }
+  /// This function checks if the client goal exists and if the client belongs to the user
+  private async clientGoalExistsAndBelongsToUser(id: number, userId: number): Promise<ClientGoal> {
+    const clientGoal = await this.clientGoalRepository.findOne({
+      where: {
+        id: id,
+        client: { user: { id: userId } }
+      }
+    });
+
+    if (!clientGoal) {
+      throw new NotFoundException('This client goal does not exist or the client does not belong to you.');
+    }
+
+    return clientGoal;
   }
 }

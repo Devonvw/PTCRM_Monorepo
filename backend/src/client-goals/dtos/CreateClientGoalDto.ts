@@ -3,7 +3,7 @@ import { IsNotEmpty } from "class-validator";
 import { IsBiggerThan } from "src/decorators/validators/is-bigger-than";
 import { Column } from "typeorm";
 
-export class CreateUpdateClientGoalDto {
+export class CreateClientGoalDto {
   @Column()
   @IsNotEmpty({ message: 'Goal id cannot be empty' })
   @ApiProperty({ type: 'number' })

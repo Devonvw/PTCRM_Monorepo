@@ -16,6 +16,7 @@ import { GoalsModule } from './goals/goals.module';
 import { ClientGoalsModule } from './client-goals/client-goals.module';
 // import { AuthenticatedGuard } from './guards/authenticated.guard';
 import { MailModule } from './mail/mail.module';
+import { ClientGoalAchievementModule } from './client-goal-achievement/client-goal-achievement.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { MailModule } from './mail/mail.module';
     AuthModule,
     GoalsModule,
     ClientGoalsModule,
+    ClientGoalAchievementModule,
   ],
   controllers: [AppController],
   providers: [AppService],

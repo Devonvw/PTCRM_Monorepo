@@ -51,25 +51,25 @@ export class GoalsService {
       }
     ]);
     const search = Search(query, [{ field: 'name' }]);
-    console.log('query', query);
+
     //. Create the filter
     const filter = Filters(search, [
       {
-        //. If the onlyCustom query is true, only return the goals that have the same user.id as the request's userId
+        //. If the show query is private, only return the goals that have the same user.id as the request's userId
         condition: query?.show === 'private',
         filter: {
           'user.id': userId,
         }
       },
       {
-        //. If the onlyGlobal query is true, only return the goals that have no userId (aka global goals)
+        //. If the show query is global, only return the goals that have no userId (aka global goals)
         condition: query?.show === 'global',
         filter: {
           'user.id': IsNull(),
         }
       },
       {
-        //. If neither onlyCustom nor onlyGlobal are true, return all global and user goals
+        //. If the show query is not provided, or is all, return all global and user goals
         condition: !query?.show || query?.show === 'all',
         filter: {
           'user.id': Or(Equal(userId), IsNull())

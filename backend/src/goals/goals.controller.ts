@@ -9,9 +9,9 @@ export class GoalsController {
   constructor(private readonly goalsService: GoalsService) { }
 
   @Post()
-  async createGoal(@Req() request: Request) {
+  async createGoal(@Req() request: Request, @Body() body: CreateUpdateGoalDto) {
     const userId = request.user.id;
-    return await this.goalsService.createGoal(userId, request.body);
+    return await this.goalsService.createGoal(userId, body);
   }
   @Put(':id')
   async updateGoal(@Param('id', ParseIntPipe) id: number, @Req() request: Request) {
