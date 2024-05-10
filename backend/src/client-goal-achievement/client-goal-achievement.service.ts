@@ -136,7 +136,12 @@ export class ClientGoalAchievementService {
 
     return { data: achievements, totalRows };
   }
+  async find(userId: number, achievementId: number): Promise<any> {
+    //. Make sure the client goal achievement belongs to the coach (user)
+    const achievement = await this.checkIfClientBelongsToUserByAchievementId(userId, achievementId);
 
+    return achievement;
+  }
   private async checkIfClientBelongsToUserByClientGoalId(userId: number, clientGoalId: number): Promise<ClientGoal> {
     //. Make sure the client belongs to the coach (user)
     const res = await this.clientGoalRepository.findOne({

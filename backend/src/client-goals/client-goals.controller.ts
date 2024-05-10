@@ -22,7 +22,8 @@ export class ClientGoalsController {
   }
   @Delete(':id')
   async delete(@Req() request: Request, @Param('id', ParseIntPipe) id: number) {
-
+    const userId: number = request.user.id;
+    return await this.clientGoalsService.delete(userId, id);
   }
   //. This route will be used to retrieve all the client goals of a specific client
   @Get()

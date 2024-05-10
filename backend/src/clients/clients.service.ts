@@ -205,4 +205,20 @@ export class ClientsService {
 
     //Send welcome email to client
   }
+
+  //. Check if client belongs to the requesting user
+  async getClientIfClientBelongsToUser(userId: number, clientId: number) {
+    const client = await this.clientRepository.findOne({
+      where: {
+        id: clientId,
+        user: { id: userId },
+      },
+    });
+
+    if (!client) {
+      throw new NotFoundException('This client does not exist or does not belong to you.');
+    }
+
+    return client;
+  }
 }

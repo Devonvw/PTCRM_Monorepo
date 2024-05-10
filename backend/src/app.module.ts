@@ -18,6 +18,8 @@ import { ClientGoalsModule } from './client-goals/client-goals.module';
 import { MailModule } from './mail/mail.module';
 import { ClientGoalAchievementModule } from './client-goal-achievement/client-goal-achievement.module';
 import { MollieService } from './mollie/mollie.service';
+import { AssessmentsModule } from './assessments/assessments.module';
+import { MeasurementsModule } from './measurements/measurements.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { MollieService } from './mollie/mollie.service';
     GoalsModule,
     ClientGoalsModule,
     ClientGoalAchievementModule,
+    AssessmentsModule,
+    MeasurementsModule,
   ],
   controllers: [AppController],
   providers: [AppService, MollieService],

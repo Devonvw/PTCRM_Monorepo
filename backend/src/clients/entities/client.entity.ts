@@ -1,3 +1,4 @@
+import { Assessment } from 'src/assessments/entities/assessment.entity';
 import { ClientGoal } from 'src/client-goals/entities/client-goal.entity';
 import { AbstractEntity } from 'src/database/abstract.entity';
 import { Subscription } from 'src/payment/entities/subscription.entity';
@@ -53,6 +54,9 @@ export class Client extends AbstractEntity<Client> {
 
   @OneToMany((type) => ClientGoal, (clientGoal) => clientGoal.client)
   clientGoals: ClientGoal[];
+
+  @OneToMany((type) => Assessment, (assessment) => assessment.client)
+  assessments: Assessment[];
 
   // @ManyToOne(() => User, (user) => user.clients)
   // user: User;
