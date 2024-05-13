@@ -23,9 +23,9 @@ export class ClientGoal extends AbstractEntity<ClientGoal> {
   client: Client;
 
   //. A client goal can have only one goal, but I don't want goals to contain client goals, which is why I'm using a one-way relationship here.
-  @ManyToOne(() => Goal)
+  @ManyToOne(() => Goal, {onDelete: 'CASCADE', onUpdate: 'CASCADE'})
   goal: Goal;
 
   @OneToMany(() => ClientGoalAchievement, (clientGoalAchievement) => clientGoalAchievement.clientGoal)
-  clientGoalAchievements: ClientGoalAchievement[];
+  achievements: ClientGoalAchievement[];
 }

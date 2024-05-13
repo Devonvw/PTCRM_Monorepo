@@ -113,19 +113,19 @@ export class ClientGoalsService {
   }
 
   async findOne(userId: number, id: number): Promise<any> {
-    return await this.clientGoalExistsAndBelongsToUser(id, userId);
+    return await this.clientGoalExistsAndBelongsToUser(userId, id);
   }
   async delete(userId: number, id: number): Promise<any> {
-    const clientGoal = await this.clientGoalExistsAndBelongsToUser(id, userId);
+    const clientGoal = await this.clientGoalExistsAndBelongsToUser(userId, id);
 
     await this.clientGoalRepository.delete({ id: clientGoal.id });
     return { message: 'Client goal deleted' };
   }
   /// This function checks if the client goal exists and if the client belongs to the user
-  private async clientGoalExistsAndBelongsToUser(id: number, userId: number): Promise<ClientGoal> {
+  private async clientGoalExistsAndBelongsToUser( userId: number,clientGoalId: number): Promise<ClientGoal> {
     const clientGoal = await this.clientGoalRepository.findOne({
       where: {
-        id: id,
+        id: clientGoalId,
         client: { user: { id: userId } }
       }
     });

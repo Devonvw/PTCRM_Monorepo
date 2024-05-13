@@ -12,6 +12,6 @@ export class CreateMeasurementDto{
   @Column()
   @IsNumber({}, {message: 'Value must be a number'})
   @Type(() => Number)
-  @IsNotEmpty({message: 'Value is required'})
+  @IsNotEmpty({message: 'You must provide a value'})
   value: number;
 }

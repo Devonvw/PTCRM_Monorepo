@@ -33,7 +33,6 @@ export class GoalsService {
   }
   async deleteGoal(userId: number, goalId: number): Promise<any> {
     const goal: Goal = await this.goalExistsAndBelongsToUser(goalId, userId);
-
     //. Delete the goal object
     await this.goalRepository.delete({ id: goal.id });
     return { message: 'Goal deleted' };
@@ -103,14 +102,11 @@ export class GoalsService {
     //. Check if the goal exists
     const goal = await this.goalRepository.findOne({relations: ['user'], where: { id: goalId }});
     console.log("goal", goal);
-    if (!goal) {
-      throw new NotFoundException('Goal not found');
+     //. Check if the goal exists and belongs to the user (users may only delete their own goals)
+    if (!goal || goal?.user?.id !== userId) {
+      throw new NotFoundException('Goal not found or does not belong to you');
     }
 
-    //. Check if the goal belongs to the user (users may only delete their own goals)
-    if (goal.user.id !== userId) {
-      throw new UnauthorizedException('Unauthorized');
-    }
     return goal;
   }
 

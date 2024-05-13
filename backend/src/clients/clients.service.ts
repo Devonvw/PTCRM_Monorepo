@@ -207,7 +207,7 @@ export class ClientsService {
   }
 
   //. Check if client belongs to the requesting user
-  async getClientIfClientBelongsToUser(userId: number, clientId: number) {
+  async getClientIfClientBelongsToUser(userId: number, clientId: number): Promise<Client> {
     const client = await this.clientRepository.findOne({
       where: {
         id: clientId,

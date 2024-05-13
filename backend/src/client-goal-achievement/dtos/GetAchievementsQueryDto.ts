@@ -5,7 +5,7 @@ import { OrderByDto } from "src/utils/dto/order-by.dto";
 import { PaginationDto } from "src/utils/dto/pagination.dto";
 import { SearchDto } from "src/utils/dto/search.dto";
 
-export class GetAchievementsQueryDto extends IntersectionType (PaginationDto, OrderByDto) {
+export class GetAchievementsQueryDto extends IntersectionType(PaginationDto, OrderByDto) {
   @IsEnum(['all', 'allAchieved', 'allNotAchieved'], {
     message: `Show must be 'all', 'allAchieved' or 'allNotAchieved'.`,
   })
@@ -15,15 +15,21 @@ export class GetAchievementsQueryDto extends IntersectionType (PaginationDto, Or
 
 
   //. Provide either clientGoalId or clientId, not both
-  @ValidateIf((query) => !query.clientGoalId && !query.clientId, {message: 'You can only provide either clientGoalId or clientId, not both'} )
-  @IsInt({ message: `The client goal id can only be a number.`})
+  @ValidateIf(
+    (query) => query.clientGoalId && query.clientId,
+    { message: 'You can only provide either clientGoalId or clientId, not both' }
+  )
+  @ValidateIf(
+    (query) => !query.clientGoalId && !query.clientId,
+    { message: 'You must provide either clientGoalId or clientId' }
+  )
+  @IsInt({ message: `The client goal id can only be a number.` })
   @Type(() => Number)
   @IsOptional()
   @ApiProperty()
   clientGoalId: number;
 
-  @ValidateIf((query) => !query.clientGoalId && !query.clientId, {message: 'You can only provide either clientGoalId or clientId, not both'} )
-  @IsInt({ message: `The client id can only be a number.`})
+  @IsInt({ message: `The client id can only be a number.` })
   @Type(() => Number)
   @IsOptional()
   @ApiProperty()

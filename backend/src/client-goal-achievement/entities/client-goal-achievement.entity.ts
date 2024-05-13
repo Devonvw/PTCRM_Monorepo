@@ -5,7 +5,7 @@ import { Column, Entity, IsNull, ManyToOne } from "typeorm";
 @Entity({name: 'client_goal_achievement'})
 export class ClientGoalAchievement extends AbstractEntity<ClientGoalAchievement> {
   //. If a client goal is deleted then all client goal achievements related to that client goal should be deleted as well.
-  @ManyToOne(() => ClientGoal, (clientGoal) => clientGoal.clientGoalAchievements, {onDelete: 'CASCADE'})
+  @ManyToOne(() => ClientGoal, (clientGoal) => clientGoal.achievements, {onDelete: 'CASCADE'})
   clientGoal: ClientGoal;
   
   @Column()

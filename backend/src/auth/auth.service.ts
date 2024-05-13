@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { User } from 'src/users/entities/user.entity';
 import { Request } from 'express';
 import { UserResponseDto } from './dto/UserResponse.dto';
+import { UserRequestDto } from 'src/users/dtos/user.request.dto';
 
 @Injectable()
 export class AuthService {
@@ -16,8 +17,7 @@ export class AuthService {
       return;
     }
 
-    const passwordMatch: boolean = user.password === providedPassword;
-    // const passwordMatch: boolean = await this.passwordMatch(password, user.password);
+    const passwordMatch: boolean = await this.passwordMatch(providedPassword, user.password);
 
     if (!passwordMatch) {
       //TODO: throw an exception
@@ -40,11 +40,9 @@ export class AuthService {
   async login(email: string): Promise<UserResponseDto> {
     const user = await this.userService.findByEmail(email);
     delete user.password;
-    delete user.id;
     return user;
   }
 
-  //TODO: This request object should be of type 'Request' but for some reason it doesn't have the session property
   async logout(@Req() request: Request): Promise<any> {
     request.session.destroy(() => {
       return {
@@ -54,7 +52,10 @@ export class AuthService {
     });
   }
   async signup(body: any): Promise<any> {
-    const user: User = await this.userService.create(body);
-    return (({ id, password, ...returnUser }) => returnUser)(user);
+    const user = await this.userService.create(body);
+    console.log('userinsignup:', user);
+    //TODO: How does this 'delete' break the code?
+    // delete user['password'];
+    return user;
   }
 }
