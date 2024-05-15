@@ -9,13 +9,13 @@ export default function Filters(
   search?: ReturnType<typeof Search>,
   filters?: IFilterProps[],
 ) {
-  var filtersOut = {};
+  let filtersOut = {};
 
   filters.forEach((filter) => {
     if (filter.condition) filtersOut = { ...filtersOut, ...filter.filter };
   });
 
-  if (search.length > 0) {
+  if (search?.length > 0) {
     return search.map((s) => ({ ...s, ...filtersOut }));
   }
 

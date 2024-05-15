@@ -1,7 +1,9 @@
+import { Assessment } from 'src/assessments/entities/assessment.entity';
+import { ClientGoal } from 'src/client-goals/entities/client-goal.entity';
 import { AbstractEntity } from 'src/database/abstract.entity';
 import { Subscription } from 'src/payment/entities/subscription.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity()
 export class Client extends AbstractEntity<Client> {
@@ -41,11 +43,21 @@ export class Client extends AbstractEntity<Client> {
   @Column({ nullable: true })
   signupToken: string;
 
-  @ManyToOne((type) => User)
+  //. This user is the coach of the client.
+  @ManyToOne(() => User)
   @JoinColumn()
   user: User;
 
-  @ManyToOne((type) => Subscription)
+  @ManyToOne(() => Subscription)
   @JoinColumn()
   subscription: Subscription;
+
+  @OneToMany(() => ClientGoal, (clientGoal) => clientGoal.client)
+  clientGoals: ClientGoal[];
+
+  @OneToMany(() => Assessment, (assessment) => assessment.client)
+  assessments: Assessment[];
+
+  // @ManyToOne(() => User, (user) => user.clients)
+  // user: User;
 }

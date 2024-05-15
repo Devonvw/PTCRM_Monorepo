@@ -1,7 +1,6 @@
-import { ExecutionContext, Injectable } from "@nestjs/common";
-import { Reflector } from "@nestjs/core";
-import { AuthGuard } from "@nestjs/passport";
-import { Observable } from "rxjs";
+import { ExecutionContext, Injectable } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
 export class LocalGuard extends AuthGuard('local') {
@@ -10,7 +9,7 @@ export class LocalGuard extends AuthGuard('local') {
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const isPublic = this.reflector.get<boolean>("isPublic", context.getHandler());
+    // const isPublic = this.reflector.get<boolean>("isPublic", context.getHandler());
 
     // if (isPublic) {
     //   return true;
