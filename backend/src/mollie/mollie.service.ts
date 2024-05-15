@@ -51,6 +51,12 @@ export class MollieService {
     return true;
   }
 
+  public async getPayment(paymentId: string) {
+    const payment = await this.mollieClient.payments.get(paymentId);
+
+    return payment;
+  }
+
   async createFirstPayment(
     customerId: string,
     amount: number,
