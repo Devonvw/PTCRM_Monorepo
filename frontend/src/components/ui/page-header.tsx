@@ -31,7 +31,7 @@ const PageHeader = ({
   noBreadcrumb,
 }: IPageHeaderProps) => {
   const { right } = getChildren(children);
-  return !loading && loading !== undefined && !withLoading ? (
+  return !withLoading || (!loading && loading !== undefined && withLoading) ? (
     <div className="flex justify-between mb-6">
       <div>
         {!noBreadcrumb && (
