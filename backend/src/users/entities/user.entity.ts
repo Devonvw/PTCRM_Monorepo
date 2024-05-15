@@ -1,7 +1,9 @@
+import { Client } from 'src/clients/entities/client.entity';
 import { AbstractEntity } from 'src/database/abstract.entity';
 import { Subscription } from 'src/payment/entities/subscription.entity';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Goal } from 'src/goals/entities/goal.entity';
 import { EnumRoles } from 'src/types/roles.enums';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity()
 export class User extends AbstractEntity<User> {
@@ -35,4 +37,10 @@ export class User extends AbstractEntity<User> {
   @ManyToOne((type) => Subscription)
   @JoinColumn()
   subscription: Subscription;
+
+  @OneToMany(() => Goal, (goal) => goal.user)
+  goals: Goal[];
+
+  @OneToMany(() => Client, (client) => client.user)
+  clients: Client[];
 }

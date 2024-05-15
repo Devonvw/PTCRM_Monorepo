@@ -6,7 +6,7 @@ export class CreateUpdateClientDto {
   @ApiProperty({ type: 'string' })
   firstName: string;
 
-  @IsNotEmpty({ message: 'First name is required' })
+  @IsNotEmpty({ message: 'Last name is required' })
   @ApiProperty({ type: 'string' })
   lastName: string;
 
