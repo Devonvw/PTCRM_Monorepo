@@ -15,7 +15,7 @@ import {
 import * as React from 'react';
 import Template from './template';
 
-interface ClientSignupProps {
+interface ClientPaymentProps {
   token: string;
   client: Client;
   company: string;
@@ -25,7 +25,11 @@ const baseUrl = process.env.VERCEL_URL
   ? `https://${process.env.FRONTEND_URL}`
   : '';
 
-export const ClientSignup = ({ token, client, company }: ClientSignupProps) => (
+export const ClientPayment = ({
+  token,
+  client,
+  company,
+}: ClientPaymentProps) => (
   <Template preview={`Sign up with ${company}`}>
     <Text className="text-black text-xl">
       Sign up with <span className="font-black">{company}</span>
@@ -37,9 +41,9 @@ export const ClientSignup = ({ token, client, company }: ClientSignupProps) => (
       <Text className="text-base">
         <Link
           className="text-blue-700"
-          href={`${process.env.FRONTEND_URL}/client-signup/${token}`}
+          href={`${process.env.FRONTEND_URL}/client-payment/${token}`}
         >
-          👉 Click here to sign up 👈
+          👉 Click here to fill in your payment details 👈
         </Link>
       </Text>
       <Text className="text-base">
@@ -53,7 +57,7 @@ export const ClientSignup = ({ token, client, company }: ClientSignupProps) => (
   </Template>
 );
 
-ClientSignup.PreviewProps = {
+ClientPayment.PreviewProps = {
   email: 'devonvanw@gmail.com',
   company: 'Joost Trainings',
   client: {
@@ -62,6 +66,6 @@ ClientSignup.PreviewProps = {
     email: '',
   } as Client,
   token: '123456',
-} as ClientSignupProps;
+} as ClientPaymentProps;
 
-export default ClientSignup;
+export default ClientPayment;
