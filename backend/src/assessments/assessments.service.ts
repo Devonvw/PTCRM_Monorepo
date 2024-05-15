@@ -127,9 +127,15 @@ export class AssessmentsService {
 
           clientGoal.currentValue = measurement.value;
 
-          //. Check if the client goal has been completed
-          if (clientGoal.currentValue >= clientGoal.completedValue) {
-            clientGoal.completed = true;
+          //. Check if the client goal has been completed (if the start value is less than the completed value, the goal is completed if the current value is greater than or equal to the completed value, and vice versa)
+          if (clientGoal.startValue < clientGoal.completedValue) {
+            if (clientGoal.currentValue >= clientGoal.completedValue) {
+              clientGoal.completed = true;
+            }
+          } else if (clientGoal.startValue > clientGoal.completedValue) {
+            if (clientGoal.currentValue <= clientGoal.completedValue) {
+              clientGoal.completed = true;
+            }
           }
           //. If the goal has not been completed yet, check if any achievements have been made
           else {
@@ -162,7 +168,7 @@ export class AssessmentsService {
 
   async findAll(userId: number, query: GetAssessmentsQueryDto): Promise<any> {
     //. Make sure the client belongs to the coach (user)
-    if (query.clientId) {
+    if (query?.clientId) {
       const client = await this.clientService.getClientIfClientBelongsToUser(
         userId,
         query.clientId,
@@ -173,7 +179,7 @@ export class AssessmentsService {
         );
       }
       return await this.findAllForClient(client.id, query);
-    } else if (query.clientGoalId) {
+    } else if (query?.clientGoalId) {
       const clientGoal =
         await this.clientGoalService.clientGoalExistsAndBelongsToUser(
           userId,
@@ -185,10 +191,9 @@ export class AssessmentsService {
         );
       }
       return await this.findAllForClientGoal(clientGoal.id, query);
-    } else {
-      //. If no client or client goal id is provided, throw an error (class-validation will prevent this from happening, but it's good to have a backup)
-      throw new NotFoundException('Please provide a client or client goal id.');
     }
+    //. If no client or client goal id is provided, throw an error (class-validation will prevent this from happening, but it's good to have a backup)
+    throw new NotFoundException('Please provide a client or client goal id.');
   }
   async findAllForClient(
     clientId: number,
@@ -290,6 +295,7 @@ export class AssessmentsService {
       assessmentId,
       userId,
     );
+    //TODO: Set the values of the clientgoals back to the most recent performed assessment
 
     await this.assessmentRepository.delete(assessment);
 

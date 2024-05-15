@@ -6,6 +6,7 @@ import Filters from 'src/utils/filter';
 import OrderBy from 'src/utils/order-by';
 import Pagination from 'src/utils/pagination';
 import { Repository } from 'typeorm';
+import { CreateClientGoalDto } from './dtos/CreateClientGoalDto';
 import { GetClientGoalsQueryDto } from './dtos/GetClientGoalsQueryDto';
 import { UpdateClientGoalDto } from './dtos/UpdateClientGoal';
 import { ClientGoal } from './entities/client-goal.entity';
@@ -18,7 +19,7 @@ export class ClientGoalsService {
     @InjectRepository(Client)
     private readonly clientRepository: Repository<Client>,
   ) {}
-  async create(userId: number, body: any): Promise<any> {
+  async create(userId: number, body: CreateClientGoalDto): Promise<ClientGoal> {
     //. Make sure the client belongs to the coach (user)
     const client = await this.clientRepository.findOne({
       where: {
@@ -116,6 +117,7 @@ export class ClientGoalsService {
       ...pagination,
       where: [...filter],
       order: orderBy,
+      relations: ['goal'],
     });
 
     //. Get the total number of rows

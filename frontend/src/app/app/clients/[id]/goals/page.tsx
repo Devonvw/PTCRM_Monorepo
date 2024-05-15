@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,59 +9,181 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { IPage } from "@/interfaces/page";
-import { useClients } from "@/stores/useClients";
-import { useEffect } from "react";
+import { useClientGoals } from "@/stores/useClientGoals";
+import {
+  DoubleArrowLeftIcon,
+  DoubleArrowRightIcon,
+} from "@radix-ui/react-icons";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  PencilLine,
+  PlusCircle,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import CreateUpdateClientGoalModal from "./components/CreateEditClientGoal-Modal";
 
 const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
-  const { getClient, client, filterOptions, addModalOpen, setAddModalOpen } =
-    useClients();
+  //. Get the client goals
+  const {
+    getClientGoals,
+    clientGoals,
+    addModalOpen,
+    setAddModalOpen,
+    loading,
+    reload,
+  } = useClientGoals();
+
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalRows, setTotalRows] = useState(0);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const pageSize = 4;
+
+  const canGetNextPage = () => {
+    return totalRows > pageSize * (currentPage + 1);
+  };
 
   useEffect(() => {
-    if (client?.id != id) getClient(id);
-  }, [id]);
+    const fetchData = async () => {
+      setTotalRows(
+        await getClientGoals({
+          clientId: Number(id),
+          pagination: [currentPage, pageSize],
+        })
+      );
+      console.log("id", id);
+    };
+    fetchData();
+  }, [id, currentPage, reload]);
+
+  const calculateProgress = (
+    startValue: number,
+    currentValue: number,
+    completedValue: number
+  ) => {
+    //. Calculate the progress
+    const progress =
+      ((currentValue - startValue) / (completedValue - startValue)) * 100;
+    //. Return the progress with 1 decimal
+    return progress.toFixed(1);
+  };
+  // const { getClient, client, filterOptions, addModalOpen, setAddModalOpen } =
+  //   useClients();
+
+  // useEffect(() => {
+  //   if (client?.id != id) getClient(id);
+  // }, [id]);
 
   return (
     <div>
-      <div className='grid gap-4 md:grid-cols-1 lg:grid-cols-2'>
-        <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>Goal name</CardTitle>
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              viewBox='0 0 24 24'
-              fill='none'
-              stroke='currentColor'
-              strokeLinecap='round'
-              strokeLinejoin='round'
-              strokeWidth='2'
-              className='h-4 w-4 text-muted-foreground'
-            >
-              <path d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2' />
-              <circle cx='9' cy='7' r='4' />
-              <path d='M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75' />
-            </svg>
-          </CardHeader>
-          <CardContent>
-            <CardDescription className='pb-2'>Some description</CardDescription>
-            <div className='grid gap-2 grid-cols-3'>
-              <div className='flex flex-col'>
-                <span>Started</span>
-                <span className='text-xl font-bold'>65 kg</span>
-              </div>
-              <div className='flex flex-col'>
-                <span>Currently</span>
-                <span className='text-xl font-bold'>62 kg</span>
-              </div>
-              <div className='flex flex-col'>
-                <span>Goal</span>
-                <span className='text-xl font-bold'>58 kg</span>
-              </div>
-            </div>
-            <p className='text-xs text-muted-foreground pt-2'>
-              +42,9% of goal reached
-            </p>
-          </CardContent>
-        </Card>
+      <CreateUpdateClientGoalModal
+        open={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+      />
+      <div className='flex justify-between'>
+        <div className='flex flex-row space-x-2'>
+          <Button
+            variant='outline'
+            className='hidden h-8 w-8 p-0 lg:flex'
+            onClick={() => setCurrentPage(currentPage - 1)}
+            disabled={currentPage === 0}
+          >
+            <span className='sr-only'>Go to first page</span>
+            <DoubleArrowLeftIcon className='h-4 w-4' />
+          </Button>
+          <Button
+            variant='outline'
+            className='h-8 w-8 p-0'
+            onClick={() => setCurrentPage(0)}
+            disabled={currentPage === 0}
+          >
+            <span className='sr-only'>Go to previous page</span>
+            <ChevronLeftIcon className='h-4 w-4' />
+          </Button>
+          <Button
+            variant='outline'
+            className='h-8 w-8 p-0'
+            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={!canGetNextPage()}
+          >
+            <span className='sr-only'>Go to next page</span>
+            <ChevronRightIcon className='h-4 w-4' />
+          </Button>
+          <Button
+            variant='outline'
+            className='hidden h-8 w-8 p-0 lg:flex'
+            onClick={() => setCurrentPage(Math.floor(totalRows / pageSize) - 1)}
+            disabled={!canGetNextPage()}
+          >
+            <span className='sr-only'>Go to last page</span>
+            <DoubleArrowRightIcon className='h-4 w-4' />
+          </Button>
+        </div>
+        <Button
+          size='sm'
+          variant='light'
+          className=''
+          onClick={() => setCreateModalOpen(true)}
+        >
+          Add Client Goal <PlusCircle className='h-5 w-5' />
+        </Button>
+      </div>
+      <div className='grid gap-4 md:grid-cols-1 lg:grid-cols-2 pt-2'>
+        {loading ? (
+          <span>Loading...</span>
+        ) : (
+          clientGoals.map((clientGoal) => {
+            const measurementUnit = clientGoal["goal"]["measurementUnit"];
+            const progress = calculateProgress(
+              clientGoal["startValue"],
+              clientGoal["currentValue"],
+              clientGoal["completedValue"]
+            );
+            return (
+              <Card key={clientGoal["id"]}>
+                <CardHeader className='pb-2'>
+                  <CardTitle className='text-sm font-medium'>
+                    {clientGoal["goal"]["name"]}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className='pb-2'>
+                    {clientGoal["goal"]["description"]}
+                  </CardDescription>
+                  <div className='grid gap-2 grid-cols-3'>
+                    <div className='flex flex-col'>
+                      <span>Started</span>
+                      <span className='text-xl font-bold'>
+                        {clientGoal["startValue"]} {measurementUnit}
+                      </span>
+                    </div>
+                    <div className='flex flex-col'>
+                      <span>Currently</span>
+                      <span className='text-xl font-bold'>
+                        {clientGoal["currentValue"]} {measurementUnit}
+                      </span>
+                    </div>
+                    <div className='flex flex-col'>
+                      <span>Goal</span>
+                      <span className='text-xl font-bold'>
+                        {clientGoal["completedValue"]} {measurementUnit}
+                      </span>
+                    </div>
+                  </div>
+                  <div className='flex flex-row justify-between'>
+                    <p className='text-sm text-muted-foreground pt-2 items-center flex'>
+                      {progress}% of goal reached
+                    </p>
+                    <Button className='mt-2' type='submit' size='sm'>
+                      Modify
+                      <PencilLine className='h-5 w-5' />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })
+        )}
       </div>
     </div>
   );
