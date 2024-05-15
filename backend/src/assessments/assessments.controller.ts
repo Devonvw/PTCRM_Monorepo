@@ -1,14 +1,24 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  Req,
+} from '@nestjs/common';
 import { Request } from 'express';
 import { AssessmentsService } from './assessments.service';
-import { InitiateAssessmentDto } from './dtos/InitiateAssessmentDto';
 import { CreateAssessmentDto } from './dtos/CreateAssessmentDto';
 import { GetAssessmentsQueryDto } from './dtos/GetAssessmentsQueryDto';
+import { InitiateAssessmentDto } from './dtos/InitiateAssessmentDto';
 import { UpdateAssessmentDto } from './dtos/UpdateAssessmentDto';
 
 @Controller('assessments')
 export class AssessmentsController {
-  constructor(private readonly assessmentsService: AssessmentsService) { }
+  constructor(private readonly assessmentsService: AssessmentsService) {}
   //. This endpoint is called when a coach initiates a new assessment for a client. It returns a list of measurements that need to be made for the assessment, it does not write anything to the database, as it is possible that the coach may cancel the assessment before it is completed.
   @Get('initiate')
   async initiate(@Req() request: Request, @Body() body: InitiateAssessmentDto) {
@@ -24,7 +34,10 @@ export class AssessmentsController {
   }
 
   @Get()
-  async findAll(@Req() request: Request, @Query() query: GetAssessmentsQueryDto) {
+  async findAll(
+    @Req() request: Request,
+    @Query() query: GetAssessmentsQueryDto,
+  ) {
     const userId = request.user.id;
     return await this.assessmentsService.findAll(userId, query);
   }
@@ -36,7 +49,11 @@ export class AssessmentsController {
   }
 
   @Put(':id')
-  async update(@Req() request: Request, @Param('id') id: number, @Body() body: UpdateAssessmentDto){
+  async update(
+    @Req() request: Request,
+    @Param('id') id: number,
+    @Body() body: UpdateAssessmentDto,
+  ) {
     const userId = request.user.id;
     return await this.assessmentsService.update(userId, id, body);
   }

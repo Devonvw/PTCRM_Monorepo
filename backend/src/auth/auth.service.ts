@@ -1,14 +1,12 @@
 import { HttpStatus, Injectable, Req } from '@nestjs/common';
-import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
-import { User } from 'src/users/entities/user.entity';
 import { Request } from 'express';
+import { UsersService } from 'src/users/users.service';
 import { UserResponseDto } from './dto/UserResponse.dto';
-import { UserRequestDto } from 'src/users/dtos/user.request.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UsersService) { }
+  constructor(private readonly userService: UsersService) {}
   async validateUser(email: string, providedPassword: string): Promise<any> {
     const user = await this.userService.findByEmail(email);
 
@@ -17,7 +15,10 @@ export class AuthService {
       return;
     }
 
-    const passwordMatch: boolean = await this.passwordMatch(providedPassword, user.password);
+    const passwordMatch: boolean = await this.passwordMatch(
+      providedPassword,
+      user.password,
+    );
 
     if (!passwordMatch) {
       //TODO: throw an exception
@@ -27,7 +28,7 @@ export class AuthService {
     delete user.password;
 
     //. Return the user's id, role and email (this will be set in the request object)
-    return { id: user.id, email: user.email, role: user.role};
+    return { id: user.id, email: user.email, role: user.role };
   }
 
   async passwordMatch(

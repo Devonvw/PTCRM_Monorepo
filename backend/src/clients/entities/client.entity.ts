@@ -44,18 +44,18 @@ export class Client extends AbstractEntity<Client> {
   signupToken: string;
 
   //. This user is the coach of the client.
-  @ManyToOne((type) => User)
+  @ManyToOne(() => User)
   @JoinColumn()
   user: User;
 
-  @ManyToOne((type) => Subscription)
+  @ManyToOne(() => Subscription)
   @JoinColumn()
   subscription: Subscription;
 
-  @OneToMany((type) => ClientGoal, (clientGoal) => clientGoal.client)
+  @OneToMany(() => ClientGoal, (clientGoal) => clientGoal.client)
   clientGoals: ClientGoal[];
 
-  @OneToMany((type) => Assessment, (assessment) => assessment.client)
+  @OneToMany(() => Assessment, (assessment) => assessment.client)
   assessments: Assessment[];
 
   // @ManyToOne(() => User, (user) => user.clients)

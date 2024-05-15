@@ -1,31 +1,37 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ClientGoal } from './entities/client-goal.entity';
-import { Repository } from 'typeorm';
 import { Client } from 'src/clients/entities/client.entity';
-import { UpdateClientGoalDto } from './dtos/UpdateClientGoal';
 import { Goal } from 'src/goals/entities/goal.entity';
-import { GetClientGoalsQueryDto } from './dtos/GetClientGoalsQueryDto';
-import Pagination from 'src/utils/pagination';
-import OrderBy from 'src/utils/order-by';
 import Filters from 'src/utils/filter';
+import OrderBy from 'src/utils/order-by';
+import Pagination from 'src/utils/pagination';
+import { Repository } from 'typeorm';
+import { GetClientGoalsQueryDto } from './dtos/GetClientGoalsQueryDto';
+import { UpdateClientGoalDto } from './dtos/UpdateClientGoal';
+import { ClientGoal } from './entities/client-goal.entity';
 
 @Injectable()
 export class ClientGoalsService {
-  constructor(@InjectRepository(ClientGoal) private readonly clientGoalRepository: Repository<ClientGoal>, @InjectRepository(Client) private readonly clientRepository: Repository<Client>) { }
+  constructor(
+    @InjectRepository(ClientGoal)
+    private readonly clientGoalRepository: Repository<ClientGoal>,
+    @InjectRepository(Client)
+    private readonly clientRepository: Repository<Client>,
+  ) {}
   async create(userId: number, body: any): Promise<any> {
-
     //. Make sure the client belongs to the coach (user)
     const client = await this.clientRepository.findOne({
       where: {
         id: body.clientId,
-        user: { id: userId }
+        user: { id: userId },
       },
-      relations: ['user']
+      relations: ['user'],
     });
 
     if (!client) {
-      throw new NotFoundException('This client does not exist or does not belong to you.');
+      throw new NotFoundException(
+        'This client does not exist or does not belong to you.',
+      );
     }
 
     //. Create a new client goal object
@@ -34,15 +40,19 @@ export class ClientGoalsService {
       client: { id: body.clientId } as Client,
       goal: { id: body.goalId } as Goal,
       currentValue: body.startValue,
-      completed: body.startValue === body.completedValue
+      completed: body.startValue === body.completedValue,
     });
 
     return await this.clientGoalRepository.save(clientGoal);
   }
 
-  async update(id: number, userId: number, body: UpdateClientGoalDto): Promise<any> {
+  async update(
+    id: number,
+    userId: number,
+    body: UpdateClientGoalDto,
+  ): Promise<any> {
     //. Make sure the client, which the client goal belongs to, belongs to the coach (user)
-    var clientGoal = await this.clientGoalExistsAndBelongsToUser(id, userId);
+    const clientGoal = await this.clientGoalExistsAndBelongsToUser(id, userId);
 
     //. Update the currentValue
     clientGoal.currentValue = body.newValue;
@@ -62,12 +72,14 @@ export class ClientGoalsService {
     const client = await this.clientRepository.findOne({
       where: {
         id: query.clientId,
-        user: { id: userId }
-      }
+        user: { id: userId },
+      },
     });
 
     if (!client) {
-      throw new NotFoundException('This client does not exist or does not belong to you.');
+      throw new NotFoundException(
+        'This client does not exist or does not belong to you.',
+      );
     }
 
     const pagination = Pagination(query);
@@ -75,28 +87,28 @@ export class ClientGoalsService {
       {
         key: 'updatedAt',
         fields: ['updatedAt'],
-      }
+      },
     ]);
     const filter = Filters(null, [
       {
         //. If the show query is uncompleted or not provided, only return the client goals that are not completed
         condition: query?.show === 'uncompleted' || !query?.show,
         filter: {
-          completed: false
-        }
+          completed: false,
+        },
       },
       {
         //. If the show query is completed, only return the client goals that are completed
         condition: query?.show === 'completed',
         filter: {
-          completed: true
-        }
+          completed: true,
+        },
       },
       {
         //. If the show query is all, return all client goals
         condition: query?.show === 'all',
-        filter: {}
-      }
+        filter: {},
+      },
     ]);
 
     //. Get the client goals
@@ -107,7 +119,9 @@ export class ClientGoalsService {
     });
 
     //. Get the total number of rows
-    const totalRows = await this.clientGoalRepository.count({ where: [...filter] });
+    const totalRows = await this.clientGoalRepository.count({
+      where: [...filter],
+    });
 
     return { data: clientGoals, totalRows };
   }
@@ -122,16 +136,21 @@ export class ClientGoalsService {
     return { message: 'Client goal deleted' };
   }
   /// This function checks if the client goal exists and if the client belongs to the user
-  private async clientGoalExistsAndBelongsToUser( userId: number,clientGoalId: number): Promise<ClientGoal> {
+  private async clientGoalExistsAndBelongsToUser(
+    userId: number,
+    clientGoalId: number,
+  ): Promise<ClientGoal> {
     const clientGoal = await this.clientGoalRepository.findOne({
       where: {
         id: clientGoalId,
-        client: { user: { id: userId } }
-      }
+        client: { user: { id: userId } },
+      },
     });
 
     if (!clientGoal) {
-      throw new NotFoundException('This client goal does not exist or the client does not belong to you.');
+      throw new NotFoundException(
+        'This client goal does not exist or the client does not belong to you.',
+      );
     }
 
     return clientGoal;

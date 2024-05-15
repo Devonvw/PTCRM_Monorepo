@@ -1,5 +1,4 @@
-import { EnumRoles } from "src/types/roles.enums";
-import { User } from "../entities/user.entity";
+import { EnumRoles } from 'src/types/roles.enums';
 
 export class UserResponseDto {
   email: string;

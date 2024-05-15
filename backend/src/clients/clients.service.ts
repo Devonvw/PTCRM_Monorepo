@@ -4,20 +4,20 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Client } from './entities/client.entity';
-import { EntityManager, Repository } from 'typeorm';
-import { CreateUpdateClientDto } from './dtos/CreateUpdateClient.dto';
-import { GetAllClientsQueryDto } from './dtos/GetAllClientsQuery.dto';
-import Pagination from 'src/utils/pagination';
-import Search from 'src/utils/search';
+import { MailService } from 'src/mail/mail.service';
+import { User } from 'src/users/entities/user.entity';
+import { UsersService } from 'src/users/users.service';
 import Filters from 'src/utils/filter';
 import OrderBy from 'src/utils/order-by';
-import { User } from 'src/users/entities/user.entity';
+import Pagination from 'src/utils/pagination';
+import Search from 'src/utils/search';
+import { EntityManager, Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { MailService } from 'src/mail/mail.service';
-import { UsersService } from 'src/users/users.service';
 import { CreateSignUpClientDto } from './dtos/CreateSignUpClient.dto';
+import { CreateUpdateClientDto } from './dtos/CreateUpdateClient.dto';
+import { GetAllClientsQueryDto } from './dtos/GetAllClientsQuery.dto';
 import { SignUpDetailsResponseDto } from './dtos/SignUpDetailsResponse.dto';
+import { Client } from './entities/client.entity';
 
 @Injectable()
 export class ClientsService {
@@ -207,7 +207,10 @@ export class ClientsService {
   }
 
   //. Check if client belongs to the requesting user
-  async getClientIfClientBelongsToUser(userId: number, clientId: number): Promise<Client> {
+  async getClientIfClientBelongsToUser(
+    userId: number,
+    clientId: number,
+  ): Promise<Client> {
     const client = await this.clientRepository.findOne({
       where: {
         id: clientId,
@@ -216,7 +219,9 @@ export class ClientsService {
     });
 
     if (!client) {
-      throw new NotFoundException('This client does not exist or does not belong to you.');
+      throw new NotFoundException(
+        'This client does not exist or does not belong to you.',
+      );
     }
 
     return client;

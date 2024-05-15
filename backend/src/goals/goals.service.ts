@@ -1,26 +1,29 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Equal, IsNull, Or, Repository } from 'typeorm';
-import { Goal } from './entities/goal.entity';
-import Pagination from 'src/utils/pagination';
-import OrderBy from 'src/utils/order-by';
-import Search from 'src/utils/search';
-import Filters from 'src/utils/filter';
-import { GetAllGoalsQueryDto } from './dtos/GetAllGoalsQuery.dto';
-import { CreateUpdateGoalDto } from './dtos/CreateUpdateGoalDto';
 import { User } from 'src/users/entities/user.entity';
+import Filters from 'src/utils/filter';
+import OrderBy from 'src/utils/order-by';
+import Pagination from 'src/utils/pagination';
+import Search from 'src/utils/search';
+import { Equal, IsNull, Or, Repository } from 'typeorm';
+import { CreateUpdateGoalDto } from './dtos/CreateUpdateGoalDto';
+import { GetAllGoalsQueryDto } from './dtos/GetAllGoalsQuery.dto';
+import { Goal } from './entities/goal.entity';
 
 @Injectable()
 export class GoalsService {
-  constructor(@InjectRepository(Goal) private readonly goalRepository: Repository<Goal>, @InjectRepository(User) private readonly userRepository: Repository<User>) { }
+  constructor(
+    @InjectRepository(Goal) private readonly goalRepository: Repository<Goal>,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+  ) {}
 
   async createGoal(userId: number, body: CreateUpdateGoalDto): Promise<any> {
     //. Create a new goal object
     const goal = new Goal(body);
     //. Add the user to the goal object
     goal.user = await this.userRepository.findOneBy({ id: userId });
-    
-    console.log("goal object:", goal);
+
+    console.log('goal object:', goal);
     return await this.goalRepository.save(goal);
   }
   async updateGoal(goalId, userId, body: CreateUpdateGoalDto): Promise<any> {
@@ -47,7 +50,7 @@ export class GoalsService {
       {
         key: 'userId',
         fields: ['userId'],
-      }
+      },
     ]);
     const search = Search(query, [{ field: 'name' }]);
 
@@ -58,29 +61,29 @@ export class GoalsService {
         condition: query?.show === 'private',
         filter: {
           'user.id': userId,
-        }
+        },
       },
       {
         //. If the show query is global, only return the goals that have no userId (aka global goals)
         condition: query?.show === 'global',
         filter: {
           'user.id': IsNull(),
-        }
+        },
       },
       {
         //. If the show query is not provided, or is all, return all global and user goals
         condition: !query?.show || query?.show === 'all',
         filter: {
-          'user.id': Or(Equal(userId), IsNull())
-        }
-      }
-    ])
+          'user.id': Or(Equal(userId), IsNull()),
+        },
+      },
+    ]);
     //. Get the goals
     const goals = await this.goalRepository.find({
       ...pagination,
       where: [...filter],
       order: orderBy,
-    })
+    });
 
     //. Get the total number of rows
     const totalRows = await this.goalRepository.count({
@@ -98,16 +101,21 @@ export class GoalsService {
       throw new NotFoundException('Goal not found');
     }
   }
-  private async goalExistsAndBelongsToUser(goalId: number, userId: number): Promise<Goal> {
+  private async goalExistsAndBelongsToUser(
+    goalId: number,
+    userId: number,
+  ): Promise<Goal> {
     //. Check if the goal exists
-    const goal = await this.goalRepository.findOne({relations: ['user'], where: { id: goalId }});
-    console.log("goal", goal);
-     //. Check if the goal exists and belongs to the user (users may only delete their own goals)
+    const goal = await this.goalRepository.findOne({
+      relations: ['user'],
+      where: { id: goalId },
+    });
+    console.log('goal', goal);
+    //. Check if the goal exists and belongs to the user (users may only delete their own goals)
     if (!goal || goal?.user?.id !== userId) {
       throw new NotFoundException('Goal not found or does not belong to you');
     }
 
     return goal;
   }
-
 }

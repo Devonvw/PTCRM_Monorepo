@@ -1,14 +1,19 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { Type } from "class-transformer";
-import { ArrayMinSize, IsArray, IsNotEmpty, IsOptional, ValidateNested } from "class-validator";
-import { CreateMeasurementDto } from "src/measurements/dtos/CreateMeasurementDto";
-import { Measurement } from "src/measurements/entities/measurement.entity";
-import { Column } from "typeorm";
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  ValidateNested,
+} from 'class-validator';
+import { CreateMeasurementDto } from 'src/measurements/dtos/CreateMeasurementDto';
+import { Column } from 'typeorm';
 
-export class CreateAssessmentDto{
+export class CreateAssessmentDto {
   @Column()
-  @IsNotEmpty({message: 'Client id is required'})
-  @ApiProperty({type: 'number'})
+  @IsNotEmpty({ message: 'Client id is required' })
+  @ApiProperty({ type: 'number' })
   clientId: number;
 
   @IsArray()
@@ -20,6 +25,6 @@ export class CreateAssessmentDto{
 
   @Column()
   @IsOptional()
-  @ApiProperty({type: 'string'})
+  @ApiProperty({ type: 'string' })
   notes: string;
 }

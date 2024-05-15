@@ -1,6 +1,6 @@
-import { AbstractEntity } from "src/database/abstract.entity";
-import { User } from "src/users/entities/user.entity";
-import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
+import { AbstractEntity } from 'src/database/abstract.entity';
+import { User } from 'src/users/entities/user.entity';
+import { Column, Entity, ManyToOne } from 'typeorm';
 
 @Entity()
 export class Goal extends AbstractEntity<Goal> {
