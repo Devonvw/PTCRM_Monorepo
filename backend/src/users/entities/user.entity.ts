@@ -22,7 +22,7 @@ export class User extends AbstractEntity<User> {
   @Column()
   dateOfBirth: Date;
 
-  @Column()
+  @Column({ nullable: true })
   company: string;
 
   @Column({ nullable: true })

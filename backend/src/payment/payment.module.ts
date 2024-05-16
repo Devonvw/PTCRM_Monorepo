@@ -11,5 +11,6 @@ import { MollieService } from 'src/mollie/mollie.service';
   imports: [TypeOrmModule.forFeature([Payment, Subscription, User])],
   providers: [PaymentService, MollieService],
   controllers: [PaymentController],
+  exports: [PaymentService],
 })
 export class PaymentModule {}

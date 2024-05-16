@@ -3,6 +3,7 @@ import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
 import { UsersService } from 'src/users/users.service';
 import { UserResponseDto } from './dto/UserResponse.dto';
+import { SignUpDto } from 'src/users/dtos/SignUp.dto';
 
 @Injectable()
 export class AuthService {
@@ -52,11 +53,9 @@ export class AuthService {
       };
     });
   }
-  async signup(body: any): Promise<any> {
-    const user = await this.userService.create(body);
-    console.log('userinsignup:', user);
-    //TODO: How does this 'delete' break the code?
-    // delete user['password'];
-    return user;
+  async signup(body: SignUpDto): Promise<{ checkoutHref: string }> {
+    const checkoutHref = await this.userService.create(body);
+
+    return { checkoutHref };
   }
 }

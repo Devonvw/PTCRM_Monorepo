@@ -2,6 +2,7 @@ import { AbstractEntity } from 'src/database/abstract.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { Subscription } from './subscription.entity';
 import { Invoice } from './invoice.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Entity()
 export class Payment extends AbstractEntity<Payment> {
@@ -33,4 +34,8 @@ export class Payment extends AbstractEntity<Payment> {
   @ManyToOne((type) => Subscription)
   @JoinColumn()
   subscription: Subscription;
+
+  @ManyToOne((type) => User)
+  @JoinColumn()
+  user: User;
 }

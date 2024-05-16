@@ -1,14 +1,19 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { PaymentService } from 'src/payment/payment.service';
+import { Payment } from 'src/payment/entities/payment.entity';
+import { SignUpDto } from './dtos/SignUp.dto';
+import { Subscription } from 'src/payment/entities/subscription.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private paymentService: PaymentService,
   ) {}
 
   async findById(id: number): Promise<User | null> {
@@ -18,30 +23,25 @@ export class UsersService {
   async findByEmail(email: string): Promise<User | null> {
     return this.userRepository.findOneBy({ email });
   }
-  async create(body: any): Promise<User> {
-    console.log('password', body);
-    //. Create a new user
-    const userCreate: User = new User(body);
+  async create(body: SignUpDto): Promise<string> {
+    const user = new User({ ...body, subscription: { id: 1 } as Subscription });
 
     //. Check if the user already exists
-    const existingUser: User = await this.findByEmail(userCreate.email);
+    const existingUser = await this.findByEmail(user.email);
     if (existingUser) {
       throw new ConflictException(
         'There is already a user registered with this email.',
       );
     }
 
-    //TODO: Hash the password
-    userCreate.password = await bcrypt.hash(userCreate.password, 10);
-    console.log('userCreate', userCreate);
-    //. Create a new user in the database
-    const user: User = this.userRepository.create(userCreate);
+    user.password = await bcrypt.hash(user.password, 10);
 
-    console.log('user2', user);
     //. Save the user in the database
-    this.userRepository.save(user);
-    console.log('user', user);
+    const savedUser = await this.userRepository.save(user);
 
-    return user;
+    return await this.paymentService.updateInitialUserSubscription(
+      user.subscription.id,
+      savedUser.id,
+    );
   }
 }

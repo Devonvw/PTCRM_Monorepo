@@ -7,6 +7,7 @@ import { User } from 'src/users/entities/user.entity';
 import { MollieService } from 'src/mollie/mollie.service';
 import dayjs from 'dayjs';
 import { EnumRoles } from 'src/types/roles.enums';
+import { MollieWebhookDto } from './dtos/MollieWebhook.dto';
 
 @Injectable()
 export class PaymentService {
@@ -18,14 +19,8 @@ export class PaymentService {
     private mollieService: MollieService,
   ) {}
 
-  async getSubscriptionsByUser(userId: number) {
-    return this.subscriptionRepository.find({
-      where: {
-        user: {
-          id: userId,
-        },
-      },
-    });
+  async getSubscriptions() {
+    return this.subscriptionRepository.find({});
   }
 
   async updateUserSubscription(subscriptionId: number, userId: number) {
@@ -34,7 +29,10 @@ export class PaymentService {
     });
   }
 
-  async updateInitialUserSubscription(subscriptionId: number, userId: number) {
+  async updateInitialUserSubscription(
+    subscriptionId: number,
+    userId: number,
+  ): Promise<string> {
     const user = await this.entityManager.findOne(User, {
       where: { id: userId },
     });
@@ -46,6 +44,7 @@ export class PaymentService {
     });
 
     user.subscription = subscription;
+    user.mollieCustomerId = 'cst_kfrURgsd4c';
 
     if (!subscription)
       throw new NotFoundException('Subscription does not exist.');
@@ -64,7 +63,7 @@ export class PaymentService {
     const molliePayment = await this.mollieService.createFirstPayment(
       user.mollieCustomerId,
       subscription.totalPrice,
-      `Payment for subscription:${subscription.name} `,
+      `Verification for subscription:${subscription.name}`,
     );
 
     const today = new Date();
@@ -77,10 +76,13 @@ export class PaymentService {
       totalPrice: subscription.totalPrice,
       molliePaymentId: molliePayment.id,
       subscription: subscription,
+      user: user,
     });
 
     await this.entityManager.save(subscription);
     await this.entityManager.save(payment);
+
+    return molliePayment._links.checkout.href;
   }
 
   async createPayment(userId: number) {
@@ -113,15 +115,17 @@ export class PaymentService {
       totalPrice: user.subscription.totalPrice,
       molliePaymentId: molliePayment.id,
       subscription: user.subscription,
+      user: user,
     });
 
     await this.entityManager.save(payment);
   }
 
-  async mollieWebhook(paymentId: string) {
-    const molliePayment = await this.mollieService.getPayment(paymentId);
+  async mollieWebhook(body: MollieWebhookDto) {
+    const molliePayment = await this.mollieService.getPayment(body?.id);
     const payment = await this.entityManager.findOne(Payment, {
-      where: { molliePaymentId: paymentId },
+      where: { molliePaymentId: body?.id },
+      relations: ['subscription', 'user'],
     });
 
     switch (molliePayment?.status) {
@@ -129,6 +133,12 @@ export class PaymentService {
         payment.paid = true;
         payment.paidAt = new Date();
         await this.entityManager.save(payment);
+        console.log(payment, payment?.user);
+        this.mollieService.createSubscription(
+          payment.user.mollieCustomerId,
+          payment.subscription.totalPrice,
+          `Payment for subscription:${payment.subscription.name}`,
+        );
         break;
       case 'canceled':
       case 'expired':
