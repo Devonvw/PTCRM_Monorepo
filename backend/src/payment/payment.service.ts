@@ -8,6 +8,10 @@ import { MollieService } from 'src/mollie/mollie.service';
 import dayjs from 'dayjs';
 import { EnumRoles } from 'src/types/roles.enums';
 import { MollieWebhookDto } from './dtos/MollieWebhook.dto';
+import { Payment as MolliePayment } from '@mollie/api-client';
+
+const VERIFY_AMOUNT = 0.01;
+const VAT_PERCENTAGE = 0.21;
 
 @Injectable()
 export class PaymentService {
@@ -44,7 +48,7 @@ export class PaymentService {
     });
 
     user.subscription = subscription;
-    user.mollieCustomerId = 'cst_kfrURgsd4c';
+    // user.mollieCustomerId = 'cst_kfrURgsd4c';
 
     if (!subscription)
       throw new NotFoundException('Subscription does not exist.');
@@ -62,7 +66,7 @@ export class PaymentService {
 
     const molliePayment = await this.mollieService.createFirstPayment(
       user.mollieCustomerId,
-      subscription.totalPrice,
+      VERIFY_AMOUNT,
       `Verification for subscription:${subscription.name}`,
     );
 
@@ -71,9 +75,9 @@ export class PaymentService {
 
     const payment = new Payment({
       date: today,
-      price: subscription.price,
-      vatPrice: subscription.vatPrice,
-      totalPrice: subscription.totalPrice,
+      price: VERIFY_AMOUNT - VERIFY_AMOUNT * VAT_PERCENTAGE,
+      vatPrice: VERIFY_AMOUNT * VAT_PERCENTAGE,
+      totalPrice: VERIFY_AMOUNT,
       molliePaymentId: molliePayment.id,
       subscription: subscription,
       user: user,
@@ -128,23 +132,64 @@ export class PaymentService {
       relations: ['subscription', 'user'],
     });
 
+    console.log('molliePayment', molliePayment);
+    console.log('payment', payment);
+    console.log('\n\n');
+
     switch (molliePayment?.status) {
       case 'paid':
-        payment.paid = true;
-        payment.paidAt = new Date();
-        await this.entityManager.save(payment);
-        console.log(payment, payment?.user);
-        this.mollieService.createSubscription(
-          payment.user.mollieCustomerId,
-          payment.subscription.totalPrice,
-          `Payment for subscription:${payment.subscription.name}`,
-        );
+        if (molliePayment?.subscriptionId)
+          await this.handleMandateFullfilled(payment.user.id, payment);
+        else await this.handleSubscriptionPayment(molliePayment);
         break;
       case 'canceled':
       case 'expired':
       case 'failed':
         break;
     }
+  }
+
+  async handleSubscriptionPayment(molliePayment: MolliePayment) {
+    const user = await this.entityManager.findOne(User, {
+      where: { mollieCustomerId: molliePayment.customerId },
+      relations: ['subscription'],
+    });
+
+    const price = Number(molliePayment.amount.value);
+    const payment = new Payment({
+      date: new Date(),
+      price: price - price * VAT_PERCENTAGE,
+      vatPrice: price * VAT_PERCENTAGE,
+      totalPrice: price,
+      molliePaymentId: molliePayment.id,
+      subscription: user.subscription,
+      user: user,
+    });
+
+    await this.entityManager.save(payment);
+
+    //TODO: Create invoice
+    //TODO: Send email
+  }
+
+  async handleMandateFullfilled(userId: number, payment: Payment) {
+    payment.paid = true;
+    payment.paidAt = new Date();
+    await this.entityManager.save(payment);
+
+    const user = await this.entityManager.findOne(User, {
+      where: { id: userId },
+      relations: ['subscription'],
+    });
+
+    user.hasMandate = true;
+    await this.entityManager.save(user);
+
+    this.mollieService.createSubscription(
+      payment.user.mollieCustomerId,
+      payment.subscription.totalPrice,
+      `Payment for subscription:${payment.subscription.name}`,
+    );
   }
 
   async handleTodaysPayments() {
