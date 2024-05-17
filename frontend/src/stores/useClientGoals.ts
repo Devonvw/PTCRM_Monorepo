@@ -13,10 +13,11 @@ export const useClientGoals = create((set: any, get: any) => ({
     filters?: any;
     clientId: number;
   }): Promise<number> => {
+    set({ loading: true });
     try {
       const { data } = await axios.get("/backend/client-goals", {
         params: {
-          ...modules.pagination,
+          // ...modules.pagination,
           ...modules.filters,
           clientId: modules.clientId,
           pageIndex: modules.pagination[0],

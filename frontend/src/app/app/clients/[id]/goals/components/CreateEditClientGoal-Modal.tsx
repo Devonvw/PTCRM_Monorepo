@@ -11,9 +11,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { useClientGoals } from "@/stores/useClientGoals";
 import { useGoals } from "@/stores/useGoals";
-import { Dialog } from "@headlessui/react";
+import { Dialog, Select } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Select } from "@radix-ui/react-select";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -41,6 +41,19 @@ interface IProps {
 const CreateUpdateClientGoalModal = (props: IProps) => {
   const { createClientGoal, updateClientGoal } = useClientGoals();
   const { goals, getGoals } = useGoals();
+  const [totalRows, setTotalRows] = useState(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setTotalRows(
+        await getGoals({
+          pagination: [0, 100],
+        })
+      );
+    };
+    fetchData();
+    console.log("goals", goals);
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -77,8 +90,13 @@ const CreateUpdateClientGoalModal = (props: IProps) => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Goal</FormLabel>
+                      <br />
                       <FormControl>
-                        <Select {...field} value={field?.value?.toString()}>
+                        <Select
+                          className='py-1 px-2 h-10 text-sm rounded-md border dark:border-slate-800 dark:bg-slate-950 w-full'
+                          {...field}
+                          value={field?.value?.toString()}
+                        >
                           {goals.map((goal) => (
                             <option key={goal["id"]} value={goal["id"]}>
                               {goal["name"]}
