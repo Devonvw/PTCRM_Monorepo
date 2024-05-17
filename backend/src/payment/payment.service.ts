@@ -139,8 +139,8 @@ export class PaymentService {
     switch (molliePayment?.status) {
       case 'paid':
         if (molliePayment?.subscriptionId)
-          await this.handleMandateFullfilled(payment.user.id, payment);
-        else await this.handleSubscriptionPayment(molliePayment);
+          await this.handleSubscriptionPayment(molliePayment);
+        else await this.handleMandateFullfilled(payment.user.id, payment);
         break;
       case 'canceled':
       case 'expired':
@@ -184,6 +184,9 @@ export class PaymentService {
 
     user.hasMandate = true;
     await this.entityManager.save(user);
+
+    const mandate = await this.mollieService.getMandates(user.mollieCustomerId);
+    console.log(mandate);
 
     this.mollieService.createSubscription(
       payment.user.mollieCustomerId,
