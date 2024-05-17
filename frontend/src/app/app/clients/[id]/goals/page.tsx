@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { IPage } from "@/interfaces/page";
 import { useClientGoals } from "@/stores/useClientGoals";
+import { Select } from "@headlessui/react";
 import {
   DoubleArrowLeftIcon,
   DoubleArrowRightIcon,
@@ -17,12 +18,14 @@ import {
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
+  ListChecks,
   PencilLine,
   PlusCircle,
   Trash,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import CreateUpdateClientGoalModal from "./components/CreateEditClientGoal-Modal";
+import DeleteClientGoalModal from "./components/DeleteClientGoal";
 
 const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
   //. Get the client goals
@@ -33,11 +36,13 @@ const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
     clientGoals,
     addOrUpdateModalOpen,
     setAddOrUpdateModalOpen: setAddOrUpdateModalOpen,
+    deleteModalOpen,
+    setDeleteModalOpen,
     loading,
-    reload,
   } = useClientGoals();
 
   const [currentPage, setCurrentPage] = useState(0);
+  const [show, setShow] = useState("uncompleted");
   const [totalRows, setTotalRows] = useState(0);
   const triggerReload = useRef(false);
   const [stateClientGoal, setClientGoal] = useState(undefined);
@@ -54,14 +59,34 @@ const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
         await getClientGoals({
           clientId: Number(id),
           pagination: [currentPage, pageSize],
+          filters: show === "all" ? {} : { show },
         })
       );
     };
     fetchData();
   }, [id, currentPage, triggerReload.current]);
 
-  const onCloseModal = () => {
+  const onCloseCreateOrUpdateModal = () => {
     setAddOrUpdateModalOpen(false);
+    setClientGoal(undefined);
+    //. Reload the data
+    triggerReload.current = !triggerReload.current;
+  };
+  const onCloseDeleteModal = () => {
+    setDeleteModalOpen(false);
+    //. Make sure that if the user was on the last page and deleted the last item, the page is set to the previous one
+    if (totalRows % pageSize === 1) {
+      setCurrentPage(currentPage - 1);
+    }
+    //. Reload the data
+    triggerReload.current = !triggerReload.current;
+  };
+
+  const onShowChange = (e: any) => {
+    setShow(e.target.value);
+
+    //. Reset the current page to 0
+    setCurrentPage(0);
     //. Reload the data
     triggerReload.current = !triggerReload.current;
   };
@@ -88,9 +113,14 @@ const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
     <div>
       <CreateUpdateClientGoalModal
         open={addOrUpdateModalOpen}
-        onClose={() => onCloseModal()}
+        onClose={() => onCloseCreateOrUpdateModal()}
         clientId={Number(id)}
         clientGoal={stateClientGoal}
+      />
+      <DeleteClientGoalModal
+        clientGoalId={stateClientGoal?.["id"]}
+        open={deleteModalOpen}
+        onClose={() => onCloseDeleteModal()}
       />
       <div className='flex justify-between'>
         <div className='flex flex-row space-x-2'>
@@ -135,18 +165,45 @@ const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
           <span className='text-sm h-8 content-center'>
             Page {currentPage + 1} of {Math.ceil(totalRows / pageSize)}
           </span>
+          <div className='text-sm h-8 content-center'>
+            <span className=' ms-4 me-2'>Show:</span>
+            <Select
+              onChange={(e) => {
+                onShowChange(e);
+              }}
+              className='h-full px-2 rounded-md border border-slate-200 bg-white hover:bg-slate-100 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50'
+            >
+              <option value='uncompleted'>Uncompleted</option>
+              <option value='completed'>Completed</option>
+              <option value='all'>All</option>
+            </Select>
+          </div>
         </div>
-        <Button
-          size='sm'
-          variant='light'
-          className=''
-          onClick={() => {
-            setClientGoal(undefined);
-            setAddOrUpdateModalOpen(true);
-          }}
-        >
-          Add Client Goal <PlusCircle className='h-5 w-5' />
-        </Button>
+        <div>
+          <Button
+            size='sm'
+            variant='default'
+            className='mr-2'
+            onClick={() => {
+              setClientGoal(undefined);
+              setAddOrUpdateModalOpen(true);
+            }}
+          >
+            Perform assessment
+            <ListChecks className='h-5 w-5' />
+          </Button>
+          <Button
+            size='sm'
+            variant='light'
+            className=''
+            onClick={() => {
+              setClientGoal(undefined);
+              setAddOrUpdateModalOpen(true);
+            }}
+          >
+            Add Client Goal <PlusCircle className='h-5 w-5' />
+          </Button>
+        </div>
       </div>
       <div className='grid gap-4 md:grid-cols-1 lg:grid-cols-2 pt-2'>
         {loading ? (
@@ -191,7 +248,7 @@ const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
                     </div>
                   </div>
                   <div className='flex flex-row justify-between'>
-                    <p className='text-sm text-muted-foreground pt-2 items-center flex'>
+                    <p className='text-xs text-muted-foreground pt-2 items-center flex'>
                       {progress}% of goal reached
                     </p>
                     <div>
@@ -201,14 +258,28 @@ const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
                         type='button'
                         onClick={() => {
                           setClientGoal(cg);
-                          setAddOrUpdateModalOpen(true);
+                          setDeleteModalOpen(true);
                         }}
                         size='sm'
                       >
                         Delete
                         <Trash className='h-5 w-5' />
                       </Button>
+                      {/* <Button
+                        className='mt-2 ms-2'
+                        variant={"primary"}
+                        type='button'
+                        onClick={() => {
+                          setClientGoal(cg);
+                          setDeleteModalOpen(true);
+                        }}
+                        size='sm'
+                      >
+                        Assess
+                        <Check className='h-5 w-5' />
+                      </Button> */}
                       <Button
+                        variant='outline'
                         className='mt-2 ms-2'
                         type='button'
                         onClick={() => {

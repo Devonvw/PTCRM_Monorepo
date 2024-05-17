@@ -17,7 +17,6 @@ import { Button, Dialog, Select } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
 import { z } from "zod";
 
 //BUG: For some reason when updating the client goal's start and completed value, the form does not update them, it sets the values to undefined and the form is invalid.
@@ -70,27 +69,32 @@ const CreateUpdateClientGoalModal = (props: IProps) => {
     };
     fetchData();
 
-    form.reset(props.clientGoal);
+    if (props.clientGoal) {
+      form.setValue("goalId", props.clientGoal?.["goal"]["id"]);
+      form.setValue("startValue", props.clientGoal?.["startValue"]);
+      form.setValue("completedValue", props.clientGoal?.["completedValue"]);
+    } else {
+      form.reset({}, { keepValues: false, keepDefaultValues: true });
+    }
   }, [props.clientGoal]);
 
   //TODO: temporarily set default values to something else than 0, set them to 0 again once the bug is fixed.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      goalId: props.clientGoal?.["id"] || undefined,
-      startValue: props.clientGoal?.["startValue"] || 80,
-      completedValue: props.clientGoal?.["completedValue"] || 68,
+      goalId: undefined,
+      startValue: 78,
+      completedValue: 68,
     },
   });
 
   function onSubmit(data: z.infer<typeof formSchema>) {
     if (props.clientGoal) {
-      console.log("client goal", props.clientGoal);
+      console.log("updating: client goal", props.clientGoal);
       updateClientGoal({ id: props.clientGoal["id"], ...data });
-      toast.success("Client goal updated successfully.");
+    } else {
+      createClientGoal({ clientId: props.clientId, ...data });
     }
-    createClientGoal({ clientId: props.clientId, ...data });
-    toast.success("Client goal created successfully.");
 
     props.onClose();
   }
@@ -132,6 +136,7 @@ const CreateUpdateClientGoalModal = (props: IProps) => {
                             {...field}
                             value={field.value || ""}
                             onChange={(e) => {
+                              console.log("current value", field.value);
                               const selectedValue = +e.target.value;
                               field.onChange(selectedValue);
                               const selectedGoal = goals.find(

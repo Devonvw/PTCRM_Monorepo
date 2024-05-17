@@ -1,6 +1,7 @@
 import { IReload } from "@/interfaces/reload";
 import toastError from "@/utils/toast-error";
 import axios from "axios";
+import toast from "react-hot-toast";
 import { create } from "zustand";
 
 export const useClientGoals = create((set: any, get: any) => ({
@@ -22,6 +23,7 @@ export const useClientGoals = create((set: any, get: any) => ({
           clientId: modules.clientId,
           pageIndex: modules.pagination[0],
           pageSize: modules.pagination[1],
+          show: modules.filters?.show,
         },
       });
       set((state: any) => ({
@@ -53,6 +55,7 @@ export const useClientGoals = create((set: any, get: any) => ({
       await axios.post("/backend/client-goals", clientGoal);
 
       if (reload) reload();
+      toast.success("Client goal created successfully.");
     } catch (e: any) {
       toastError(e?.response?.data?.message);
     }
@@ -62,34 +65,38 @@ export const useClientGoals = create((set: any, get: any) => ({
       await axios.put(`/backend/client-goals/${clientGoal.id}`, clientGoal);
 
       if (reload) reload();
+      toast.success("Client goal updated successfully.");
     } catch (e: any) {
       toastError(e?.response?.data?.message);
     }
   },
-  deleteClientGoal: async (id: string, reload?: IReload) => {
+  deleteClientGoal: async (id: number, reload?: IReload) => {
     try {
       await axios.delete(`/backend/client-goals/${id}`);
 
       if (reload) reload();
+      toast.success("Client goal deleted successfully.");
     } catch (e: any) {
       toastError(e?.response?.data?.message);
     }
   },
-  filterOptions: [
-    {
-      label: "All",
-      value: "all",
-    },
-    {
-      label: "Completed",
-      value: "completed",
-    },
-    {
-      label: "Uncompleted",
-      value: "uncompleted",
-    },
-  ],
+  // filterOptions: [
+  //   {
+  //     label: "All",
+  //     value: "all",
+  //   },
+  //   {
+  //     label: "Completed",
+  //     value: "completed",
+  //   },
+  //   {
+  //     label: "Uncompleted",
+  //     value: "uncompleted",
+  //   },
+  // ],
   addOrUpdateModalOpen: false,
   setAddOrUpdateModalOpen: (open: boolean) =>
     set({ addOrUpdateModalOpen: open }),
+  deleteModalOpen: false,
+  setDeleteModalOpen: (open: boolean) => set({ deleteModalOpen: open }),
 }));
