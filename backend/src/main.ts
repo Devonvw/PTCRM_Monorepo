@@ -11,6 +11,7 @@ import { TypeormStore } from 'connect-typeorm';
 import { SessionEntity } from './domain/session.entity';
 import { DataSource } from 'typeorm';
 import { RolesGuard } from './guards/roles.guard';
+import { GlobalExceptionsFilter } from './utils/global-exception-filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -35,7 +36,7 @@ async function bootstrap() {
   app.use(passport.initialize());
   app.use(passport.session());
   app.useGlobalGuards(new RolesGuard(new Reflector()));
-  //. 
+  app.useGlobalFilters(new GlobalExceptionsFilter());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

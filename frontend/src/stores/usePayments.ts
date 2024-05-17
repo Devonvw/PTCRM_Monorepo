@@ -9,10 +9,10 @@ import { persist, createJSONStorage } from "zustand/middleware";
 export const usePayments = create((set: any, get: any) => ({
   subscriptions: [] as any[],
   loading: undefined,
-  getMySubscriptions: async (initialLoad?: boolean) => {
+  getSubscriptions: async (initialLoad?: boolean) => {
     if (initialLoad) set({ loading: true });
     try {
-      const { data } = await axios.get(`/backend/payment/my-subscriptions`);
+      const { data } = await axios.get(`/backend/payment/subscriptions`);
       set((state: any) => ({
         subscriptions: data,
       }));

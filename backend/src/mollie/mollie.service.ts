@@ -39,6 +39,25 @@ export class MollieService {
     return mandate;
   }
 
+  async createSubscription(
+    customerId: string,
+    amount: number,
+    description: string,
+  ) {
+    const subscription = await this.mollieClient.customerSubscriptions.create({
+      customerId: customerId,
+      amount: {
+        currency: 'EUR',
+        value: Number(amount).toFixed(2),
+      },
+      interval: '4 weeks',
+      description,
+      webhookUrl: process.env.BACKEND_URL + '/payment/webhook-mollie',
+    });
+
+    return subscription;
+  }
+
   async checkUserMandate(customerId: string) {
     const mandates = await this.getMandates(customerId);
 
@@ -51,25 +70,35 @@ export class MollieService {
     return true;
   }
 
+  public async getPayment(paymentId: string) {
+    const payment = await this.mollieClient.payments.get(paymentId);
+
+    return payment;
+  }
+
   async createFirstPayment(
     customerId: string,
     amount: number,
     description: string,
   ) {
-    const res = await this.mollieClient.payments.create({
-      customerId,
-      sequenceType: SequenceType.first,
-      amount: {
-        currency: 'EUR',
-        value: amount.toFixed(2),
-      },
-      method: PaymentMethod.ideal,
-      description,
-      redirectUrl: process.env.FRONTEND_URL + `/app/start`,
-      webhookUrl: process.env.BACKEND_URL + '/payment/webhook-mollie',
-    });
+    try {
+      console.log('customerId', customerId, amount, description);
+      const res = await this.mollieClient.payments.create({
+        customerId,
+        sequenceType: SequenceType.first,
+        amount: {
+          currency: 'EUR',
+          value: '0.01',
+        },
+        description,
+        redirectUrl: process.env.FRONTEND_URL + `/app`,
+        webhookUrl: process.env.BACKEND_URL + '/payment/webhook-mollie',
+      });
 
-    return res;
+      return res;
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   async createRecurringPayment(
