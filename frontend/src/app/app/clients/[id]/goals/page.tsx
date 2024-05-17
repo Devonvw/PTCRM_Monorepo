@@ -19,24 +19,29 @@ import {
   ChevronRightIcon,
   PencilLine,
   PlusCircle,
+  Trash,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CreateUpdateClientGoalModal from "./components/CreateEditClientGoal-Modal";
 
 const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
   //. Get the client goals
   const {
     getClientGoals,
+    getClientGoal,
+    clientGoal,
     clientGoals,
-    addModalOpen,
-    setAddModalOpen,
+    addOrUpdateModalOpen,
+    setAddOrUpdateModalOpen: setAddOrUpdateModalOpen,
     loading,
     reload,
   } = useClientGoals();
 
   const [currentPage, setCurrentPage] = useState(0);
   const [totalRows, setTotalRows] = useState(0);
-  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const triggerReload = useRef(false);
+  const [stateClientGoal, setClientGoal] = useState(undefined);
+  // const [createOrUpdateModalOpen, setCreateOrUpdateModalOpen] = useState(false);
   const pageSize = 4;
 
   const canGetNextPage = () => {
@@ -51,10 +56,15 @@ const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
           pagination: [currentPage, pageSize],
         })
       );
-      console.log("id", id);
     };
     fetchData();
-  }, [id, currentPage, reload]);
+  }, [id, currentPage, triggerReload.current]);
+
+  const onCloseModal = () => {
+    setAddOrUpdateModalOpen(false);
+    //. Reload the data
+    triggerReload.current = !triggerReload.current;
+  };
 
   const calculateProgress = (
     startValue: number,
@@ -77,15 +87,17 @@ const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
   return (
     <div>
       <CreateUpdateClientGoalModal
-        open={createModalOpen}
-        onClose={() => setCreateModalOpen(false)}
+        open={addOrUpdateModalOpen}
+        onClose={() => onCloseModal()}
+        clientId={Number(id)}
+        clientGoal={stateClientGoal}
       />
       <div className='flex justify-between'>
         <div className='flex flex-row space-x-2'>
           <Button
             variant='outline'
             className='hidden h-8 w-8 p-0 lg:flex'
-            onClick={() => setCurrentPage(currentPage - 1)}
+            onClick={() => setCurrentPage(0)}
             disabled={currentPage === 0}
           >
             <span className='sr-only'>Go to first page</span>
@@ -94,7 +106,7 @@ const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
           <Button
             variant='outline'
             className='h-8 w-8 p-0'
-            onClick={() => setCurrentPage(0)}
+            onClick={() => setCurrentPage(currentPage - 1)}
             disabled={currentPage === 0}
           >
             <span className='sr-only'>Go to previous page</span>
@@ -112,18 +124,26 @@ const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
           <Button
             variant='outline'
             className='hidden h-8 w-8 p-0 lg:flex'
-            onClick={() => setCurrentPage(Math.floor(totalRows / pageSize) - 1)}
+            onClick={() => {
+              setCurrentPage(Math.ceil(totalRows / pageSize) - 1);
+            }}
             disabled={!canGetNextPage()}
           >
             <span className='sr-only'>Go to last page</span>
             <DoubleArrowRightIcon className='h-4 w-4' />
           </Button>
+          <span className='text-sm h-8 content-center'>
+            Page {currentPage + 1} of {Math.ceil(totalRows / pageSize)}
+          </span>
         </div>
         <Button
           size='sm'
           variant='light'
           className=''
-          onClick={() => setCreateModalOpen(true)}
+          onClick={() => {
+            setClientGoal(undefined);
+            setAddOrUpdateModalOpen(true);
+          }}
         >
           Add Client Goal <PlusCircle className='h-5 w-5' />
         </Button>
@@ -132,41 +152,41 @@ const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
         {loading ? (
           <span>Loading...</span>
         ) : (
-          clientGoals.map((clientGoal) => {
-            const measurementUnit = clientGoal["goal"]["measurementUnit"];
+          clientGoals.map((cg) => {
+            const measurementUnit = cg["goal"]["measurementUnit"];
             const progress = calculateProgress(
-              clientGoal["startValue"],
-              clientGoal["currentValue"],
-              clientGoal["completedValue"]
+              cg["startValue"],
+              cg["currentValue"],
+              cg["completedValue"]
             );
             return (
-              <Card key={clientGoal["id"]}>
+              <Card key={cg["id"]}>
                 <CardHeader className='pb-2'>
                   <CardTitle className='text-sm font-medium'>
-                    {clientGoal["goal"]["name"]}
+                    {cg["goal"]["name"]}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <CardDescription className='pb-2'>
-                    {clientGoal["goal"]["description"]}
+                    {cg["goal"]["description"]}
                   </CardDescription>
                   <div className='grid gap-2 grid-cols-3'>
                     <div className='flex flex-col'>
                       <span>Started</span>
                       <span className='text-xl font-bold'>
-                        {clientGoal["startValue"]} {measurementUnit}
+                        {cg["startValue"]} {measurementUnit}
                       </span>
                     </div>
                     <div className='flex flex-col'>
                       <span>Currently</span>
                       <span className='text-xl font-bold'>
-                        {clientGoal["currentValue"]} {measurementUnit}
+                        {cg["currentValue"]} {measurementUnit}
                       </span>
                     </div>
                     <div className='flex flex-col'>
                       <span>Goal</span>
                       <span className='text-xl font-bold'>
-                        {clientGoal["completedValue"]} {measurementUnit}
+                        {cg["completedValue"]} {measurementUnit}
                       </span>
                     </div>
                   </div>
@@ -174,10 +194,33 @@ const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
                     <p className='text-sm text-muted-foreground pt-2 items-center flex'>
                       {progress}% of goal reached
                     </p>
-                    <Button className='mt-2' type='submit' size='sm'>
-                      Modify
-                      <PencilLine className='h-5 w-5' />
-                    </Button>
+                    <div>
+                      <Button
+                        className='mt-2'
+                        variant={"destructive"}
+                        type='button'
+                        onClick={() => {
+                          setClientGoal(cg);
+                          setAddOrUpdateModalOpen(true);
+                        }}
+                        size='sm'
+                      >
+                        Delete
+                        <Trash className='h-5 w-5' />
+                      </Button>
+                      <Button
+                        className='mt-2 ms-2'
+                        type='button'
+                        onClick={() => {
+                          setClientGoal(cg);
+                          setAddOrUpdateModalOpen(true);
+                        }}
+                        size='sm'
+                      >
+                        Modify
+                        <PencilLine className='h-5 w-5' />
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

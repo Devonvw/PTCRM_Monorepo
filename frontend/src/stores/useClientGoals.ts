@@ -34,8 +34,9 @@ export const useClientGoals = create((set: any, get: any) => ({
       set({ loading: false });
     }
   },
-  getClientGoal: async (id: string, initialLoad?: boolean) => {
-    if (initialLoad) set({ loading: true });
+  getClientGoal: async (id: number, initialLoad?: boolean) => {
+    // if (initialLoad)
+    set({ loading: true });
     try {
       const { data } = await axios.get(`/backend/client-goals/${id}`);
       set((state: any) => ({
@@ -88,6 +89,7 @@ export const useClientGoals = create((set: any, get: any) => ({
       value: "uncompleted",
     },
   ],
-  addModalOpen: false,
-  setAddModalOpen: (open: boolean) => set({ addModalOpen: open }),
+  addOrUpdateModalOpen: false,
+  setAddOrUpdateModalOpen: (open: boolean) =>
+    set({ addOrUpdateModalOpen: open }),
 }));
