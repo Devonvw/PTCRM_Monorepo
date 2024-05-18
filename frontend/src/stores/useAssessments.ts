@@ -61,4 +61,31 @@ export const useAssessments = create((set: any, get: any) => ({
       set({ loading: false });
     }
   },
+  getAssessment: async (assessmentId: number) => {
+    set({ loading: true });
+    try {
+      const { data } = await axios.get(`/backend/assessments/${assessmentId}`);
+      set({ assessment: data });
+    } catch (e: any) {
+      toastError(e?.response?.data?.message);
+    } finally {
+      set({ loading: false });
+    }
+  },
+  deleteAssessment: async (assessmentId: number) => {
+    set({ loading: true });
+    try {
+      await axios.delete(`/backend/assessments/${assessmentId}`);
+      set({ reload: true });
+    } catch (e: any) {
+      toastError(e?.response?.data?.message);
+    } finally {
+      set({ loading: false });
+    }
+  },
+  addOrUpdateModalOpen: false,
+  setAddOrUpdateModalOpen: (open: boolean) =>
+    set({ addOrUpdateModalOpen: open }),
+  deleteModalOpen: false,
+  setDeleteModalOpen: (open: boolean) => set({ deleteModalOpen: open }),
 }));

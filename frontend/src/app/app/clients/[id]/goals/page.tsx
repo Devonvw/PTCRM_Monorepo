@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { IPage } from "@/interfaces/page";
+import { useAssessments } from "@/stores/useAssessments";
 import { useClientGoals } from "@/stores/useClientGoals";
 import { Select } from "@headlessui/react";
 import {
@@ -26,6 +27,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import CreateUpdateClientGoalModal from "./components/CreateEditClientGoal-Modal";
 import DeleteClientGoalModal from "./components/DeleteClientGoal";
+import PerformAssessmentModal from "./components/PerformAssessmentModal";
 
 const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
   //. Get the client goals
@@ -40,6 +42,10 @@ const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
     setDeleteModalOpen,
     loading,
   } = useClientGoals();
+  const {
+    addOrUpdateModalOpen: assessmentModalOpen,
+    setAddOrUpdateModalOpen: setAssessmentModalOpen,
+  } = useAssessments();
 
   const [currentPage, setCurrentPage] = useState(0);
   const [show, setShow] = useState("uncompleted");
@@ -47,7 +53,7 @@ const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
   const triggerReload = useRef(false);
   const [stateClientGoal, setClientGoal] = useState(undefined);
   // const [createOrUpdateModalOpen, setCreateOrUpdateModalOpen] = useState(false);
-  const pageSize = 4;
+  const pageSize: number = 4 as const;
 
   const canGetNextPage = () => {
     return totalRows > pageSize * (currentPage + 1);
@@ -78,6 +84,10 @@ const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
     if (totalRows % pageSize === 1) {
       setCurrentPage(currentPage - 1);
     }
+    //. Reload the data
+    triggerReload.current = !triggerReload.current;
+  };
+  const onCloseAssessmentModal = () => {
     //. Reload the data
     triggerReload.current = !triggerReload.current;
   };
@@ -121,6 +131,11 @@ const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
         clientGoalId={stateClientGoal?.["id"]}
         open={deleteModalOpen}
         onClose={() => onCloseDeleteModal()}
+      />
+      <PerformAssessmentModal
+        open={assessmentModalOpen}
+        onClose={() => onCloseAssessmentModal()}
+        clientId={Number(id)}
       />
       <div className='flex justify-between'>
         <div className='flex flex-row space-x-2'>
@@ -185,8 +200,7 @@ const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
             variant='default'
             className='mr-2'
             onClick={() => {
-              setClientGoal(undefined);
-              setAddOrUpdateModalOpen(true);
+              setAssessmentModalOpen(true);
             }}
           >
             Perform assessment
