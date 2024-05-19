@@ -57,6 +57,9 @@ const PerformAssessmentModal = (props: IProps) => {
     useAssessments();
 
   const [totalClientGoals, setTotalClientGoals] = useState(0);
+  const [measurementsToPerform, setMeasurementsToPerform] = useState<
+    { goalId: number; value: number }[]
+  >([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,6 +70,14 @@ const PerformAssessmentModal = (props: IProps) => {
           pagination: [0, 100],
         })
       );
+      setMeasurementsToPerform([]);
+      // var measurements: { goalId: number; value: number }[] = [];
+      clientGoals.forEach((clientGoal: ClientGoal) => {
+        measurementsToPerform.push({
+          goalId: clientGoal.goal.id,
+          value: clientGoal.currentValue,
+        });
+      });
       console.log("clientGoals", clientGoals);
     };
 
@@ -82,6 +93,11 @@ const PerformAssessmentModal = (props: IProps) => {
       })),
     },
   });
+
+  useEffect(
+    () => form.reset({ measurements: measurementsToPerform }),
+    [measurementsToPerform]
+  );
 
   function onSubmit(data: z.infer<typeof formSchema>) {
     console.log("data", data);
