@@ -25,20 +25,20 @@ const formSchema: any = z
     goalId: z.number({
       message: "Don't forget to select a goal.",
     }),
-    startValue: z
-      .number({
-        message: "Don't forget to fill in the start value.",
-      })
-      .nonnegative({
-        message: "The start value must be a positive number.",
-      }),
-    completedValue: z
-      .number({
-        message: "Don't forget to fill in the completed value.",
-      })
-      .nonnegative({
-        message: "The completed value must be a positive number.",
-      }),
+    startValue: z.string().refine(
+      (v) => {
+        let n = Number(v);
+        return !isNaN(n) && v?.length > 0;
+      },
+      { message: "Invalid number" }
+    ),
+    completedValue: z.string().refine(
+      (v) => {
+        let n = Number(v);
+        return !isNaN(n) && v?.length > 0;
+      },
+      { message: "Invalid number" }
+    ),
   })
   .refine((data) => data.startValue !== data.completedValue, {
     path: ["completedValue"],

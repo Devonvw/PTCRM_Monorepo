@@ -1,7 +1,15 @@
 import { DialogHeader } from "@/components/ui/dialog";
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useAssessments } from "@/stores/useAssessments";
 import { useClientGoals } from "@/stores/useClientGoals";
-import { Dialog } from "@headlessui/react";
+import { Dialog, Input } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -91,28 +99,28 @@ const PerformAssessmentModal = (props: IProps) => {
             </DialogHeader>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <div className='flex flex-col gap-4'>
-                {clientGoals.map((clientGoal: ClientGoal) => (
-                  <div key={clientGoal.id}>{clientGoal.id}</div>
-                  // <FormField
-                  //   key={clientGoal.id}
-                  //   name={`measurements.${clientGoal.id}.value`}
-                  //   render={({ field }) => (
-                  //     <FormItem>
-                  //       <FormLabel>{clientGoal.goal.name}</FormLabel>
-                  //       <FormDescription>
-                  //         {clientGoal.goal.howToMeasure}
-                  //       </FormDescription>
-                  //       <FormControl>
-                  //         <Input
-                  //           {...field}
-                  //           type='number'
-                  //           placeholder={clientGoal.currentValue.toString()}
-                  //         />
-                  //       </FormControl>
-                  //       <FormMessage />
-                  //     </FormItem>
-                  //   )}
-                  // ></FormField>
+                {clientGoals.map((clientGoal: ClientGoal, index: number) => (
+                  // <div key={clientGoal.id}>{clientGoal.id}</div>
+                  <FormField
+                    key={clientGoal.id}
+                    name={`measurements[${index}].clientGoalId`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{clientGoal.goal.name}</FormLabel>
+                        <FormDescription>
+                          {clientGoal.goal.howToMeasure}
+                        </FormDescription>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type='number'
+                            placeholder={clientGoal.currentValue.toString()}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  ></FormField>
                 ))}
               </div>
               <button type='submit' className='btn btn-primary'>
