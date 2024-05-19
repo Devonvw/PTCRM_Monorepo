@@ -26,5 +26,5 @@ export class CreateAssessmentDto {
   @Column()
   @IsOptional()
   @ApiProperty({ type: 'string' })
-  notes: string;
+  notes?: string;
 }

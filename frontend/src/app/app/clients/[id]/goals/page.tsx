@@ -81,13 +81,14 @@ const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
   const onCloseDeleteModal = () => {
     setDeleteModalOpen(false);
     //. Make sure that if the user was on the last page and deleted the last item, the page is set to the previous one
-    if (totalRows % pageSize === 1) {
+    if (totalRows % pageSize === 1 && currentPage > 0) {
       setCurrentPage(currentPage - 1);
     }
     //. Reload the data
     triggerReload.current = !triggerReload.current;
   };
   const onCloseAssessmentModal = () => {
+    setAssessmentModalOpen(false);
     //. Reload the data
     triggerReload.current = !triggerReload.current;
   };

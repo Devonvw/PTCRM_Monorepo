@@ -26,7 +26,7 @@ export const useClientGoals = create((set: any, get: any) => ({
           show: modules.filters?.show,
         },
       });
-      set((state: any) => ({
+      set(() => ({
         clientGoals: data?.data,
       }));
       return data?.totalRows;
@@ -41,7 +41,7 @@ export const useClientGoals = create((set: any, get: any) => ({
     set({ loading: true });
     try {
       const { data } = await axios.get(`/backend/client-goals/${id}`);
-      set((state: any) => ({
+      set(() => ({
         clientGoal: data,
       }));
     } catch (e: any) {

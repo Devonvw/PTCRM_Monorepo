@@ -19,26 +19,51 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-//BUG: For some reason when updating the client goal's start and completed value, the form does not update them, it sets the values to undefined and the form is invalid.
+//RESOLVED: For some reason when updating the client goal's start and completed value, the form does not update them, it sets the values to undefined and the form is invalid.
+//BY: The issue was that all input fields automatically return a string (all input fields to this), so the values were being set as strings, and the form was expecting numbers. I had to make the fields string fields and add a refine method to the schema to check if the values are numbers and not empty strings.
 const formSchema: any = z
   .object({
     goalId: z.number({
       message: "Don't forget to select a goal.",
     }),
-    startValue: z.string().refine(
-      (v) => {
-        let n = Number(v);
-        return !isNaN(n) && v?.length > 0;
-      },
-      { message: "Invalid number" }
-    ),
-    completedValue: z.string().refine(
-      (v) => {
-        let n = Number(v);
-        return !isNaN(n) && v?.length > 0;
-      },
-      { message: "Invalid number" }
-    ),
+    startValue: z
+      .string()
+      .refine(
+        (v) => {
+          let n = Number(v);
+          return !isNaN(n) && v?.length > 0;
+        },
+        { message: "Invalid number" }
+      )
+      .refine(
+        (v) => {
+          let n = Number(v);
+          return n > 0 && n < 9999.9 && v.split(".")[1]?.length === 1;
+        },
+        {
+          message:
+            "Only numbers greater than 0, smaller than 9999.9 and with a single decimal point are allowed",
+        }
+      ),
+    completedValue: z
+      .string()
+      .refine(
+        (v) => {
+          let n = Number(v);
+          return !isNaN(n) && v?.length > 0;
+        },
+        { message: "Invalid number" }
+      )
+      .refine(
+        (v) => {
+          let n = Number(v);
+          return n > 0 && n < 9999.9 && v.split(".")[1]?.length === 1;
+        },
+        {
+          message:
+            "Only numbers greater than 0, smaller than 9999.9 and with a single decimal point are allowed",
+        }
+      ),
   })
   .refine((data) => data.startValue !== data.completedValue, {
     path: ["completedValue"],
@@ -53,8 +78,13 @@ interface IProps {
 }
 
 const CreateUpdateClientGoalModal = (props: IProps) => {
-  const { createClientGoal, updateClientGoal, getClientGoal, getClientGoals } =
-    useClientGoals();
+  const {
+    createClientGoal,
+    updateClientGoal,
+    getClientGoal,
+    getClientGoals,
+    addOrUpdateModalOpen,
+  } = useClientGoals();
   const { goals, getGoals } = useGoals();
   const [totalRows, setTotalRows] = useState(0);
   const [selectedGoal, setSelectedGoal] = useState(undefined);
@@ -76,24 +106,22 @@ const CreateUpdateClientGoalModal = (props: IProps) => {
     } else {
       form.reset({}, { keepValues: false, keepDefaultValues: true });
     }
-  }, [props.clientGoal]);
+  }, [props.clientGoal, addOrUpdateModalOpen]);
 
-  //TODO: temporarily set default values to something else than 0, set them to 0 again once the bug is fixed.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       goalId: undefined,
-      startValue: 78,
-      completedValue: 68,
+      startValue: 0,
+      completedValue: 0,
     },
   });
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
+  async function onSubmit(data: z.infer<typeof formSchema>) {
     if (props.clientGoal) {
-      console.log("updating: client goal", props.clientGoal);
-      updateClientGoal({ id: props.clientGoal["id"], ...data });
+      await updateClientGoal({ id: props.clientGoal["id"], ...data });
     } else {
-      createClientGoal({ clientId: props.clientId, ...data });
+      await createClientGoal({ clientId: props.clientId, ...data });
     }
 
     props.onClose();

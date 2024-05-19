@@ -1,12 +1,38 @@
 import toastError from "@/utils/toast-error";
 import axios from "axios";
+import toast from "react-hot-toast";
 import { create } from "zustand";
 
 export const useAssessments = create((set: any, get: any) => ({
   assessment: {} as any,
   assessments: [],
+  clientGoalsToMeasure: [],
   loading: undefined,
   reload: false,
+  getClientGoalsToMeasure: async (modules: {
+    pagination: [pageIndex: number, pageSize: number];
+    clientId: number;
+  }): Promise<number> => {
+    set({ loading: true });
+    try {
+      const { data } = await axios.get("/backend/client-goals", {
+        params: {
+          // ...modules.pagination,
+          clientId: modules.clientId,
+          pageIndex: modules.pagination[0],
+          pageSize: modules.pagination[1],
+        },
+      });
+      set(() => ({
+        clientGoalsToMeasure: data?.data,
+      }));
+      return data?.totalRows;
+    } catch (e: any) {
+      return 0;
+    } finally {
+      set({ loading: false });
+    }
+  },
   initiateAssessment: async (clientId: number) => {
     set({ loading: true });
     try {
@@ -21,7 +47,7 @@ export const useAssessments = create((set: any, get: any) => ({
   },
   completeAssessment: async (
     clientId: number,
-    measurements: [clientGoalId: number, value: number][],
+    measurements: { clientGoalId: number; value: string }[],
     notes?: string
   ) => {
     set({ loading: true });
@@ -31,6 +57,8 @@ export const useAssessments = create((set: any, get: any) => ({
         measurements,
         notes,
       });
+
+      toast.success("Assessment saved");
     } catch (e: any) {
       toastError(e?.response?.data?.message);
     } finally {
