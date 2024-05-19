@@ -6,13 +6,13 @@ import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity({ name: 'client_goal' })
 export class ClientGoal extends AbstractEntity<ClientGoal> {
-  @Column()
+  @Column({ type: 'decimal', precision: 5, scale: 1 })
   startValue: number;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 5, scale: 1 })
   currentValue: number;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 5, scale: 1 })
   completedValue: number;
 
   @Column()

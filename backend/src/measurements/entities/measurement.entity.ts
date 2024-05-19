@@ -17,7 +17,7 @@ export class Measurement extends AbstractEntity<Measurement> {
   @ManyToOne(() => ClientGoal, { onDelete: 'CASCADE' })
   clientGoal: ClientGoal;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 5, scale: 1 })
   @IsNumber({}, { message: 'Value must be a number' })
   @Type(() => Number)
   @IsNotEmpty({ message: 'Value is required' })

@@ -1,5 +1,6 @@
 import { DialogHeader } from "@/components/ui/dialog";
 import {
+  Form,
   FormControl,
   FormDescription,
   FormField,
@@ -58,7 +59,7 @@ const PerformAssessmentModal = (props: IProps) => {
 
   const [totalClientGoals, setTotalClientGoals] = useState(0);
   const [measurementsToPerform, setMeasurementsToPerform] = useState<
-    { goalId: number; value: number }[]
+    { clientGoalId: number; value: number }[]
   >([]);
 
   useEffect(() => {
@@ -74,7 +75,7 @@ const PerformAssessmentModal = (props: IProps) => {
       // var measurements: { goalId: number; value: number }[] = [];
       clientGoals.forEach((clientGoal: ClientGoal) => {
         measurementsToPerform.push({
-          goalId: clientGoal.goal.id,
+          clientGoalId: clientGoal.id,
           value: clientGoal.currentValue,
         });
       });
@@ -87,9 +88,9 @@ const PerformAssessmentModal = (props: IProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      measurements: clientGoals.map((goal: ClientGoal) => ({
-        clientGoalId: goal.id,
-        value: goal.currentValue,
+      measurements: clientGoals.map((clientGoal: ClientGoal) => ({
+        clientGoalId: clientGoal.id,
+        value: clientGoal.currentValue,
       })),
     },
   });
@@ -113,36 +114,39 @@ const PerformAssessmentModal = (props: IProps) => {
                 Perform Assessment
               </h2>
             </DialogHeader>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
-              <div className='flex flex-col gap-4'>
-                {clientGoals.map((clientGoal: ClientGoal, index: number) => (
-                  // <div key={clientGoal.id}>{clientGoal.id}</div>
-                  <FormField
-                    key={clientGoal.id}
-                    name={`measurements[${index}].clientGoalId`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{clientGoal.goal.name}</FormLabel>
-                        <FormDescription>
-                          {clientGoal.goal.howToMeasure}
-                        </FormDescription>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type='number'
-                            placeholder={clientGoal.currentValue.toString()}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  ></FormField>
-                ))}
-              </div>
-              <button type='submit' className='btn btn-primary'>
-                Submit
-              </button>
-            </form>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)}>
+                <div className='flex flex-col gap-4'>
+                  {clientGoals.map((clientGoal: ClientGoal, index: number) => (
+                    // <div key={clientGoal.id}>{clientGoal.id}</div>
+                    <FormField
+                      control={form.control}
+                      key={clientGoal.id}
+                      name={`measurements.${index}.clientGoalId`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{clientGoal.goal.name}</FormLabel>
+                          <FormDescription>
+                            {clientGoal.goal.howToMeasure}
+                          </FormDescription>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type='number'
+                              placeholder={clientGoal.currentValue.toString()}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    ></FormField>
+                  ))}
+                </div>
+                <button type='submit' className='btn btn-primary'>
+                  Submit
+                </button>
+              </form>
+            </Form>
           </Dialog.Panel>
         </div>
       </div>

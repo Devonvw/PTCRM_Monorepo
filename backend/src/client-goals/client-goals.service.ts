@@ -18,6 +18,8 @@ export class ClientGoalsService {
     private readonly clientGoalRepository: Repository<ClientGoal>,
     @InjectRepository(Client)
     private readonly clientRepository: Repository<Client>,
+    @InjectRepository(Goal)
+    private readonly goalRepository: Repository<Goal>,
   ) {}
   async create(userId: number, body: CreateClientGoalDto): Promise<ClientGoal> {
     //. Make sure the client belongs to the coach (user)
@@ -35,6 +37,17 @@ export class ClientGoalsService {
       );
     }
 
+    //. Make sure the goal exists
+    const goal = await this.goalRepository.findOne({
+      where: { id: body.goalId },
+    });
+
+    if (!goal) {
+      throw new NotFoundException(
+        'There was no goal found with the provided id.',
+      );
+    }
+
     //. Create a new client goal object
     const clientGoal = new ClientGoal({
       ...body,
@@ -43,7 +56,6 @@ export class ClientGoalsService {
       currentValue: body.startValue,
       completed: body.startValue === body.completedValue,
     });
-
     return await this.clientGoalRepository.save(clientGoal);
   }
 
