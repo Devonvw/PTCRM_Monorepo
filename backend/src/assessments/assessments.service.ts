@@ -127,31 +127,28 @@ export class AssessmentsService {
 
           clientGoal.currentValue = measurement.value;
 
-          //. Check if the client goal has been completed (if the start value is less than the completed value, the goal is completed if the current value is greater than or equal to the completed value, and vice versa)
-          if (clientGoal.startValue < clientGoal.completedValue) {
-            if (clientGoal.currentValue >= clientGoal.completedValue) {
-              clientGoal.completed = true;
-            }
-          } else if (clientGoal.startValue > clientGoal.completedValue) {
-            if (clientGoal.currentValue <= clientGoal.completedValue) {
-              clientGoal.completed = true;
-            }
-          }
-          //. If the goal has not been completed yet, check if any achievements have been made
-          else {
-            if (clientGoal.achievements.length > 0) {
-              for (const achievement of clientGoal.achievements) {
-                if (
-                  measurement.value >= achievement.value &&
-                  !achievement.achieved
-                ) {
-                  achievement.achieved = true;
-                  achievement.achievedAt = new Date();
-                  achievementsObtained.push(achievement);
-                }
-              }
-            }
-          }
+          //. Check if the client goal has been completed
+          clientGoal.completed = this.clientGoalIsCompleted(
+            clientGoal.currentValue,
+            clientGoal.startValue,
+            clientGoal.completedValue,
+          );
+
+          //. REMOVED If the goal has not been completed yet, check if any achievements have been made
+          // else {
+          //   if (clientGoal.achievements.length > 0) {
+          //     for (const achievement of clientGoal.achievements) {
+          //       if (
+          //         measurement.value >= achievement.value &&
+          //         !achievement.achieved
+          //       ) {
+          //         achievement.achieved = true;
+          //         achievement.achievedAt = new Date();
+          //         achievementsObtained.push(achievement);
+          //       }
+          //     }
+          //   }
+          // }
           await entityManager.save(ClientGoal, clientGoal);
         }
       },
@@ -295,6 +292,7 @@ export class AssessmentsService {
     const assessment = await this.assessmentExistsAndBelongsToUser(
       assessmentId,
       userId,
+      true,
     );
 
     //. Get the most recent assessment before the one being deleted
@@ -304,12 +302,10 @@ export class AssessmentsService {
         performedAt: LessThan(assessment.performedAt),
       },
       order: { performedAt: 'DESC' },
-      relations: ['measurements'],
+      relations: ['measurements', 'measurements.clientGoal'],
     });
 
-    console.log(mostRecentAssessment);
-
-    //. If there is a most recent assessment, set the client goals' values to the most recent assessment's values, otherwise set them to the start values
+    //. If there is a most recent assessment, set the client goals' values to the most recent assessment's values, otherwise set them to the start values. Check if the client goals has been completed or not, and set the completed value accordingly
     if (mostRecentAssessment) {
       for (const measurement of assessment.measurements) {
         const clientGoal = await this.clientGoalRepository.findOne({
@@ -318,7 +314,13 @@ export class AssessmentsService {
 
         clientGoal.currentValue = mostRecentAssessment.measurements.find(
           (m) => m.clientGoal.id === clientGoal.id,
-        ).value;
+        )?.value;
+
+        clientGoal.completed = this.clientGoalIsCompleted(
+          clientGoal.currentValue,
+          clientGoal.startValue,
+          clientGoal.completedValue,
+        );
 
         await this.clientGoalRepository.save(clientGoal);
       }
@@ -334,7 +336,13 @@ export class AssessmentsService {
       }
     }
 
-    await this.assessmentRepository.delete(assessment);
+    //. Remove the clientGoal object from the measurements of the assessment to prevent wrongful deletion of the clientGoal object
+    assessment.measurements?.forEach((m) => {
+      delete m.clientGoal;
+    });
+
+    //. Use remove to delete the assessment and its measurements (delete only removes the assessment, not its measurements and causes a foreign key constraint error)
+    await this.assessmentRepository.remove(assessment);
 
     return { message: 'Assessment deleted' };
   }
@@ -384,5 +392,18 @@ export class AssessmentsService {
           'measurements.clientGoal.goal',
         ]
       : ['measurements', 'client'];
+  };
+
+  //. Check if the client goal has been completed (if the start value is less than the completed value, the goal is completed if the current value is greater than or equal to the completed value, and vice versa)
+  clientGoalIsCompleted = (
+    newValue: number,
+    startValue: number,
+    completedValue: number,
+  ) => {
+    if (startValue < completedValue) {
+      return newValue >= completedValue;
+    } else {
+      return newValue <= completedValue;
+    }
   };
 }

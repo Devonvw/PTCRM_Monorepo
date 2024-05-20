@@ -18,7 +18,7 @@ export default function DeleteAssessmentModal(props: IProps) {
       toast.error("Something went wrong, please try again.");
       props.onDeleted();
     }
-    await deleteAssessment(props.assessmentId as number, props.onClose);
+    await deleteAssessment(props.assessmentId as number, props.onDeleted);
   };
 
   return (

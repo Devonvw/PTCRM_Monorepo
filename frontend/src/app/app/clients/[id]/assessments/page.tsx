@@ -30,6 +30,7 @@ const ClientAssessmentsPage = ({ params: { id } }) => {
   });
 
   const handleTableChange = (changeProps: IOnChangeProps) => {
+    reload();
     return getAssessments({ ...changeProps, clientId: id });
   };
   const handleAssessmentCreated = () => {
@@ -44,7 +45,7 @@ const ClientAssessmentsPage = ({ params: { id } }) => {
         clientId={id}
         onClose={() => handleAssessmentCreated()}
       />
-      <ViewAssessmentModal />
+      <ViewAssessmentModal onDataChange={() => reload()} />
       <div className='flex justify-end -mb-8'>
         <Button
           onClick={() => setAddOrUpdateModalOpen(true)}

@@ -4,9 +4,20 @@ import { useAssessments } from "@/stores/useAssessments";
 import { Dialog } from "@headlessui/react";
 import DeleteAssessmentModal from "./DeleteAssessmentModal";
 
-const ViewAssessmentModal = () => {
+interface IProps {
+  onDataChange: () => void;
+}
+
+const ViewAssessmentModal = (props: IProps) => {
   const { assessment, viewModalOpen, setViewModalOpen, setDeleteModalOpen } =
     useAssessments();
+
+  const onDeleted = () => {
+    //. Refresh the grid
+    props.onDataChange();
+    setViewModalOpen(false);
+    setDeleteModalOpen(false);
+  };
 
   return (
     <>
@@ -17,8 +28,7 @@ const ViewAssessmentModal = () => {
           setViewModalOpen(true);
         }}
         onDeleted={() => {
-          setDeleteModalOpen(false);
-          setViewModalOpen(false);
+          onDeleted();
         }}
       />
       <Dialog open={viewModalOpen} onClose={() => setViewModalOpen(false)}>
