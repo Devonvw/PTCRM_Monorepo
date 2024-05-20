@@ -9,7 +9,7 @@ import { Measurement } from 'src/measurements/entities/measurement.entity';
 import Filters from 'src/utils/filter';
 import OrderBy from 'src/utils/order-by';
 import Pagination from 'src/utils/pagination';
-import { Between, Repository } from 'typeorm';
+import { Between, LessThan, Repository } from 'typeorm';
 import { CreateAssessmentDto } from './dtos/CreateAssessmentDto';
 import { GetAssessmentsQueryDto } from './dtos/GetAssessmentsQueryDto';
 import { InitiateAssessmentDto } from './dtos/InitiateAssessmentDto';
@@ -285,6 +285,7 @@ export class AssessmentsService {
     const assessment = await this.assessmentExistsAndBelongsToUser(
       assessmentId,
       userId,
+      true,
     );
 
     return assessment;
@@ -295,7 +296,43 @@ export class AssessmentsService {
       assessmentId,
       userId,
     );
-    //TODO: Set the values of the clientgoals back to the most recent performed assessment
+
+    //. Get the most recent assessment before the one being deleted
+    const mostRecentAssessment = await this.assessmentRepository.findOne({
+      where: {
+        client: { id: assessment.client.id },
+        performedAt: LessThan(assessment.performedAt),
+      },
+      order: { performedAt: 'DESC' },
+      relations: ['measurements'],
+    });
+
+    console.log(mostRecentAssessment);
+
+    //. If there is a most recent assessment, set the client goals' values to the most recent assessment's values, otherwise set them to the start values
+    if (mostRecentAssessment) {
+      for (const measurement of assessment.measurements) {
+        const clientGoal = await this.clientGoalRepository.findOne({
+          where: { id: measurement.clientGoal.id },
+        });
+
+        clientGoal.currentValue = mostRecentAssessment.measurements.find(
+          (m) => m.clientGoal.id === clientGoal.id,
+        ).value;
+
+        await this.clientGoalRepository.save(clientGoal);
+      }
+    } else {
+      for (const measurement of assessment.measurements) {
+        const clientGoal = await this.clientGoalRepository.findOne({
+          where: { id: measurement.clientGoal.id },
+        });
+
+        clientGoal.currentValue = clientGoal.startValue;
+
+        await this.clientGoalRepository.save(clientGoal);
+      }
+    }
 
     await this.assessmentRepository.delete(assessment);
 
@@ -321,6 +358,7 @@ export class AssessmentsService {
   async assessmentExistsAndBelongsToUser(
     assessmentId: number,
     userId: number,
+    getDeepRelations = false,
   ): Promise<Assessment> {
     //. Check if the assessment exists and belongs to the user
     const assessment = await this.assessmentRepository.findOne({
@@ -328,7 +366,7 @@ export class AssessmentsService {
         id: assessmentId,
         client: { user: { id: userId } },
       },
-      relations: ['measurements'],
+      relations: this.determineRelationRetrieval(getDeepRelations),
     });
 
     if (!assessment) {
@@ -337,4 +375,14 @@ export class AssessmentsService {
 
     return assessment;
   }
+  determineRelationRetrieval = (getDeepRelations: boolean) => {
+    return getDeepRelations
+      ? [
+          'client',
+          'measurements',
+          'measurements.clientGoal',
+          'measurements.clientGoal.goal',
+        ]
+      : ['measurements', 'client'];
+  };
 }

@@ -29,16 +29,21 @@ const formSchema: any = z
     startValue: z
       .string()
       .refine(
-        (v) => {
-          let n = Number(v);
-          return !isNaN(n) && v?.length > 0;
+        (value) => {
+          let n = Number(value);
+          return !isNaN(n) && value?.length > 0;
         },
         { message: "Invalid number" }
       )
       .refine(
-        (v) => {
-          let n = Number(v);
-          return n > 0 && n < 9999.9 && v.split(".")[1]?.length === 1;
+        (value) => {
+          let n = Number(value);
+          let split = value.split(".");
+          return (
+            n > 0 &&
+            n < 9999.9 &&
+            (split.length === 1 ? true : split[1].length <= 1)
+          );
         },
         {
           message:
@@ -48,16 +53,21 @@ const formSchema: any = z
     completedValue: z
       .string()
       .refine(
-        (v) => {
-          let n = Number(v);
-          return !isNaN(n) && v?.length > 0;
+        (value) => {
+          let n = Number(value);
+          return !isNaN(n) && value?.length > 0;
         },
         { message: "Invalid number" }
       )
       .refine(
-        (v) => {
-          let n = Number(v);
-          return n > 0 && n < 9999.9 && v.split(".")[1]?.length === 1;
+        (value) => {
+          let n = Number(value);
+          let split = value.split(".");
+          return (
+            n > 0 &&
+            n < 9999.9 &&
+            (split.length === 1 ? true : split[1].length <= 1)
+          );
         },
         {
           message:

@@ -25,11 +25,11 @@ import {
   Trash,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import PerformAssessmentModal from "../assessments/components/PerformAssessmentModal";
 import CreateUpdateClientGoalModal from "./components/CreateEditClientGoal-Modal";
 import DeleteClientGoalModal from "./components/DeleteClientGoal";
-import PerformAssessmentModal from "./components/PerformAssessmentModal";
 
-const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
+const ClientGoalsPage = ({ params: { id } }: IPage) => {
   //. Get the client goals
   const {
     getClientGoals,
@@ -318,4 +318,4 @@ const ClientDetailGoalsPage = ({ params: { id } }: IPage) => {
   );
 };
 
-export default ClientDetailGoalsPage;
+export default ClientGoalsPage;

@@ -1,11 +1,8 @@
 import { IReload } from "@/interfaces/reload";
 import toastError from "@/utils/toast-error";
 import axios from "axios";
-import { error } from "console";
-import { Router } from "next/router";
 import toast from "react-hot-toast";
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
 
 export const useClients = create((set: any, get: any) => ({
   client: {} as any,

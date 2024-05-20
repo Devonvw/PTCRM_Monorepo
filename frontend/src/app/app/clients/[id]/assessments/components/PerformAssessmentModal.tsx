@@ -141,16 +141,16 @@ const PerformAssessmentModal = (props: IProps) => {
             <DialogHeader className='mb-4'>
               <h2 className='text-2xl font-bold text-gray-100'>
                 Performing Assessment
+                <small className='text-sm font-normal ms-2'>
+                  ({totalClientGoals}{" "}
+                  {totalClientGoals > 1 ? "measurements" : "measurement"} to
+                  perform)
+                </small>
               </h2>
-              <small className='text-xs font-normal'>
-                {totalClientGoals}{" "}
-                {totalClientGoals > 1 ? "measurements" : "measurement"} to
-                perform
-              </small>
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
-                <div className='grid grid-cols-2 gap-4 mb-4 max-h-96 overflow-y-scroll'>
+                <div className='grid grid-cols-2 gap-4 mb-4 max-h-112 overflow-y-scroll'>
                   {clientGoalsToMeasure.map(
                     (clientGoal: ClientGoal, index: number) => (
                       // <div key={clientGoal.id}>{clientGoal.id}</div>
