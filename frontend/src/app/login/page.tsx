@@ -79,11 +79,11 @@ export function Login() {
             </div>
           </nav>
         </div>
-        <div className="">
+        <div className="w-full max-w-sm dark:bg-slate-950 p-6 border dark:border-slate-800 rounded-lg">
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className=" w-fit dark:bg-slate-950 p-6 border dark:border-slate-800 rounded-lg grid grid-cols-1 gap-y-1"
+              className="grid grid-cols-1 gap-y-1"
             >
               <span className="uppercase font-black text-6xl text-gray-100 text-center">
                 PT<span className="font-thin">CRM</span>

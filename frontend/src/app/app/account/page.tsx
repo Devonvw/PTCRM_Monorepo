@@ -57,10 +57,32 @@ const formSchema: any = z.object({
     .max(255, {
       message: "Company name cannot be more than 255 characters.",
     }),
+  street: z.string().min(2, {
+    message: "Street must be at least 2 characters.",
+  }),
+  housenumber: z.string().min(1, {
+    message: "House number must be at least 1 character.",
+  }),
+  housenumberExtra: z.string().optional(),
+  city: z.string().min(2, {
+    message: "City must be at least 2 characters.",
+  }),
+  zipCode: z.string().min(2, {
+    message: "Zip code must be at least 2 characters.",
+  }),
+  country: z.string().min(2, {
+    message: "Country must be at least 2 characters.",
+  }),
 });
 
 const AccountPage = () => {
-  const { user, status, getLoggedInUser, getUserPaymentStatus } = useUser();
+  const {
+    user,
+    status,
+    getLoggedInUser,
+    getUserPaymentStatus,
+    updateLoggedInUser,
+  } = useUser();
 
   useEffect(() => {
     getLoggedInUser();
@@ -88,10 +110,7 @@ const AccountPage = () => {
 
   // // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-    // updateClient(id, values);
+    updateLoggedInUser(values);
   }
 
   return (
@@ -179,7 +198,7 @@ const AccountPage = () => {
           <div className="md:col-span-2 mt-6">
             <h3 className="text-lg font-semibold">Address information</h3>
             <p className="text-sm text-gray-400 mb-2 ">
-              Change the client address information below.
+              Change your address information below.
             </p>
             <Separator className="bg-light/30" />
           </div>

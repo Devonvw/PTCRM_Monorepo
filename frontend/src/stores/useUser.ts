@@ -1,4 +1,6 @@
+import toastError from "@/utils/toast-error";
 import axios from "axios";
+import toast from "react-hot-toast";
 import { create } from "zustand";
 
 export const useUser = create((set: any, get: any) => ({
@@ -8,10 +10,20 @@ export const useUser = create((set: any, get: any) => ({
   setUser: () => (user: any) => set({ user }),
   getLoggedInUser: async () => {
     try {
-      const { data } = await axios.get("/backend/user/me");
+      const { data } = await axios.get("/backend/users/me");
 
       set({ user: data });
     } catch (error: any) {}
+  },
+  updateLoggedInUser: async (user: any) => {
+    try {
+      const { data } = await axios.put("/backend/users/me", user);
+
+      set({ user: data?.user });
+      toast.success(data?.message);
+    } catch (error: any) {
+      toastError(error?.response?.data?.message);
+    }
   },
   getUserPaymentStatus: async () => {
     try {

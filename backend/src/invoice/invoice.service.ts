@@ -5,6 +5,11 @@ import { Invoice } from './entities/invoice.entity';
 import { User } from 'src/users/entities/user.entity';
 import invoicePDF from 'src/utils/pdf/userInvoice';
 import { DownloadDto } from 'src/utils/dto/download.dto';
+import { GetInvoicesByUserQueryDto } from './dtos/GetInvoicesByUserQuery.dto';
+import Pagination from 'src/utils/pagination';
+import OrderBy from 'src/utils/order-by';
+import { EnumRoles } from 'src/types/roles.enums';
+import Filters from 'src/utils/filter';
 
 @Injectable()
 export class InvoiceService {
@@ -31,7 +36,12 @@ export class InvoiceService {
   ): Promise<DownloadDto> {
     const invoice = await this.entityManager.findOne(Invoice, {
       where: { id: invoiceId, user: { id: userId } },
-      relations: ['payment', 'user'],
+      relations: {
+        payment: {
+          subscription: true,
+        },
+        user: true,
+      },
     });
 
     if (!invoice) {
@@ -47,5 +57,50 @@ export class InvoiceService {
       name,
       mimeType: 'application/pdf',
     };
+  }
+
+  async getInvoicesByUser(
+    query: GetInvoicesByUserQueryDto,
+    userId: number,
+    loggedInUserId: number,
+  ) {
+    const pagination = Pagination(query);
+    const orderBy = OrderBy(query, [
+      {
+        key: 'date',
+        fields: ['date'],
+        relations: ['payment'],
+      },
+    ]);
+
+    const loggedInUser = await this.entityManager.findOne(User, {
+      where: { id: loggedInUserId },
+    });
+
+    userId = loggedInUser.role === EnumRoles.USER ? loggedInUserId : userId;
+
+    const filter = Filters(null, [
+      {
+        condition: true,
+        filter: {
+          user: { id: userId },
+        },
+      },
+    ]);
+
+    const data = await this.entityManager.find(Invoice, {
+      ...pagination,
+      where: [...filter],
+      relations: {
+        payment: true,
+      },
+      order: orderBy,
+    });
+
+    const totalRows = await this.entityManager.count(Invoice, {
+      where: [...filter],
+    });
+
+    return { data, totalRows };
   }
 }

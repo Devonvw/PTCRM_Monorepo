@@ -11,9 +11,11 @@ import { DownloadIcon } from "lucide-react";
 
 interface IPayment {
   id: number;
-  totalPrice: number;
-  vatPrice: number;
-  date: string;
+  payment: {
+    totalPrice: number;
+    vatPrice: number;
+    date: string;
+  };
 }
 
 export const columns: ColumnDef<IPayment>[] = [
@@ -27,7 +29,7 @@ export const columns: ColumnDef<IPayment>[] = [
   },
   {
     id: "totalPrice",
-    accessorFn: (row) => `${row.totalPrice}`,
+    accessorFn: (row) => `${row?.payment?.totalPrice}`,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Total" />
     ),
@@ -35,7 +37,7 @@ export const columns: ColumnDef<IPayment>[] = [
   },
   {
     id: "vatPrice",
-    accessorFn: (row) => `${row.vatPrice}`,
+    accessorFn: (row) => `${row?.payment.vatPrice}`,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Vat" />
     ),
@@ -43,7 +45,7 @@ export const columns: ColumnDef<IPayment>[] = [
   },
   {
     id: "date",
-    accessorFn: (row) => `${dayjs(row.date).format("YYYY-MM-DD")}`,
+    accessorFn: (row) => `${dayjs(row?.payment.date).format("YYYY-MM-DD")}`,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Date" />
     ),

@@ -136,6 +136,7 @@ export class PaymentService {
 
     await this.entityManager.save(subscription);
     await this.entityManager.save(payment);
+    await this.invoiceService.handleNewInvoice(payment, user);
 
     return molliePayment._links.checkout.href;
   }

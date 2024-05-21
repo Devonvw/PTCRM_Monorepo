@@ -41,12 +41,7 @@ const Clients = () => {
           </Link>
         </PageHeader.Right>
       </PageHeader>
-      <DataTable
-        columns={columns}
-        data={clients}
-        onChange={getClients}
-        {...state}
-      />
+      <DataTable columns={columns} data={clients} {...state} />
       <CreateClientModal
         open={addModalOpen}
         onOpenChange={setAddModalOpen}

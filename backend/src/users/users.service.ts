@@ -1,12 +1,18 @@
-import { ConflictException, Inject, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import bcrypt from 'bcrypt';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { PaymentService } from 'src/payment/payment.service';
 import { Payment } from 'src/payment/entities/payment.entity';
 import { SignUpDto } from './dtos/SignUp.dto';
 import { Subscription } from 'src/payment/entities/subscription.entity';
+import { UpdateUserDto } from './dtos/UpdateUser.dto';
 
 @Injectable()
 export class UsersService {
@@ -43,6 +49,28 @@ export class UsersService {
       user.subscription.id,
       savedUser.id,
     );
+  }
+
+  async updateLoggedInUser(id: number, body: UpdateUserDto): Promise<User> {
+    const user = await this.userRepository.findOneBy({ id });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const existingUser = await this.userRepository.findOne({
+      where: { email: body.email, id: Not(id) },
+    });
+
+    if (existingUser) {
+      throw new ConflictException(
+        'There is already a user registered with this email.',
+      );
+    }
+
+    const updatedUser = new User({ ...user, ...body });
+
+    return await this.userRepository.save(updatedUser);
   }
 
   async getLoggedInUser(userId: number) {

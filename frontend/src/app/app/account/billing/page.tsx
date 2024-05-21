@@ -16,24 +16,20 @@ import { PlusCircle } from "lucide-react";
 import useTable from "@/hooks/useTable";
 import Link from "next/link";
 import { usePayments } from "@/stores/usePayments";
+import { useInvoices } from "@/stores/useInvoices";
 
 const AccountBillingPage = () => {
-  const { getPaymentsByMe, payments } = usePayments();
+  const { getInvoicesByMe, invoices } = useInvoices();
 
   const { state, reload } = useTable({
-    onChange: getPaymentsByMe,
+    onChange: getInvoicesByMe,
     filterOptions: [],
     sortingDefault: [{ id: "date", desc: true }],
   });
 
   return (
     <div>
-      <DataTable
-        columns={columns}
-        data={payments}
-        onChange={getPaymentsByMe}
-        {...state}
-      />
+      <DataTable columns={columns} data={invoices} noSearch {...state} />
     </div>
   );
 };
