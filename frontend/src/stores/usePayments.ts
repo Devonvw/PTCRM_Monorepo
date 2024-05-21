@@ -8,6 +8,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 
 export const usePayments = create((set: any, get: any) => ({
   subscriptions: [] as any[],
+  payments: [] as any[],
   loading: undefined,
   getSubscriptions: async (initialLoad?: boolean) => {
     if (initialLoad) set({ loading: true });
@@ -22,4 +23,39 @@ export const usePayments = create((set: any, get: any) => ({
       set({ loading: false });
     }
   },
+  getPaymentsByMe: async (modules: {
+    pagination?: any;
+    search?: any;
+    sort?: any;
+    filters?: any;
+  }): Promise<number> => {
+    try {
+      const { data } = await axios.get(`/backend/payment/my-payments`, {
+        params: {
+          ...modules.pagination,
+          ...modules.search,
+          ...modules.sort,
+          ...modules.filters,
+        },
+      });
+      set((state: any) => ({
+        payments: data?.data,
+      }));
+      return data?.totalRows;
+    } catch (e: any) {
+      return 0;
+    }
+  },
+  sortOptions: [
+    {
+      id: 1,
+      name: "Aantal schepen - Oplopend",
+      meta: { key: "ship_count", direction: "ASC" },
+    },
+    {
+      id: 2,
+      name: "Aantal schepen - Aflopend",
+      meta: { key: "ship_count", direction: "DESC" },
+    },
+  ],
 }));

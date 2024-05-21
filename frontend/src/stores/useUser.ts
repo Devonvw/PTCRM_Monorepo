@@ -4,8 +4,30 @@ import { create } from "zustand";
 export const useUser = create((set: any, get: any) => ({
   infoMessage: {} as { message: string; isError: boolean },
   user: {} as any,
+  status: {} as any,
   setUser: () => (user: any) => set({ user }),
-  logout: () => set({ user: {} }),
+  getLoggedInUser: async () => {
+    try {
+      const { data } = await axios.get("/backend/user/me");
+
+      set({ user: data });
+    } catch (error: any) {}
+  },
+  getUserPaymentStatus: async () => {
+    try {
+      const { data } = await axios.get("/backend/payment/user-status");
+
+      set({ status: data });
+    } catch (error: any) {}
+  },
+  logout: async (redirect: (path: string) => void) => {
+    try {
+      await axios.delete("/backend/auth/logout");
+
+      set({ user: null });
+      redirect("/login");
+    } catch (error: any) {}
+  },
   signUp: async (user: any, redirect: (href: string) => void) => {
     try {
       // Make the signup request with Axios

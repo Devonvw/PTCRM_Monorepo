@@ -44,4 +44,11 @@ export class UsersService {
       savedUser.id,
     );
   }
+
+  async getLoggedInUser(userId: number) {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    delete user.password;
+
+    return user;
+  }
 }

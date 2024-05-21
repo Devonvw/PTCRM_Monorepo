@@ -120,16 +120,6 @@ export const useClients = create((set: any, get: any) => ({
       name: "Naam Z-A",
       meta: { key: "name", direction: "DESC" },
     },
-    {
-      id: 3,
-      name: "Aantal schepen - Oplopend",
-      meta: { key: "ship_count", direction: "ASC" },
-    },
-    {
-      id: 4,
-      name: "Aantal schepen - Aflopend",
-      meta: { key: "ship_count", direction: "DESC" },
-    },
   ],
   filterOptions: [
     {

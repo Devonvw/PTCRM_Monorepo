@@ -3,6 +3,7 @@ import createMollieClient, {
   PaymentMethod,
   SequenceType,
 } from '@mollie/api-client';
+import dayjs from 'dayjs';
 
 @Injectable()
 export class MollieService {
@@ -41,11 +42,15 @@ export class MollieService {
 
   async createSubscription(
     customerId: string,
+    mandateId: string,
+    startDate: string,
     amount: number,
     description: string,
   ) {
     const subscription = await this.mollieClient.customerSubscriptions.create({
-      customerId: customerId,
+      customerId,
+      mandateId,
+      startDate,
       amount: {
         currency: 'EUR',
         value: Number(amount).toFixed(2),

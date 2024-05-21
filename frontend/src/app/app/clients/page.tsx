@@ -21,7 +21,10 @@ const Clients = () => {
   const { getClients, clients, filterOptions, addModalOpen, setAddModalOpen } =
     useClients();
 
-  const { state, reload } = useTable({ onChange: getClients, filterOptions });
+  const { state, reload } = useTable({
+    onChange: getClients,
+    filterOptions,
+  });
   return (
     <div>
       <PageHeader title="Clients" breadcrumbs={[{ title: "Clients" }]}>
