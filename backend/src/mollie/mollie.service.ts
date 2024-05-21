@@ -93,7 +93,7 @@ export class MollieService {
         sequenceType: SequenceType.first,
         amount: {
           currency: 'EUR',
-          value: '0.01',
+          value: Number(amount).toFixed(2),
         },
         description,
         redirectUrl: process.env.FRONTEND_URL + `/app`,

@@ -7,11 +7,13 @@ import { Subscription } from './entities/subscription.entity';
 import { User } from 'src/users/entities/user.entity';
 import { MollieService } from 'src/mollie/mollie.service';
 import { InvoiceModule } from 'src/invoice/invoice.module';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Payment, Subscription, User]),
     InvoiceModule,
+    MailModule,
   ],
   providers: [PaymentService, MollieService],
   controllers: [PaymentController],

@@ -54,5 +54,6 @@ import { ReactAdapter } from '@webtre/nestjs-mailer-react-adapter';
     }),
   ],
   providers: [MailService],
+  exports: [MailService],
 })
 export class MailModule {}

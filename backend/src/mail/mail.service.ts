@@ -23,4 +23,16 @@ export class MailService {
       },
     });
   }
+
+  async sendUserInvoiceEmail(email: string, invoice: any) {
+    await this.mailerService.sendMail({
+      to: email,
+      subject: `Invoice #${invoice.number}`,
+      template: 'user-invoice',
+      context: {
+        invoiceNumber: invoice.number,
+        name: invoice.user.company,
+      },
+    });
+  }
 }

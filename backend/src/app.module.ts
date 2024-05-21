@@ -17,7 +17,6 @@ import { MailModule } from './mail/mail.module';
 import { MeasurementsModule } from './measurements/measurements.module';
 import { MollieService } from './mollie/mollie.service';
 import { InvoiceModule } from './invoice/invoice.module';
-import { InvoiceService } from './-/invoice/invoice.service';
 
 @Module({
   imports: [
@@ -39,6 +38,6 @@ import { InvoiceService } from './-/invoice/invoice.service';
     InvoiceModule,
   ],
   controllers: [AppController],
-  providers: [AppService, MollieService, InvoiceService],
+  providers: [AppService, MollieService],
 })
 export class AppModule {}

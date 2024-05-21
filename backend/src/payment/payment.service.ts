@@ -16,6 +16,7 @@ import Filters from 'src/utils/filter';
 import invoicePDF from 'src/utils/pdf/userInvoice';
 import { Invoice } from 'src/invoice/entities/invoice.entity';
 import { InvoiceService } from 'src/invoice/invoice.service';
+import { MailService } from 'src/mail/mail.service';
 
 const VAT_PERCENTAGE = 0.21;
 
@@ -28,6 +29,7 @@ export class PaymentService {
     private readonly entityManager: EntityManager,
     private mollieService: MollieService,
     private invoiceService: InvoiceService,
+    private mailService: MailService,
   ) {}
 
   async getSubscriptions() {
@@ -136,7 +138,8 @@ export class PaymentService {
 
     await this.entityManager.save(subscription);
     await this.entityManager.save(payment);
-    await this.invoiceService.handleNewInvoice(payment, user);
+    const invoice = await this.invoiceService.handleNewInvoice(payment, user);
+    await this.mailService.sendUserInvoiceEmail(user?.email, invoice);
 
     return molliePayment._links.checkout.href;
   }
@@ -183,10 +186,6 @@ export class PaymentService {
       where: { molliePaymentId: body?.id },
       relations: ['subscription', 'user'],
     });
-
-    console.log('molliePayment', molliePayment);
-    console.log('payment', payment);
-    console.log('\n\n');
 
     switch (molliePayment?.status) {
       case 'paid':
@@ -240,7 +239,7 @@ export class PaymentService {
 
     if (!mandate?.length) return;
 
-    this.mollieService.createSubscription(
+    await this.mollieService.createSubscription(
       payment.user.mollieCustomerId,
       mandate?.[0].id,
       dayjs().add(4, 'week').format('YYYY-MM-DD'),
