@@ -8,8 +8,27 @@ import { PlusCircle } from "lucide-react";
 import { columns } from "./columns";
 import PerformAssessmentModal from "./components/PerformAssessmentModal";
 import ViewAssessmentModal from "./components/ViewAssessmentModal";
+import { useRouter } from "next/navigation";
+import { useClients } from "@/stores/useClients";
+import { useEffect } from "react";
+import ClientDetailLayout from "../components/layout";
+import { IPage } from "@/interfaces/page";
 
-const ClientAssessmentsPage = ({ params: { id } }) => {
+const ClientAssessmentsPage = ({ params: { id } }: IPage) => {
+  const router = useRouter();
+  const {
+    getClient,
+    loading: clientLoading,
+    client,
+    addModalOpen,
+    setAddModalOpen,
+    updateClient,
+  } = useClients();
+
+  useEffect(() => {
+    if (client?.id != id) getClient(id, true, router.push);
+  }, [id]);
+
   const {
     assessment,
     assessments,
@@ -24,14 +43,20 @@ const ClientAssessmentsPage = ({ params: { id } }) => {
 
   const { state, reload } = useTable({
     onChange: ({ pagination, filters, search, sort }) =>
-      getAssessments({ pagination, filters, search, sort, clientId: id }),
+      getAssessments({
+        pagination,
+        filters,
+        search,
+        sort,
+        clientId: Number(id),
+      }),
     filterOptions,
     sortingDefault: [{ id: "performedAt", desc: true }],
   });
 
   const handleTableChange = (changeProps: IOnChangeProps) => {
     reload();
-    return getAssessments({ ...changeProps, clientId: id });
+    return getAssessments({ ...changeProps, clientId: Number(id) });
   };
   const handleAssessmentCreated = () => {
     reload();
@@ -39,30 +64,27 @@ const ClientAssessmentsPage = ({ params: { id } }) => {
   };
 
   return (
-    <div>
-      <PerformAssessmentModal
-        open={addOrUpdateModalOpen}
-        clientId={id}
-        onClose={() => handleAssessmentCreated()}
-      />
-      <ViewAssessmentModal onDataChange={() => reload()} />
-      <div className='flex justify-end -mb-8'>
-        <Button
-          onClick={() => setAddOrUpdateModalOpen(true)}
-          size='sm'
-          variant='light'
-          className=' z-10'
-        >
-          New assessment <PlusCircle className='h-5 w-5' />
-        </Button>
+    <ClientDetailLayout client={client} loading={clientLoading}>
+      <div>
+        <PerformAssessmentModal
+          open={addOrUpdateModalOpen}
+          clientId={Number(id)}
+          onClose={() => handleAssessmentCreated()}
+        />
+        <ViewAssessmentModal onDataChange={() => reload()} />
+        <div className="flex justify-end -mb-8">
+          <Button
+            onClick={() => setAddOrUpdateModalOpen(true)}
+            size="sm"
+            variant="light"
+            className=" z-10"
+          >
+            New assessment <PlusCircle className="h-5 w-5" />
+          </Button>
+        </div>
+        <DataTable columns={columns} data={assessments} {...state} />
       </div>
-      <DataTable
-        columns={columns}
-        data={assessments}
-        onChange={handleTableChange}
-        {...state}
-      />
-    </div>
+    </ClientDetailLayout>
   );
 };
 

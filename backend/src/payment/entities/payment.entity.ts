@@ -3,6 +3,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { Subscription } from './subscription.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Invoice } from 'src/invoice/entities/invoice.entity';
+import { PaymentStatus } from '@mollie/api-client';
 
 @Entity()
 export class Payment extends AbstractEntity<Payment> {
@@ -21,8 +22,8 @@ export class Payment extends AbstractEntity<Payment> {
   @Column({ nullable: true })
   molliePaymentId: string;
 
-  @Column({ default: false })
-  paid: boolean;
+  @Column({ type: 'enum', enum: PaymentStatus, default: PaymentStatus.open })
+  status: PaymentStatus;
 
   @Column({ type: 'datetime', nullable: true })
   paidAt: Date;

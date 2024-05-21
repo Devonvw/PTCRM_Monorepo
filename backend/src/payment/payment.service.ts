@@ -8,17 +8,18 @@ import { MollieService } from 'src/mollie/mollie.service';
 import dayjs from 'dayjs';
 import { EnumRoles } from 'src/types/roles.enums';
 import { MollieWebhookDto } from './dtos/MollieWebhook.dto';
-import { Payment as MolliePayment } from '@mollie/api-client';
+import { Payment as MolliePayment, PaymentStatus } from '@mollie/api-client';
 import { GetPaymentsByUserQueryDto } from './dtos/GetPaymentsByUserQuery.dto';
 import Pagination from 'src/utils/pagination';
 import OrderBy from 'src/utils/order-by';
 import Filters from 'src/utils/filter';
-import invoicePDF from 'src/utils/pdf/userInvoice';
-import { Invoice } from 'src/invoice/entities/invoice.entity';
 import { InvoiceService } from 'src/invoice/invoice.service';
 import { MailService } from 'src/mail/mail.service';
-
-const VAT_PERCENTAGE = 0.21;
+import {
+  SUBSCRIPTION_INTERVAL_NUMBER,
+  SUBSCRIPTION_INTERVAL_TYPE,
+  VAT_PERCENTAGE,
+} from 'src/utils/constants';
 
 @Injectable()
 export class PaymentService {
@@ -78,12 +79,6 @@ export class PaymentService {
     return { data: clients, totalRows };
   }
 
-  async updateUserSubscription(subscriptionId: number, userId: number) {
-    const user = await this.entityManager.findOne(User, {
-      where: { id: userId },
-    });
-  }
-
   async updateInitialUserSubscription(
     subscriptionId: number,
     userId: number,
@@ -99,7 +94,6 @@ export class PaymentService {
     });
 
     user.subscription = subscription;
-    // user.mollieCustomerId = 'cst_kfrURgsd4c';
 
     if (!subscription)
       throw new NotFoundException('Subscription does not exist.');
@@ -139,68 +133,51 @@ export class PaymentService {
     await this.entityManager.save(subscription);
     await this.entityManager.save(payment);
     const invoice = await this.invoiceService.handleNewInvoice(payment, user);
-    await this.mailService.sendUserInvoiceEmail(user?.email, invoice);
+
+    const pdf = await this.invoiceService.downloadInvoice(invoice.id, user.id);
+    await this.mailService.sendUserInvoiceEmail(
+      user?.email,
+      invoice,
+      pdf?.buffer,
+    );
 
     return molliePayment._links.checkout.href;
   }
 
-  async createPayment(userId: number) {
-    const user = await this.entityManager.findOne(User, {
-      where: { id: userId },
-      relations: ['subscription'],
-    });
-
-    const latestPayment = await this.entityManager.findOne(Payment, {
-      where: { subscription: { id: user.subscription.id } },
-      order: { date: 'DESC' },
-    });
-
-    const today = dayjs();
-
-    if (today.diff(dayjs(latestPayment.date), 'day') >= 28) return;
-
-    const molliePayment = await this.mollieService.createRecurringPayment(
-      user.mollieCustomerId,
-      user.subscription.totalPrice,
-      `Payment for subscription:${user.subscription.name} ()`,
-    );
-
-    today.hour(0).minute(0).second(0).millisecond(0);
-
-    const payment = new Payment({
-      date: today.toDate(),
-      price: user.subscription.price,
-      vatPrice: user.subscription.vatPrice,
-      totalPrice: user.subscription.totalPrice,
-      molliePaymentId: molliePayment.id,
-      subscription: user.subscription,
-      user: user,
-    });
-
-    await this.entityManager.save(payment);
-  }
-
   async mollieWebhook(body: MollieWebhookDto) {
     const molliePayment = await this.mollieService.getPayment(body?.id);
-    const payment = await this.entityManager.findOne(Payment, {
+    let payment = await this.entityManager.findOne(Payment, {
       where: { molliePaymentId: body?.id },
       relations: ['subscription', 'user'],
     });
 
-    switch (molliePayment?.status) {
-      case 'paid':
-        if (molliePayment?.subscriptionId)
-          await this.handleSubscriptionPayment(molliePayment);
-        else await this.handleMandateFullfilled(payment.user.id, payment);
-        break;
-      case 'canceled':
-      case 'expired':
-      case 'failed':
-        break;
+    // Check if payment is a subscription payment and if the payment is already in the database
+    if (molliePayment?.subscriptionId && !payment) {
+      payment = await this.handleNewSubscriptionPayment(molliePayment);
     }
+
+    // Check if payment is a subscription payment and if the payment is paid
+    if (
+      molliePayment?.subscriptionId &&
+      molliePayment?.status == PaymentStatus.paid
+    ) {
+      await this.handlePaymentPaid(payment);
+      payment.paidAt = new Date();
+    }
+
+    if (
+      !molliePayment?.subscriptionId &&
+      molliePayment?.status == PaymentStatus.paid
+    ) {
+      await this.handleMandateFullfilled(payment.user.id, payment);
+      payment.paidAt = new Date();
+    }
+
+    payment.status = molliePayment.status;
+    this.entityManager.save(payment);
   }
 
-  async handleSubscriptionPayment(molliePayment: MolliePayment) {
+  async handleNewSubscriptionPayment(molliePayment: MolliePayment) {
     const user = await this.entityManager.findOne(User, {
       where: { mollieCustomerId: molliePayment.customerId },
       relations: ['subscription'],
@@ -215,18 +192,29 @@ export class PaymentService {
       molliePaymentId: molliePayment.id,
       subscription: user.subscription,
       user: user,
+      status: molliePayment.status,
     });
 
-    await this.entityManager.save(payment);
+    return await this.entityManager.save(payment);
+  }
 
-    await this.invoiceService.handleNewInvoice(payment, user);
+  async handlePaymentPaid(payment: Payment) {
+    const invoice = await this.invoiceService.handleNewInvoice(
+      payment,
+      payment?.user,
+    );
+    const pdf = await this.invoiceService.downloadInvoice(
+      invoice.id,
+      payment?.user.id,
+    );
+    await this.mailService.sendUserInvoiceEmail(
+      payment?.user?.email,
+      invoice,
+      pdf?.buffer,
+    );
   }
 
   async handleMandateFullfilled(userId: number, payment: Payment) {
-    payment.paid = true;
-    payment.paidAt = new Date();
-    await this.entityManager.save(payment);
-
     const user = await this.entityManager.findOne(User, {
       where: { id: userId },
       relations: ['subscription'],
@@ -242,32 +230,12 @@ export class PaymentService {
     await this.mollieService.createSubscription(
       payment.user.mollieCustomerId,
       mandate?.[0].id,
-      dayjs().add(4, 'week').format('YYYY-MM-DD'),
+      dayjs()
+        .add(SUBSCRIPTION_INTERVAL_NUMBER, SUBSCRIPTION_INTERVAL_TYPE)
+        .format('YYYY-MM-DD'),
       payment.subscription.totalPrice,
       `Payment for subscription:${payment.subscription.name}`,
     );
-  }
-
-  async handleTodaysPayments() {
-    const users = await this.entityManager.find(User, {
-      where: { role: EnumRoles.USER, subscription: Not(null) },
-      relations: ['subscription'],
-    });
-
-    users.forEach(async (user) => {
-      const latestPayment = await this.entityManager.findOne(Payment, {
-        where: { subscription: { id: user.subscription.id } },
-        order: { date: 'DESC' },
-      });
-
-      const today = dayjs();
-
-      if (today.diff(dayjs(latestPayment.date), 'day') >= 28) {
-        await this.createPayment(user.id);
-        //TODO: Create invoice
-        //TODO: Send email
-      }
-    });
   }
 
   async getUserMandateStatus(userId: number) {

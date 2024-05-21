@@ -65,7 +65,6 @@ export function DataTableToolbar<TData>({
             />
           ))}
         </div>
-        {/* <DataTableViewOptions table={table} /> */}
       </div>
       <ul className="flex items-center flex-wrap gap-2">
         <li className="font-bold uppercase text-secondary text-sm">Filters</li>
@@ -92,9 +91,6 @@ export function DataTableToolbar<TData>({
               className="bg-accent/20 text-primary text-sm font-semibold px-2 rounded flex gap-x-1"
             >
               {filter?.name}: {filter?.value}
-              {/* <Button variant='ghost' className='!p-0' onClick={() => onChangeSingleFilter(filter, '')}>
-            <XCircleIcon className='h-3 w-3 text-black hover:text-accent' />
-          </Button> */}
             </li>
           ) : null
         )}

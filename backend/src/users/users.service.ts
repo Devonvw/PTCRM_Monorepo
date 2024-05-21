@@ -13,6 +13,7 @@ import { Payment } from 'src/payment/entities/payment.entity';
 import { SignUpDto } from './dtos/SignUp.dto';
 import { Subscription } from 'src/payment/entities/subscription.entity';
 import { UpdateUserDto } from './dtos/UpdateUser.dto';
+import { PASSWORD_SALT_ROUNDS } from 'src/utils/constants';
 
 @Injectable()
 export class UsersService {
@@ -30,9 +31,12 @@ export class UsersService {
     return this.userRepository.findOneBy({ email });
   }
   async create(body: SignUpDto): Promise<string> {
-    const user = new User({ ...body, subscription: { id: 1 } as Subscription });
+    const user = new User({
+      ...body,
+      subscription: { id: body?.subscription } as Subscription,
+    });
 
-    //. Check if the user already exists
+    // Check if the user already exists
     const existingUser = await this.findByEmail(user.email);
     if (existingUser) {
       throw new ConflictException(
@@ -40,7 +44,7 @@ export class UsersService {
       );
     }
 
-    user.password = await bcrypt.hash(user.password, 10);
+    user.password = await bcrypt.hash(user.password, PASSWORD_SALT_ROUNDS);
 
     //. Save the user in the database
     const savedUser = await this.userRepository.save(user);

@@ -30,7 +30,7 @@ const formSchema = z.object({
   remember: z.boolean().optional(),
 });
 
-export function Login() {
+const LoginPage = () => {
   const { push } = useRouter();
   const { login, infoMessage } = useAuth();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -157,5 +157,5 @@ export function Login() {
       </div>
     </main>
   );
-}
-export default Login;
+};
+export default LoginPage;

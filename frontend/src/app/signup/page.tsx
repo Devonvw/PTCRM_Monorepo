@@ -70,7 +70,7 @@ const formSchema: any = z
     message: "Passwords do not match",
   });
 
-export function Signup() {
+const Signup = () => {
   const { subscriptions, getSubscriptions } = usePayments();
   const { signUp, infoMessage } = useAuth();
   const { push } = useRouter();
@@ -380,6 +380,6 @@ export function Signup() {
       </div>
     </main>
   );
-}
+};
 
 export default Signup;

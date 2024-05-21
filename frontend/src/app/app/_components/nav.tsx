@@ -23,14 +23,6 @@ const navItems = [
     title: "Clients",
     href: "/app/clients",
   },
-  {
-    title: "Payments",
-    href: "/app/payments",
-  },
-  {
-    title: "Documents",
-    href: "/app/documents",
-  },
 ];
 
 const Nav = () => {

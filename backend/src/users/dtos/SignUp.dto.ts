@@ -65,4 +65,8 @@ export class SignUpDto {
   @IsNotEmpty({ message: 'Country is required' })
   @ApiProperty({ type: 'string' })
   country: string;
+
+  @IsNotEmpty({ message: 'Subscription is required' })
+  @ApiProperty({ type: 'number' })
+  subscription: number;
 }
