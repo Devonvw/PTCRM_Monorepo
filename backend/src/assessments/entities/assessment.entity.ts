@@ -14,8 +14,8 @@ export class Assessment extends AbstractEntity<Assessment> {
   @Column()
   performedAt: Date;
 
-  @Column({ type: 'text' })
-  notes: string;
+  @Column({ type: 'text', nullable: true })
+  notes?: string;
 
   @OneToMany(() => Measurement, (measurement) => measurement.assessment, {
     cascade: true,

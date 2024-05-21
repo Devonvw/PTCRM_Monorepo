@@ -1,5 +1,4 @@
 import {
-  IFilterOption,
   IFilterProps,
   IOnChangeProps,
   IPaginationProps,

@@ -1,7 +1,6 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty } from "class-validator";
-import { IsBiggerThan } from "src/decorators/validators/is-bigger-than";
-import { Column } from "typeorm";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, ValidateIf } from 'class-validator';
+import { Column } from 'typeorm';
 
 export class CreateClientGoalDto {
   @Column()
@@ -21,7 +20,9 @@ export class CreateClientGoalDto {
 
   @Column()
   @IsNotEmpty({ message: 'Completed value is required' })
-  @IsBiggerThan('startValue', { message: 'Completed value must be bigger than start value' })
+  @ValidateIf((dto) => dto.startValue != dto.completedValue, {
+    message: 'Completed value must be different from start value',
+  })
   @ApiProperty({ type: 'number' })
   completedValue: number;
 

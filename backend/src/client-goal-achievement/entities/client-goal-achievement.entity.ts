@@ -16,7 +16,7 @@ export class ClientGoalAchievement extends AbstractEntity<ClientGoalAchievement>
   @Column({ nullable: true })
   achievedAt?: Date = null;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 5, scale: 1 })
   value: number;
 
   //TODO: Add measurement entity

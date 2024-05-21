@@ -104,6 +104,7 @@ export class ClientsService {
   }
 
   async findAll(query: GetAllClientsQueryDto, userId: number) {
+    console.log('userid', userId);
     const pagination = Pagination(query);
     const orderBy = OrderBy(query, [
       {
@@ -151,7 +152,7 @@ export class ClientsService {
     const totalRows = await this.clientRepository.count({
       where: [...filter],
     });
-
+    console.log(clients);
     return { data: clients, totalRows };
   }
 
