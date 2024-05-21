@@ -9,14 +9,15 @@ export const useGoals = create((set: any, get: any) => ({
   loading: undefined,
 
   getGoals: async (modules: {
-    pagination?: any;
+    pagination: [pageIndex: number, pageSize: number];
     filters?: any;
   }): Promise<number> => {
     try {
       const { data } = await axios.get("/backend/goals", {
         params: {
-          ...modules.pagination,
           ...modules.filters,
+          pageIndex: modules.pagination[0],
+          pageSize: modules.pagination[1],
         },
       });
       set((state: any) => ({

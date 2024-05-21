@@ -1,5 +1,4 @@
 import {
-  IFilterOption,
   IFilterProps,
   IOnChangeProps,
   IPaginationProps,
@@ -15,11 +14,12 @@ interface IUseTable {
     sort,
   }: IOnChangeProps) => Promise<number>;
   filterOptions: IFilterProps[];
+  sortingDefault?: SortingState;
 }
 
-const useTable = ({ onChange, filterOptions }: IUseTable) => {
+const useTable = ({ onChange, filterOptions, sortingDefault }: IUseTable) => {
   const [filters, setFilters] = useState<IFilterProps[]>(filterOptions);
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>(sortingDefault || []);
   const [pagination, setPagination] = useState<IPaginationProps>({
     pageIndex: 0,
     pageSize: 10,

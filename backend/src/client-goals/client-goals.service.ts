@@ -18,6 +18,8 @@ export class ClientGoalsService {
     private readonly clientGoalRepository: Repository<ClientGoal>,
     @InjectRepository(Client)
     private readonly clientRepository: Repository<Client>,
+    @InjectRepository(Goal)
+    private readonly goalRepository: Repository<Goal>,
   ) {}
   async create(userId: number, body: CreateClientGoalDto): Promise<ClientGoal> {
     //. Make sure the client belongs to the coach (user)
@@ -35,6 +37,17 @@ export class ClientGoalsService {
       );
     }
 
+    //. Make sure the goal exists
+    const goal = await this.goalRepository.findOne({
+      where: { id: body.goalId },
+    });
+
+    if (!goal) {
+      throw new NotFoundException(
+        'There was no goal found with the provided id.',
+      );
+    }
+
     //. Create a new client goal object
     const clientGoal = new ClientGoal({
       ...body,
@@ -43,7 +56,6 @@ export class ClientGoalsService {
       currentValue: body.startValue,
       completed: body.startValue === body.completedValue,
     });
-
     return await this.clientGoalRepository.save(clientGoal);
   }
 
@@ -53,18 +65,28 @@ export class ClientGoalsService {
     body: UpdateClientGoalDto,
   ): Promise<any> {
     //. Make sure the client, which the client goal belongs to, belongs to the coach (user)
-    const clientGoal = await this.clientGoalExistsAndBelongsToUser(id, userId);
+    const clientGoal = await this.clientGoalExistsAndBelongsToUser(userId, id);
 
-    //. Update the currentValue
-    clientGoal.currentValue = body.newValue;
+    console.log('id', id);
+    console.log('clientGoal', clientGoal);
+
+    //. Update the start and completed value of the client goal
+    clientGoal.startValue = body.startValue;
+    clientGoal.completedValue = body.completedValue;
 
     //. Check if the currentValue is greater than or equal to the completedValue, and if so, set the completed property to true
-    if (body.newValue >= clientGoal.completedValue) {
-      clientGoal.completed = true;
+    if (clientGoal.startValue > clientGoal.completedValue) {
+      if (clientGoal.currentValue <= clientGoal.completedValue) {
+        clientGoal.completed = true;
+      }
+    } else {
+      if (clientGoal.currentValue >= clientGoal.completedValue) {
+        clientGoal.completed = true;
+      }
     }
 
     //. Update the client goal object
-    await this.clientGoalRepository.update(id, clientGoal);
+    await this.clientGoalRepository.update(clientGoal.id, clientGoal);
 
     return await this.clientGoalRepository.findOneBy({ id });
   }

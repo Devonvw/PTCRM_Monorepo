@@ -1,6 +1,7 @@
 import { IReload } from "@/interfaces/reload";
 import toastError from "@/utils/toast-error";
 import axios from "axios";
+import toast from "react-hot-toast";
 import { create } from "zustand";
 
 export const useClientGoals = create((set: any, get: any) => ({
@@ -13,17 +14,19 @@ export const useClientGoals = create((set: any, get: any) => ({
     filters?: any;
     clientId: number;
   }): Promise<number> => {
+    set({ loading: true });
     try {
       const { data } = await axios.get("/backend/client-goals", {
         params: {
-          ...modules.pagination,
+          // ...modules.pagination,
           ...modules.filters,
           clientId: modules.clientId,
           pageIndex: modules.pagination[0],
           pageSize: modules.pagination[1],
+          show: modules.filters?.show,
         },
       });
-      set((state: any) => ({
+      set(() => ({
         clientGoals: data?.data,
       }));
       return data?.totalRows;
@@ -33,11 +36,12 @@ export const useClientGoals = create((set: any, get: any) => ({
       set({ loading: false });
     }
   },
-  getClientGoal: async (id: string, initialLoad?: boolean) => {
-    if (initialLoad) set({ loading: true });
+  getClientGoal: async (id: number, initialLoad?: boolean) => {
+    // if (initialLoad)
+    set({ loading: true });
     try {
       const { data } = await axios.get(`/backend/client-goals/${id}`);
-      set((state: any) => ({
+      set(() => ({
         clientGoal: data,
       }));
     } catch (e: any) {
@@ -51,6 +55,7 @@ export const useClientGoals = create((set: any, get: any) => ({
       await axios.post("/backend/client-goals", clientGoal);
 
       if (reload) reload();
+      toast.success("Client goal created successfully.");
     } catch (e: any) {
       toastError(e?.response?.data?.message);
     }
@@ -60,33 +65,38 @@ export const useClientGoals = create((set: any, get: any) => ({
       await axios.put(`/backend/client-goals/${clientGoal.id}`, clientGoal);
 
       if (reload) reload();
+      toast.success("Client goal updated successfully.");
     } catch (e: any) {
       toastError(e?.response?.data?.message);
     }
   },
-  deleteClientGoal: async (id: string, reload?: IReload) => {
+  deleteClientGoal: async (id: number, reload?: IReload) => {
     try {
       await axios.delete(`/backend/client-goals/${id}`);
 
       if (reload) reload();
+      toast.success("Client goal deleted successfully.");
     } catch (e: any) {
       toastError(e?.response?.data?.message);
     }
   },
-  filterOptions: [
-    {
-      label: "All",
-      value: "all",
-    },
-    {
-      label: "Completed",
-      value: "completed",
-    },
-    {
-      label: "Uncompleted",
-      value: "uncompleted",
-    },
-  ],
-  addModalOpen: false,
-  setAddModalOpen: (open: boolean) => set({ addModalOpen: open }),
+  // filterOptions: [
+  //   {
+  //     label: "All",
+  //     value: "all",
+  //   },
+  //   {
+  //     label: "Completed",
+  //     value: "completed",
+  //   },
+  //   {
+  //     label: "Uncompleted",
+  //     value: "uncompleted",
+  //   },
+  // ],
+  addOrUpdateModalOpen: false,
+  setAddOrUpdateModalOpen: (open: boolean) =>
+    set({ addOrUpdateModalOpen: open }),
+  deleteModalOpen: false,
+  setDeleteModalOpen: (open: boolean) => set({ deleteModalOpen: open }),
 }));
