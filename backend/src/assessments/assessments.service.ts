@@ -282,7 +282,6 @@ export class AssessmentsService {
     const assessment = await this.assessmentExistsAndBelongsToUser(
       assessmentId,
       userId,
-      true,
     );
 
     return assessment;
@@ -292,7 +291,6 @@ export class AssessmentsService {
     const assessment = await this.assessmentExistsAndBelongsToUser(
       assessmentId,
       userId,
-      true,
     );
 
     //. Get the most recent assessment before the one being deleted
@@ -366,7 +364,6 @@ export class AssessmentsService {
   async assessmentExistsAndBelongsToUser(
     assessmentId: number,
     userId: number,
-    getDeepRelations = false,
   ): Promise<Assessment> {
     //. Check if the assessment exists and belongs to the user
     const assessment = await this.assessmentRepository.findOne({
@@ -374,7 +371,12 @@ export class AssessmentsService {
         id: assessmentId,
         client: { user: { id: userId } },
       },
-      relations: this.determineRelationRetrieval(getDeepRelations),
+      relations: [
+        'client',
+        'measurements',
+        'measurements.clientGoal',
+        'measurements.clientGoal.goal',
+      ],
     });
 
     if (!assessment) {
