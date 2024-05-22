@@ -14,20 +14,12 @@ const sidebarNavItems = (id: string) => [
     href: `/app/clients/${id}`,
   },
   {
-    title: "Progress",
-    href: `/app/clients/${id}/progress`,
-  },
-  {
     title: "Goals",
     href: `/app/clients/${id}/goals`,
   },
   {
     title: "Assessments",
     href: `/app/clients/${id}/assessments`,
-  },
-  {
-    title: "Preferences",
-    href: `/app/clients/${id}/preferences`,
   },
   {
     title: "Information",
