@@ -3,6 +3,8 @@ import createMollieClient, {
   PaymentMethod,
   SequenceType,
 } from '@mollie/api-client';
+import dayjs from 'dayjs';
+import { SUBSCRIPTION_INTERVAL } from 'src/utils/constants';
 
 @Injectable()
 export class MollieService {
@@ -41,16 +43,20 @@ export class MollieService {
 
   async createSubscription(
     customerId: string,
+    mandateId: string,
+    startDate: string,
     amount: number,
     description: string,
   ) {
     const subscription = await this.mollieClient.customerSubscriptions.create({
-      customerId: customerId,
+      customerId,
+      mandateId,
+      startDate,
       amount: {
         currency: 'EUR',
         value: Number(amount).toFixed(2),
       },
-      interval: '4 weeks',
+      interval: SUBSCRIPTION_INTERVAL,
       description,
       webhookUrl: process.env.BACKEND_URL + '/payment/webhook-mollie',
     });
@@ -81,24 +87,19 @@ export class MollieService {
     amount: number,
     description: string,
   ) {
-    try {
-      console.log('customerId', customerId, amount, description);
-      const res = await this.mollieClient.payments.create({
-        customerId,
-        sequenceType: SequenceType.first,
-        amount: {
-          currency: 'EUR',
-          value: '0.01',
-        },
-        description,
-        redirectUrl: process.env.FRONTEND_URL + `/app`,
-        webhookUrl: process.env.BACKEND_URL + '/payment/webhook-mollie',
-      });
+    const res = await this.mollieClient.payments.create({
+      customerId,
+      sequenceType: SequenceType.first,
+      amount: {
+        currency: 'EUR',
+        value: Number(amount).toFixed(2),
+      },
+      description,
+      redirectUrl: process.env.FRONTEND_URL + `/app`,
+      webhookUrl: process.env.BACKEND_URL + '/payment/webhook-mollie',
+    });
 
-      return res;
-    } catch (e) {
-      console.log(e);
-    }
+    return res;
   }
 
   async createRecurringPayment(

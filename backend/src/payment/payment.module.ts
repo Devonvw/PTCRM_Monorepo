@@ -6,9 +6,15 @@ import { Payment } from './entities/payment.entity';
 import { Subscription } from './entities/subscription.entity';
 import { User } from 'src/users/entities/user.entity';
 import { MollieService } from 'src/mollie/mollie.service';
+import { InvoiceModule } from 'src/invoice/invoice.module';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Payment, Subscription, User])],
+  imports: [
+    TypeOrmModule.forFeature([Payment, Subscription, User]),
+    InvoiceModule,
+    MailModule,
+  ],
   providers: [PaymentService, MollieService],
   controllers: [PaymentController],
   exports: [PaymentService],

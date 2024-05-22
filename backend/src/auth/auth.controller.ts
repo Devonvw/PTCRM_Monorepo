@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Post,
@@ -21,13 +22,18 @@ import Success from 'src/utils/success';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Get('logout')
+  @Delete('/logout')
   logout(@Req() request: Request) {
     return this.authService.logout(request);
   }
 
+  @Get('/my-info')
+  async getUserAuthData(@Req() request: Request) {
+    return await this.authService.getUserAuthData(request.user.id);
+  }
+
   @Public()
-  @Post('signup')
+  @Post('/signup')
   async signup(@Body() body: SignUpDto) {
     const res = await this.authService.signup(body);
     return Success(
@@ -38,21 +44,10 @@ export class AuthController {
 
   @UseGuards(LocalGuard)
   @Public()
-  @Post('login')
+  @Post('/login')
   @HttpCode(200)
   async login(@Body() body: any): Promise<UserResponseDto> {
-    // const res : Response = await this.authService.login(body.email);
     const res = await this.authService.login(body.email);
     return res;
-  }
-
-  @Get('test')
-  getProfile() {
-    return 'I am authenticated';
-  }
-  @Get('test2')
-  @Roles([EnumRoles.ADMIN])
-  getProfile2() {
-    return 'I am authenticated as admin';
   }
 }

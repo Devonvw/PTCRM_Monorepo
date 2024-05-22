@@ -26,6 +26,24 @@ export class User extends AbstractEntity<User> {
   company: string;
 
   @Column({ nullable: true })
+  street: string;
+
+  @Column({ nullable: true })
+  housenumber: string;
+
+  @Column({ nullable: true })
+  housenumberExtra: string;
+
+  @Column({ nullable: true })
+  city: string;
+
+  @Column({ nullable: true })
+  zipCode: string;
+
+  @Column({ nullable: true })
+  country: string;
+
+  @Column({ nullable: true })
   mollieCustomerId: string;
 
   @Column({ default: false })

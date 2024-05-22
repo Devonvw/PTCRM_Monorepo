@@ -10,9 +10,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useRouter } from "next/router";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/stores/useAuth";
 
 const navItems = [
   {
@@ -23,18 +23,12 @@ const navItems = [
     title: "Clients",
     href: "/app/clients",
   },
-  {
-    title: "Payments",
-    href: "/app/payments",
-  },
-  {
-    title: "Documents",
-    href: "/app/documents",
-  },
 ];
 
 const Nav = () => {
+  const router = useRouter();
   const pathname = usePathname();
+  const { logout } = useAuth();
   return (
     <div className="flex justify-center items-center shadow-lg w-full border-b-[0.5px] border-gray-600">
       <nav className="flex container px-4 w-full items-center justify-between py-4">
@@ -65,10 +59,16 @@ const Nav = () => {
               <DropdownMenuContent>
                 <DropdownMenuLabel>Devon van Wichen</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Account</DropdownMenuItem>
-                <DropdownMenuItem>Billing</DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link href="/app/account">Account</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link href="/app/account/billing">Billing</Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Logout</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => logout(router.push)}>
+                  Logout
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </li>

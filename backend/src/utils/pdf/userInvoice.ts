@@ -1,9 +1,11 @@
 import getStream from 'get-stream';
 import PdfPrinter from 'pdfmake';
 import fonts from './fonts';
+import { Invoice } from 'src/invoice/entities/invoice.entity';
+import dayjs from 'dayjs';
 var printer = new PdfPrinter(fonts);
 
-const invoicePDF = async (invoice: any) => {
+const invoicePDF = async (invoice: Invoice) => {
   var dd: any = {
     content: [
       {
@@ -15,7 +17,7 @@ const invoicePDF = async (invoice: any) => {
           },
           [
             {
-              text: 'Receipt',
+              text: 'Invoice',
               color: '#333333',
               width: '*',
               fontSize: 28,
@@ -28,7 +30,7 @@ const invoicePDF = async (invoice: any) => {
                 {
                   columns: [
                     {
-                      text: 'Receipt No.',
+                      text: 'Invoice No.',
                       color: '#aaaaab',
                       bold: true,
                       width: '*',
@@ -36,7 +38,7 @@ const invoicePDF = async (invoice: any) => {
                       alignment: 'right',
                     },
                     {
-                      text: '00001',
+                      text: invoice?.number,
                       bold: true,
                       color: '#333333',
                       fontSize: 12,
@@ -56,31 +58,11 @@ const invoicePDF = async (invoice: any) => {
                       alignment: 'right',
                     },
                     {
-                      text: 'June 01, 2016',
+                      text: dayjs(invoice?.payment?.date).format('DD/MM/YYYY'),
                       bold: true,
                       color: '#333333',
                       fontSize: 12,
                       alignment: 'right',
-                      width: 100,
-                    },
-                  ],
-                },
-                {
-                  columns: [
-                    {
-                      text: 'Status',
-                      color: '#aaaaab',
-                      bold: true,
-                      fontSize: 12,
-                      alignment: 'right',
-                      width: '*',
-                    },
-                    {
-                      text: 'PAID',
-                      bold: true,
-                      fontSize: 14,
-                      alignment: 'right',
-                      color: 'green',
                       width: 100,
                     },
                   ],
@@ -113,13 +95,15 @@ const invoicePDF = async (invoice: any) => {
       {
         columns: [
           {
-            text: 'Your Name \n Your Company Inc.',
+            text: 'PTCRM',
             bold: true,
             color: '#333333',
             alignment: 'left',
           },
           {
-            text: 'Client Name \n Client Company',
+            text:
+              invoice?.user?.company ||
+              `${invoice?.user?.firstname} ${invoice?.user?.lastname}`,
             bold: true,
             color: '#333333',
             alignment: 'left',
@@ -145,24 +129,20 @@ const invoicePDF = async (invoice: any) => {
       {
         columns: [
           {
-            text: '9999 Street name 1A \n New-York City NY 00000 \n   USA',
+            text: 'Hoofdstraat 123\n1234AB Amsterdam\nNetherlands',
             style: 'invoiceBillingAddress',
           },
           {
-            text: '1111 Other street 25 \n New-York City NY 00000 \n   USA',
+            text: `${invoice?.user?.street ?? '-'} ${invoice?.user?.housenumber ?? '-'}${
+              invoice?.user?.housenumberExtra
+                ? invoice?.user?.housenumberExtra
+                : ''
+            }\n${invoice?.user?.zipCode ?? '-'} ${invoice?.user?.city ?? '-'}\n${invoice?.user?.country ?? '-'}`,
             style: 'invoiceBillingAddress',
           },
         ],
       },
       '\n\n',
-      {
-        width: '100%',
-        alignment: 'center',
-        text: 'Invoice No. 123',
-        bold: true,
-        margin: [0, 10, 0, 10],
-        fontSize: 15,
-      },
       {
         layout: {
           defaultBorder: false,
@@ -226,29 +206,14 @@ const invoicePDF = async (invoice: any) => {
             ],
             [
               {
-                text: 'Item 1',
+                text: invoice?.payment?.subscription.name,
                 border: [false, false, false, true],
                 margin: [0, 5, 0, 5],
                 alignment: 'left',
               },
               {
                 border: [false, false, false, true],
-                text: '$999.99',
-                fillColor: '#f5f5f5',
-                alignment: 'right',
-                margin: [0, 5, 0, 5],
-              },
-            ],
-            [
-              {
-                text: 'Item 2',
-                border: [false, false, false, true],
-                margin: [0, 5, 0, 5],
-                alignment: 'left',
-              },
-              {
-                text: '$999.99',
-                border: [false, false, false, true],
+                text: `€${invoice?.payment?.subscription.totalPrice}`,
                 fillColor: '#f5f5f5',
                 alignment: 'right',
                 margin: [0, 5, 0, 5],
@@ -302,14 +267,14 @@ const invoicePDF = async (invoice: any) => {
           body: [
             [
               {
-                text: 'Payment Subtotal',
+                text: 'Subtotal',
                 border: [false, true, false, true],
                 alignment: 'right',
                 margin: [0, 5, 0, 5],
               },
               {
                 border: [false, true, false, true],
-                text: '$999.99',
+                text: `€${invoice?.payment?.subscription.price}`,
                 alignment: 'right',
                 fillColor: '#f5f5f5',
                 margin: [0, 5, 0, 5],
@@ -317,13 +282,13 @@ const invoicePDF = async (invoice: any) => {
             ],
             [
               {
-                text: 'Payment Processing Fee',
+                text: 'Vat (21%)',
                 border: [false, false, false, true],
                 alignment: 'right',
                 margin: [0, 5, 0, 5],
               },
               {
-                text: '$999.99',
+                text: `€${invoice?.payment?.subscription.vatPrice}`,
                 border: [false, false, false, true],
                 fillColor: '#f5f5f5',
                 alignment: 'right',
@@ -340,7 +305,7 @@ const invoicePDF = async (invoice: any) => {
                 margin: [0, 5, 0, 5],
               },
               {
-                text: 'USD $999.99',
+                text: `€${invoice?.payment?.subscription.totalPrice}`,
                 bold: true,
                 fontSize: 20,
                 alignment: 'right',
@@ -353,14 +318,6 @@ const invoicePDF = async (invoice: any) => {
         },
       },
       '\n\n',
-      {
-        text: 'NOTES',
-        style: 'notesTitle',
-      },
-      {
-        text: 'Some notes goes here \n Notes second line',
-        style: 'notesText',
-      },
     ],
     styles: {
       notesTitle: {
@@ -374,7 +331,7 @@ const invoicePDF = async (invoice: any) => {
     },
     defaultStyle: {
       columnGap: 20,
-      //font: 'Quicksand',
+      font: 'Inter',
     },
   };
 
@@ -384,7 +341,10 @@ const invoicePDF = async (invoice: any) => {
     pdfDoc.end();
 
     return await getStream.buffer(pdfDoc);
-  } catch (e) {}
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
 };
 
 export default invoicePDF;

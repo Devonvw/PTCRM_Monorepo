@@ -36,12 +36,6 @@ import type {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  onChange: ({
-    pagination,
-    filters,
-    search,
-    sort,
-  }: IOnChangeProps) => Promise<number>;
   filters: IFilterProps[];
   setFilters: Dispatch<SetStateAction<IFilterProps[]>>;
   sorting: SortingState;
@@ -51,12 +45,12 @@ interface DataTableProps<TData, TValue> {
   rowCount: number;
   search: string;
   setSearch: Dispatch<SetStateAction<string>>;
+  noSearch?: boolean;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  onChange,
   filters,
   setFilters,
   sorting,
@@ -66,6 +60,7 @@ export function DataTable<TData, TValue>({
   rowCount,
   search,
   setSearch,
+  noSearch,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -87,25 +82,6 @@ export function DataTable<TData, TValue>({
     manualSorting: true,
   });
 
-  // useEffect(() => {
-  //   let parsedFilters: any = {};
-  //   filters.forEach((filter) => {
-  //     parsedFilters[filter.key] = filter.selected.map(
-  //       (option) => option.meta.key
-  //     );
-  //   });
-
-  //   onChange({
-  //     pagination,
-  //     filters: parsedFilters,
-  //     search: { search },
-  //     sort: {
-  //       orderByColumn: sorting?.[0]?.id,
-  //       orderDirection: sorting?.[0]?.desc ? "DESC" : "ASC",
-  //     },
-  //   }).then((totalRows: number) => setRowCount(totalRows));
-  // }, [pagination, filters, search, sorting]);
-
   return (
     <div className="space-y-4">
       <DataTableToolbar
@@ -114,6 +90,7 @@ export function DataTable<TData, TValue>({
         setFilters={setFilters}
         search={search}
         setSearch={setSearch}
+        noSearch={noSearch}
       />
       <div className="rounded-md border-[0.5px] border-gray-600 bg-slate-950">
         <Table>
