@@ -342,7 +342,6 @@ const invoicePDF = async (invoice: Invoice) => {
 
     return await getStream.buffer(pdfDoc);
   } catch (e) {
-    console.log(e);
     return null;
   }
 };

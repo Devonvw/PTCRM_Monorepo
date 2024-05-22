@@ -1,3 +1,4 @@
+"use client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Card,
@@ -7,8 +8,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import PageHeader from "@/components/ui/page-header";
+import { useGeneral } from "@/stores/useGeneral";
+import { useEffect } from "react";
 
 const Dashboard = () => {
+  const { dashboardData, getUserDashboard } = useGeneral();
+
+  useEffect(() => {
+    getUserDashboard();
+  }, []);
+
   return (
     <div>
       <PageHeader title="Overview" />
@@ -32,16 +41,15 @@ const Dashboard = () => {
             </svg>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">10</div>
-            <p className="text-xs text-muted-foreground">
-              +40% from last month
-            </p>
+            <div className="text-2xl font-bold">
+              {dashboardData?.clientCount}
+            </div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total Achievements
+              Total Completed Goals
             </CardTitle>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -58,16 +66,15 @@ const Dashboard = () => {
             </svg>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">340</div>
-            <p className="text-xs text-muted-foreground">
-              +19% from last month
-            </p>
+            <div className="text-2xl font-bold">
+              {dashboardData?.completedGoalsCount}
+            </div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Achieved Goals
+              Total Uncompleted Goals
             </CardTitle>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -83,15 +90,16 @@ const Dashboard = () => {
             </svg>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">32</div>
-            <p className="text-xs text-muted-foreground">
-              +12 since last month
-            </p>
+            <div className="text-2xl font-bold">
+              {dashboardData?.uncompletedGoalsCount}
+            </div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Assessments
+            </CardTitle>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -106,45 +114,8 @@ const Dashboard = () => {
             </svg>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">€45,231.89</div>
-            <p className="text-xs text-muted-foreground">
-              +20.1% from last month
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 mt-4">
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Overview</CardTitle>
-          </CardHeader>
-          <CardContent className="pl-2"></CardContent>
-        </Card>
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>Recent Achievements</CardTitle>
-            <CardDescription>
-              You achieved 1 achievement this month.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-8">
-              <div className="flex items-center">
-                <Avatar className="h-9 w-9">
-                  <AvatarFallback>OM</AvatarFallback>
-                </Avatar>
-                <div className="ml-4 space-y-1">
-                  <p className="text-sm font-medium leading-none">
-                    Olivia Martin
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    olivia.martin@email.com
-                  </p>
-                </div>
-                <div className="ml-auto font-medium text-green-600">
-                  -2.2 kg
-                </div>
-              </div>
+            <div className="text-2xl font-bold">
+              {dashboardData?.assessmentCount}
             </div>
           </CardContent>
         </Card>

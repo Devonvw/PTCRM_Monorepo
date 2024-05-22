@@ -9,7 +9,6 @@ import { persist, createJSONStorage } from "zustand/middleware";
 export const useAuth = create<any>()(
   persist(
     (set, get) => ({
-      infoMessage: {} as { message: string; isError: boolean },
       user: null,
       logout: async (redirect: (path: string) => void) => {
         try {
@@ -19,14 +18,19 @@ export const useAuth = create<any>()(
           redirect("/login");
         } catch (error: any) {}
       },
-      login: async (user: any, redirect: (path: string) => void) => {
+      login: async (
+        user: any,
+        redirect: (path: string) => void,
+        setInfoMessage: (msg: any) => void
+      ) => {
         try {
           const { data } = await axios.post("/backend/auth/login", user);
 
           set({
             user: data?.user,
-            infoMessage: { message: data?.message, isError: false },
           });
+          setInfoMessage({ message: data?.message, isError: false });
+          toast.success(data?.message);
           redirect("/app");
         } catch (error: any) {
           set({
@@ -37,24 +41,26 @@ export const useAuth = create<any>()(
           });
         }
       },
-      signUp: async (user: any, redirect: (href: string) => void) => {
+      signUp: async (
+        user: any,
+        redirect: (href: string) => void,
+        setInfoMessage: (msg: any) => void
+      ) => {
         try {
           // Make the signup request with Axios
           const { data } = await axios.post("/backend/auth/signup", user);
 
-          set({ infoMessage: { message: data?.message, isError: false } });
+          setInfoMessage({ message: data?.message, isError: false });
 
           // Redirect to the checkout page after 3 seconds
           setTimeout(() => {
             redirect(data?.checkoutHref);
-            set({ infoMessage: {} });
+            setInfoMessage({});
           }, 3000);
         } catch (error: any) {
-          set({
-            infoMessage: {
-              message: error?.response?.data?.message,
-              isError: true,
-            },
+          setInfoMessage({
+            message: error?.response?.data?.message,
+            isError: true,
           });
         }
       },

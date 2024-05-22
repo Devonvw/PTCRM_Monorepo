@@ -181,7 +181,6 @@ const CreateUpdateClientGoalModal = (props: IProps) => {
                         {...field}
                         value={field.value || ""}
                         onChange={(e) => {
-                          console.log("current value", field.value);
                           const selectedValue = +e.target.value;
                           field.onChange(selectedValue);
                           const selectedGoal = goals.find(

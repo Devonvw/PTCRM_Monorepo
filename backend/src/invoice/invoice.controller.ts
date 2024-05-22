@@ -40,22 +40,18 @@ export class InvoiceController {
     @Res({ passthrough: true })
     res: Response,
   ): Promise<StreamableFile> {
-    try {
-      const result = await this.invoiceService.downloadInvoice(id, req.user.id);
+    const result = await this.invoiceService.downloadInvoice(id, req.user.id);
 
-      res.set({
-        'Content-Type': result?.mimeType,
-        'Content-Disposition': `attachment; filename=${encodeURI(
-          result?.name,
-        )}.${mime.extension(result?.mimeType)}`,
-        Filename: `${encodeURI(result?.name)}.${mime.extension(
-          result?.mimeType,
-        )}`,
-      });
+    res.set({
+      'Content-Type': result?.mimeType,
+      'Content-Disposition': `attachment; filename=${encodeURI(
+        result?.name,
+      )}.${mime.extension(result?.mimeType)}`,
+      Filename: `${encodeURI(result?.name)}.${mime.extension(
+        result?.mimeType,
+      )}`,
+    });
 
-      return new StreamableFile(result.buffer);
-    } catch (error) {
-      console.log(error);
-    }
+    return new StreamableFile(result.buffer);
   }
 }

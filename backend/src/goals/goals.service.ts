@@ -23,7 +23,6 @@ export class GoalsService {
     //. Add the user to the goal object
     goal.user = await this.userRepository.findOneBy({ id: userId });
 
-    console.log('goal object:', goal);
     return await this.goalRepository.save(goal);
   }
   async updateGoal(goalId, userId, body: CreateUpdateGoalDto): Promise<any> {
@@ -110,7 +109,6 @@ export class GoalsService {
       relations: ['user'],
       where: { id: goalId },
     });
-    console.log('goal', goal);
     //. Check if the goal exists and belongs to the user (users may only delete their own goals)
     if (!goal || goal?.user?.id !== userId) {
       throw new NotFoundException('Goal not found or does not belong to you');
