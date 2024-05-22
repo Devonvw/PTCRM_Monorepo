@@ -48,6 +48,8 @@ export default function ClientDetailLayout({
             { title: "Clients", href: "/app/clients" },
             { title: `${client?.firstName} ${client?.lastName}` },
           ]}
+          loading={loading}
+          withLoading
         ></PageHeader>
         <Separator />
         <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">

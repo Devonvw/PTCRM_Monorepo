@@ -17,9 +17,10 @@ export class GetAllClientsQueryDto extends IntersectionType(
 ) {
   @IsArray()
   @IsEnum(['true', 'false'], {
+    each: true,
     message: 'The active field must be either true or false',
   })
   @IsOptional()
   @ApiProperty()
-  active: 'true' | 'false'[];
+  active: ('true' | 'false')[];
 }
