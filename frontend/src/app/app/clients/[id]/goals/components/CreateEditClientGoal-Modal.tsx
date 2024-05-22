@@ -104,17 +104,13 @@ const CreateUpdateClientGoalModal = (props: IProps) => {
     getClientGoals,
     addOrUpdateModalOpen,
   } = useClientGoals();
-  const { goals, getGoals } = useGoals();
+  const { goals, getAllGoals } = useGoals();
   const [totalRows, setTotalRows] = useState(0);
   const [selectedGoal, setSelectedGoal] = useState(undefined);
 
   useEffect(() => {
     const fetchData = async () => {
-      setTotalRows(
-        await getGoals({
-          pagination: [0, 100],
-        })
-      );
+      setTotalRows(await getAllGoals());
     };
     fetchData();
 

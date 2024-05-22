@@ -88,7 +88,7 @@ const PerformAssessmentModal = (props: IProps) => {
   // const { clientGoals, getClientGoals } = useClientGoals();
   const {
     clientGoalsToMeasure,
-    getClientGoalsToMeasure,
+    getAllUncompletedClientGoals,
     initiateAssessment,
     completeAssessment,
     addOrUpdateModalOpen,
@@ -112,10 +112,7 @@ const PerformAssessmentModal = (props: IProps) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const goals = await getClientGoalsToMeasure({
-        clientId: props.clientId,
-        pagination: [0, 100],
-      });
+      const goals = await getAllUncompletedClientGoals(props.clientId);
       setTotalClientGoals(goals);
 
       const measurements = clientGoalsToMeasure.map(

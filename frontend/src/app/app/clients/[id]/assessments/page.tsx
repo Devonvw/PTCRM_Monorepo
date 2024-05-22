@@ -3,16 +3,16 @@ import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { IOnChangeProps } from "@/components/ui/data-table/interfaces";
 import useTable from "@/hooks/useTable";
+import { IPage } from "@/interfaces/page";
 import { useAssessments } from "@/stores/useAssessments";
+import { useClients } from "@/stores/useClients";
 import { PlusCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import ClientDetailLayout from "../components/layout";
 import { columns } from "./columns";
 import PerformAssessmentModal from "./components/PerformAssessmentModal";
 import ViewAssessmentModal from "./components/ViewAssessmentModal";
-import { useRouter } from "next/navigation";
-import { useClients } from "@/stores/useClients";
-import { useEffect } from "react";
-import ClientDetailLayout from "../components/layout";
-import { IPage } from "@/interfaces/page";
 
 const ClientAssessmentsPage = ({ params: { id } }: IPage) => {
   const router = useRouter();
@@ -72,17 +72,17 @@ const ClientAssessmentsPage = ({ params: { id } }: IPage) => {
           onClose={() => handleAssessmentCreated()}
         />
         <ViewAssessmentModal onDataChange={() => reload()} />
-        <div className="flex justify-end -mb-8">
+        <div className='flex justify-end -mb-8'>
           <Button
             onClick={() => setAddOrUpdateModalOpen(true)}
-            size="sm"
-            variant="light"
-            className=" z-10"
+            size='sm'
+            variant='light'
+            className=' z-10'
           >
-            New assessment <PlusCircle className="h-5 w-5" />
+            New assessment <PlusCircle className='h-5 w-5' />
           </Button>
         </div>
-        <DataTable columns={columns} data={assessments} {...state} />
+        <DataTable columns={columns} data={assessments} noSearch {...state} />
       </div>
     </ClientDetailLayout>
   );

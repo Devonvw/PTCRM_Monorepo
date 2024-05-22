@@ -134,7 +134,7 @@ export class AssessmentsService {
             clientGoal.completedValue,
           );
 
-          //. REMOVED If the goal has not been completed yet, check if any achievements have been made
+          //. REMOVED: If the goal has not been completed yet, check if any achievements have been made
           // else {
           //   if (clientGoal.achievements.length > 0) {
           //     for (const achievement of clientGoal.achievements) {

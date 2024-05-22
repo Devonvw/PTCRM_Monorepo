@@ -6,6 +6,7 @@ import Filters from 'src/utils/filter';
 import OrderBy from 'src/utils/order-by';
 import Pagination from 'src/utils/pagination';
 import { Repository } from 'typeorm';
+import { ClientGoalResponseDto } from './dtos/ClientGoalResponseDto';
 import { CreateClientGoalDto } from './dtos/CreateClientGoalDto';
 import { GetClientGoalsQueryDto } from './dtos/GetClientGoalsQueryDto';
 import { GetUncompletedClientGoalsDto } from './dtos/GetUncompletedClientGoalsDto';
@@ -92,7 +93,6 @@ export class ClientGoalsService {
     return await this.clientGoalRepository.findOneBy({ id });
   }
   async findAll(userId: number, query: GetClientGoalsQueryDto): Promise<any> {
-    console.log('query', query);
     //. Make sure the client belongs to the coach (user)
     const client = await this.clientRepository.findOne({
       where: {
@@ -150,19 +150,57 @@ export class ClientGoalsService {
       relations: ['goal'],
     });
 
+    //. Format the client goals to the ClientGoalResponseDto format
+    const formattedClientGoals: ClientGoalResponseDto[] = clientGoals.map(
+      (clientGoal) => ({
+        id: clientGoal.id,
+        progress: this.calculateProgress(
+          clientGoal.currentValue,
+          clientGoal.startValue,
+          clientGoal.completedValue,
+        ),
+        startValue: clientGoal.startValue,
+        currentValue: clientGoal.currentValue,
+        completedValue: clientGoal.completedValue,
+        completed: clientGoal.completed,
+        goal: clientGoal.goal,
+        client: clientGoal.client,
+        // Add any other required properties of ClientGoalResponseDto here
+      }),
+    );
+
     //. Get the total number of rows
     const totalRows = await this.clientGoalRepository.count({
       where: [...filter],
     });
 
-    return { data: clientGoals, totalRows };
+    return { data: formattedClientGoals, totalRows };
   }
+  private calculateProgress = (
+    currentValue: number,
+    startValue: number,
+    completedValue: number,
+  ) => {
+    return (
+      ((currentValue - startValue) / (completedValue - startValue)) *
+      100
+    ).toFixed(1);
+  };
   async getUncompletedClientGoals(
     userId: number,
     query: GetUncompletedClientGoalsDto,
   ) {
     //. Make sure the client belongs to the coach (user)
     await this.clientExistsAndBelongsToUser(userId, query.clientId);
+
+    //. Return all the clientGoals which are not completed
+    return await this.clientGoalRepository.find({
+      where: {
+        client: { id: query.clientId },
+        completed: false,
+      },
+      relations: ['goal'],
+    });
   }
   async findOne(userId: number, id: number): Promise<any> {
     return await this.clientGoalExistsAndBelongsToUser(userId, id);
