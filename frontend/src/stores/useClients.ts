@@ -1,6 +1,7 @@
 import { IReload } from "@/interfaces/reload";
 import toastError from "@/utils/toast-error";
 import axios from "axios";
+import { Router } from "next/router";
 import toast from "react-hot-toast";
 import { create } from "zustand";
 
@@ -33,7 +34,11 @@ export const useClients = create((set: any, get: any) => ({
       return 0;
     }
   },
-  getClient: async (id: string, initialLoad?: boolean) => {
+  getClient: async (
+    id: string,
+    initialLoad?: boolean,
+    redirect?: (path: string) => void
+  ) => {
     if (initialLoad) set({ loading: true });
     try {
       const { data } = await axios.get(`/backend/clients/${id}`);
@@ -41,6 +46,7 @@ export const useClients = create((set: any, get: any) => ({
         client: data,
       }));
     } catch (e: any) {
+      if (redirect) redirect("/app/clients");
       toastError(e?.response?.data?.message);
     } finally {
       set({ loading: false });
@@ -116,16 +122,6 @@ export const useClients = create((set: any, get: any) => ({
       id: 2,
       name: "Naam Z-A",
       meta: { key: "name", direction: "DESC" },
-    },
-    {
-      id: 3,
-      name: "Aantal schepen - Oplopend",
-      meta: { key: "ship_count", direction: "ASC" },
-    },
-    {
-      id: 4,
-      name: "Aantal schepen - Aflopend",
-      meta: { key: "ship_count", direction: "DESC" },
     },
   ],
   filterOptions: [

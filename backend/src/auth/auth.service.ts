@@ -4,6 +4,7 @@ import { Request } from 'express';
 import { UsersService } from 'src/users/users.service';
 import { UserResponseDto } from './dto/UserResponse.dto';
 import { SignUpDto } from 'src/users/dtos/SignUp.dto';
+import { UserAuthDataDto } from './dto/UserAuthData.dto';
 
 @Injectable()
 export class AuthService {
@@ -45,7 +46,7 @@ export class AuthService {
     return user;
   }
 
-  async logout(@Req() request: Request): Promise<any> {
+  async logout(request: Request): Promise<any> {
     request.session.destroy(() => {
       return {
         message: 'Logout successful',
@@ -53,9 +54,17 @@ export class AuthService {
       };
     });
   }
+
   async signup(body: SignUpDto): Promise<{ checkoutHref: string }> {
     const checkoutHref = await this.userService.create(body);
 
     return { checkoutHref };
+  }
+
+  async getUserAuthData(userId: number): Promise<UserAuthDataDto> {
+    const user = await this.userService.findById(userId);
+
+    console.log('user', user);
+    return { hasMandate: user.hasMandate, role: user.role };
   }
 }

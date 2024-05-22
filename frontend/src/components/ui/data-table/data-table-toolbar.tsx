@@ -18,6 +18,7 @@ interface DataTableToolbarProps<TData> {
   setFilters: (filters: IFilterProps[]) => void;
   search: string;
   setSearch: (search: string) => void;
+  noSearch?: boolean;
 }
 
 export function DataTableToolbar<TData>({
@@ -26,9 +27,8 @@ export function DataTableToolbar<TData>({
   setFilters,
   search,
   setSearch,
+  noSearch,
 }: DataTableToolbarProps<TData>) {
-  const isFiltered = filters.some((f) => f.selected.length > 0);
-
   const onChangeFilter = (filter: IFilterProps, selected: IFilterOption[]) => {
     const newFilters = filters.map((f) => {
       if (f.id === filter.id) {
@@ -48,13 +48,15 @@ export function DataTableToolbar<TData>({
     <>
       <div className="flex items-center justify-between">
         <div className="flex flex-1 items-center space-x-2">
-          <DebouncedInput
-            placeholder="Search..."
-            value={search}
-            onChange={(value) => setSearch(value)}
-            debounce={500}
-            className="h-8 w-[150px] lg:w-[250px]"
-          />
+          {!noSearch && (
+            <DebouncedInput
+              placeholder="Search..."
+              value={search}
+              onChange={(value) => setSearch(value)}
+              debounce={500}
+              className="h-8 w-[150px] lg:w-[250px]"
+            />
+          )}
           {filters.map((filter) => (
             <DataTableFilter
               key={filter.id}
@@ -63,7 +65,6 @@ export function DataTableToolbar<TData>({
             />
           ))}
         </div>
-        {/* <DataTableViewOptions table={table} /> */}
       </div>
       <ul className="flex items-center flex-wrap gap-2">
         <li className="font-bold uppercase text-secondary text-sm">Filters</li>
@@ -90,9 +91,6 @@ export function DataTableToolbar<TData>({
               className="bg-accent/20 text-primary text-sm font-semibold px-2 rounded flex gap-x-1"
             >
               {filter?.name}: {filter?.value}
-              {/* <Button variant='ghost' className='!p-0' onClick={() => onChangeSingleFilter(filter, '')}>
-            <XCircleIcon className='h-3 w-3 text-black hover:text-accent' />
-          </Button> */}
             </li>
           ) : null
         )}

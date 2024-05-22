@@ -16,6 +16,7 @@ import { ClientGoalAchievementModule } from './client-goal-achievement/client-go
 import { MailModule } from './mail/mail.module';
 import { MeasurementsModule } from './measurements/measurements.module';
 import { MollieService } from './mollie/mollie.service';
+import { InvoiceModule } from './invoice/invoice.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { MollieService } from './mollie/mollie.service';
     ClientGoalAchievementModule,
     AssessmentsModule,
     MeasurementsModule,
+    InvoiceModule,
   ],
   controllers: [AppController],
   providers: [AppService, MollieService],

@@ -8,11 +8,6 @@ import { API_URL } from "@/constants";
 import { IPage } from "@/interfaces/page";
 import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Client",
-  description: "Manage client details.",
-};
-
 const sidebarNavItems = (id: string) => [
   {
     title: "Overview",
@@ -42,12 +37,34 @@ const sidebarNavItems = (id: string) => [
 
 interface ClientDetailLayoutProps {
   children: React.ReactNode;
-  params: { id: string };
+  client: any;
+  loading?: boolean;
 }
 
-export default async function ClientDetailLayout({
+export default function ClientDetailLayout({
   children,
-  params: { id },
+  client,
+  loading,
 }: ClientDetailLayoutProps) {
-  return children;
+  return (
+    <>
+      <div className="hidden space-y-6 md:block">
+        <PageHeader
+          title={`${client?.firstName} ${client?.lastName}`}
+          description="Manage client details."
+          breadcrumbs={[
+            { title: "Clients", href: "/app/clients" },
+            { title: `${client?.firstName} ${client?.lastName}` },
+          ]}
+        ></PageHeader>
+        <Separator />
+        <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
+          <aside className="-mx-4 lg:w-1/5">
+            <SidebarNav items={sidebarNavItems(client?.id)} />
+          </aside>
+          <div className="flex-1">{children}</div>
+        </div>
+      </div>
+    </>
+  );
 }

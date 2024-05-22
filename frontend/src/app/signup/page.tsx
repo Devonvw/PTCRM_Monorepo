@@ -20,7 +20,7 @@ import { z } from "zod";
 import InfoBox from "../app/_components/infoBox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { usePayments } from "@/stores/usePayments";
-import { useUser } from "@/stores/useUser";
+import { useAuth } from "@/stores/useAuth";
 
 const formSchema: any = z
   .object({
@@ -48,15 +48,31 @@ const formSchema: any = z
         message: "Company name cannot be more than 255 characters.",
       }),
     subscription: z.string(),
+    street: z.string().min(2, {
+      message: "Street must be at least 2 characters.",
+    }),
+    housenumber: z.string().min(1, {
+      message: "House number must be at least 1 character.",
+    }),
+    housenumberExtra: z.string().optional(),
+    city: z.string().min(2, {
+      message: "City must be at least 2 characters.",
+    }),
+    zipCode: z.string().min(2, {
+      message: "Zip code must be at least 2 characters.",
+    }),
+    country: z.string().min(2, {
+      message: "Country must be at least 2 characters.",
+    }),
   })
   .refine((data) => data.password === data.passwordConfirm, {
     path: ["passwordConfirm"],
     message: "Passwords do not match",
   });
 
-export function Signup() {
+const Signup = () => {
   const { subscriptions, getSubscriptions } = usePayments();
-  const { signUp, infoMessage } = useUser();
+  const { signUp, infoMessage } = useAuth();
   const { push } = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -128,7 +144,7 @@ export function Signup() {
                   control={form.control}
                   name="email"
                   render={({ field }) => (
-                    <FormItem className="col-span-2">
+                    <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
                         <Input placeholder="Email" {...field} type="email" />
@@ -167,6 +183,98 @@ export function Signup() {
                     </FormItem>
                   )}
                 />
+
+                <FormField
+                  control={form.control}
+                  name="company"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Company</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Company" {...field} type="text" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="street"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Street</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Street..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="housenumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>House number</FormLabel>
+                      <FormControl>
+                        <Input placeholder="House number..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="housenumberExtra"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>House number extra</FormLabel>
+                      <FormControl>
+                        <Input placeholder="House number extra..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="city"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>City</FormLabel>
+                      <FormControl>
+                        <Input placeholder="City..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="zipCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Zip code</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Zip code..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="country"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Country</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Country..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="password"
@@ -196,19 +304,6 @@ export function Signup() {
                           {...field}
                           type="password"
                         />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="company"
-                  render={({ field }) => (
-                    <FormItem className="col-span-2">
-                      <FormLabel>Company</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Company" {...field} type="text" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -285,6 +380,6 @@ export function Signup() {
       </div>
     </main>
   );
-}
+};
 
 export default Signup;

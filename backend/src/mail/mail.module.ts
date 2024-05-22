@@ -21,16 +21,6 @@ import { ReactAdapter } from '@webtre/nestjs-mailer-react-adapter';
             }),
             aws: { SendRawEmailCommand },
           },
-          //   host: config.get('MAIL_HOST'),
-          //   port: config.get('MAIL_PORT'),
-          //   secure: false,
-          //   ignoreTLS: true,
-          //   requireTLS: false,
-          //   auth: {
-          //     user: config.get('MAIL_USERNAME'),
-          //     pass: config.get('MAIL_PASSWORD'),
-          //   },
-          //   debug: true,
         },
         defaults: {
           from: `"${config.get('mail.fromName')}" <${config.get(
@@ -41,18 +31,11 @@ import { ReactAdapter } from '@webtre/nestjs-mailer-react-adapter';
           dir: __dirname + '/templates',
           adapter: new ReactAdapter(),
         },
-        // options: {
-        //   partials: {
-        //     dir: join(__dirname, '/templates/partials'),
-        //     options: {
-        //       strict: true,
-        //     },
-        //   },
-        // },
       }),
       inject: [ConfigService],
     }),
   ],
   providers: [MailService],
+  exports: [MailService],
 })
 export class MailModule {}
