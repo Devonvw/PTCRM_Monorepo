@@ -144,7 +144,7 @@ const CreateUpdateClientGoalModal = (props: IProps) => {
 
   return (
     <Dialog open={props.open} onOpenChange={props.onClose}>
-      <DialogContent className='mx-8 my-10 bg-inherit'>
+      <DialogContent className="mx-8 my-10 bg-inherit">
         <DialogHeader>
           <DialogTitle>
             {props.clientGoal ? "Update" : "Add"} Client Goal
@@ -160,24 +160,23 @@ const CreateUpdateClientGoalModal = (props: IProps) => {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className='flex flex-col gap-y-8 gap-8 max-w-2xl'
+            className="flex flex-col gap-y-8 gap-8 max-w-2xl"
           >
             {/* {!props.clientGoal && ( */}
             <div>
               <FormField
                 control={form.control}
-                name='goalId'
+                name="goalId"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Goal</FormLabel>
                     <br />
                     <FormControl>
                       <Select
-                        className='py-1 px-2 h-10 text-sm rounded-md border dark:border-slate-800 dark:bg-slate-950 w-full'
+                        className="py-1 px-2 h-10 text-sm rounded-md border dark:border-slate-800 dark:bg-slate-950 w-full"
                         {...field}
                         value={field.value || ""}
                         onChange={(e) => {
-                          console.log("current value", field.value);
                           const selectedValue = +e.target.value;
                           field.onChange(selectedValue);
                           const selectedGoal = goals.find(
@@ -186,7 +185,7 @@ const CreateUpdateClientGoalModal = (props: IProps) => {
                           setSelectedGoal(selectedGoal);
                         }}
                       >
-                        <option value='' hidden disabled>
+                        <option value="" hidden disabled>
                           Select a goal...
                         </option>
                         {goals.map((goal) => (
@@ -201,7 +200,7 @@ const CreateUpdateClientGoalModal = (props: IProps) => {
                 )}
               ></FormField>
               {selectedGoal && (
-                <p className='pt-4 w-80 text-xs'>
+                <p className="pt-4 w-80 text-xs">
                   {selectedGoal?.["description"]}
                 </p>
               )}
@@ -209,15 +208,15 @@ const CreateUpdateClientGoalModal = (props: IProps) => {
             {/* )} */}
             <FormField
               control={form.control}
-              name='startValue'
+              name="startValue"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Start value</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
-                      type='number'
-                      placeholder='Start value...'
+                      type="number"
+                      placeholder="Start value..."
                     />
                   </FormControl>
                   <FormDescription>
@@ -242,14 +241,14 @@ const CreateUpdateClientGoalModal = (props: IProps) => {
                 /> */}
             <FormField
               control={form.control}
-              name='completedValue'
+              name="completedValue"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Completed value</FormLabel>
                   <FormControl>
                     <Input
-                      type='number'
-                      placeholder='Completed value...'
+                      type="number"
+                      placeholder="Completed value..."
                       {...field}
                     />
                   </FormControl>
@@ -260,21 +259,21 @@ const CreateUpdateClientGoalModal = (props: IProps) => {
                 </FormItem>
               )}
             />
-            <DialogFooter className='pt-6 justify-end md:col-span-2'>
+            <DialogFooter className="pt-6 justify-end md:col-span-2">
               <DialogClose asChild>
-                <Button type='button' variant='secondary' size='sm'>
+                <Button type="button" variant="secondary" size="sm">
                   Cancel
-                  <XCircle className='h-5 w-5' />
+                  <XCircle className="h-5 w-5" />
                 </Button>
               </DialogClose>
-              <Button type='submit' size='sm'>
+              <Button type="submit" size="sm">
                 {props.clientGoal ? (
                   <>
-                    Update <BadgeCheck className='h-5 w-5' />
+                    Update <BadgeCheck className="h-5 w-5" />
                   </>
                 ) : (
                   <>
-                    Add <BadgeCheck className='h-5 w-5' />
+                    Add <BadgeCheck className="h-5 w-5" />
                   </>
                 )}
               </Button>

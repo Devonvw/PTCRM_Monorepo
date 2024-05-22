@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import InfoBox from "../app/_components/infoBox";
+import { useState } from "react";
 
 const formSchema = z.object({
   email: z.string().email("This is not a valid email."),
@@ -32,7 +33,11 @@ const formSchema = z.object({
 
 const LoginPage = () => {
   const { push } = useRouter();
-  const { login, infoMessage } = useAuth();
+  const [infoMessage, setInfoMessage] = useState({
+    message: "",
+    isError: false,
+  });
+  const { login } = useAuth();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -49,7 +54,7 @@ const LoginPage = () => {
       password: data.password,
     };
 
-    await login(user, push);
+    await login(user, push, setInfoMessage);
   }
 
   return (
@@ -90,7 +95,7 @@ const LoginPage = () => {
               </span>
               <hr className="m-4"></hr>
               <span className="text-4xl text-center  text-gray-300">Login</span>
-              <InfoBox message={infoMessage?.[0]} isError={infoMessage?.[1]} />
+              <InfoBox {...infoMessage} />
               <FormField
                 control={form.control}
                 name="email"

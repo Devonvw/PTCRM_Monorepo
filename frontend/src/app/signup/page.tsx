@@ -72,7 +72,11 @@ const formSchema: any = z
 
 const Signup = () => {
   const { subscriptions, getSubscriptions } = usePayments();
-  const { signUp, infoMessage } = useAuth();
+  const [infoMessage, setInfoMessage] = useState({
+    message: "",
+    isError: false,
+  });
+  const { signUp } = useAuth();
   const { push } = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -89,7 +93,7 @@ const Signup = () => {
   });
 
   async function onSubmit(data: z.infer<typeof formSchema>): Promise<void> {
-    signUp(data, push);
+    signUp(data, push, setInfoMessage);
   }
 
   useEffect(() => {

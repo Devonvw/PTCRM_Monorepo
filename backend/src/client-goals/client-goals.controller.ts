@@ -24,7 +24,6 @@ export class ClientGoalsController {
   @Post()
   async create(@Req() request: Request, @Body() body: CreateClientGoalDto) {
     //. Retrieve the user id from the request object
-    console.log('body', body);
     const userId = request.user.id;
     return await this.clientGoalsService.create(userId, body);
   }

@@ -71,10 +71,7 @@ export function DataTable<TData, TValue>({
     },
     getCoreRowModel: getCoreRowModel(),
     enableRowSelection: true,
-    onSortingChange: (sort) => {
-      console.log(sort);
-      setSorting(sort);
-    },
+    onSortingChange: setSorting,
     onPaginationChange: setPagination,
     manualFiltering: true,
     manualPagination: true,

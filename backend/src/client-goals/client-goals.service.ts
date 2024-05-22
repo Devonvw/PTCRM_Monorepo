@@ -69,9 +69,6 @@ export class ClientGoalsService {
     //. Make sure the client, which the client goal belongs to, belongs to the coach (user)
     const clientGoal = await this.clientGoalExistsAndBelongsToUser(userId, id);
 
-    console.log('id', id);
-    console.log('clientGoal', clientGoal);
-
     //. Update the start and completed value of the client goal
     clientGoal.startValue = body.startValue;
     clientGoal.completedValue = body.completedValue;

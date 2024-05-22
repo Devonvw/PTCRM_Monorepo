@@ -29,26 +29,23 @@ export class ClientsController {
 
   @Get()
   async findAll(@Req() req: Request, @Query() query: GetAllClientsQueryDto) {
-    return await this.clientsService.findAll(query, req.user.id || 1);
+    return await this.clientsService.findAll(query, req.user.id);
   }
 
   @Get(':id')
   async findOne(@Req() req: Request, @Param('id', ParseIntPipe) id: number) {
-    return await this.clientsService.findOne(id, req.user.id || 1);
+    return await this.clientsService.findOne(id, req.user.id);
   }
 
   @Post()
   async create(@Req() req: Request, @Body() body: CreateUpdateClientDto) {
-    const client = await this.clientsService.create(body, req.user.id || 1);
+    const client = await this.clientsService.create(body, req.user.id);
     return Success('Client created successfully', { client });
   }
 
   @Post('/sign-up')
   async createSignUp(@Req() req: Request, @Body() body: CreateSignUpClientDto) {
-    const client = await this.clientsService.createSignUp(
-      body,
-      req.user.id || 1,
-    );
+    const client = await this.clientsService.createSignUp(body, req.user.id);
     return Success('Client sign up created successfully', { client });
   }
 
@@ -58,7 +55,8 @@ export class ClientsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() body: CreateUpdateClientDto,
   ) {
-    return await this.clientsService.update(id, body, req.user.id || 1);
+    const client = await this.clientsService.update(id, body, req.user.id);
+    return Success('Client updated successfully', { client });
   }
 
   @Public()

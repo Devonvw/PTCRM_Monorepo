@@ -84,34 +84,6 @@ export const useClients = create((set: any, get: any) => ({
       toastError(e?.response?.data?.message);
     }
   },
-  getClientSignUpDetails: async (token: string) => {
-    set({ loading: true });
-    try {
-      const { data } = await axios.get(`/backend/clients/sign-up/${token}`);
-
-      set((state: any) => ({
-        signUpDetails: data,
-      }));
-    } catch (e: any) {
-      set((state: any) => ({
-        signUpErrorMsg: e?.response?.data?.message,
-      }));
-    } finally {
-      set({ loading: false });
-    }
-  },
-  signUpClient: async (token: string, client: any, redirect: any) => {
-    try {
-      const { data } = await axios.put(
-        `/backend/clients/sign-up/${token}`,
-        client
-      );
-      toast.success(data?.message);
-      redirect();
-    } catch (e: any) {
-      toastError(e?.response?.data?.message);
-    }
-  },
   sortOptions: [
     {
       id: 1,
