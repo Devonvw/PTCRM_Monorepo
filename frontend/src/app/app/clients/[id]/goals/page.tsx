@@ -1,5 +1,6 @@
 "use client";
 
+import DeleteDialog from "@/components/custom/delete-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,7 +31,6 @@ import { useEffect, useRef, useState } from "react";
 import PerformAssessmentModal from "../assessments/components/PerformAssessmentModal";
 import ClientDetailLayout from "../components/layout";
 import CreateUpdateClientGoalModal from "./components/CreateEditClientGoal-Modal";
-import DeleteClientGoalModal from "./components/DeleteClientGoal";
 
 const ClientGoalsPage = ({ params: { id } }: IPage) => {
   const router = useRouter();
@@ -57,6 +57,7 @@ const ClientGoalsPage = ({ params: { id } }: IPage) => {
     setAddOrUpdateModalOpen: setAddOrUpdateModalOpen,
     deleteModalOpen,
     setDeleteModalOpen,
+    deleteClientGoal,
     loading,
   } = useClientGoals();
   const {
@@ -81,8 +82,8 @@ const ClientGoalsPage = ({ params: { id } }: IPage) => {
       setTotalRows(
         await getClientGoals({
           clientId: Number(id),
-          pagination: [currentPage, pageSize],
-          filters: show === "all" ? {} : { show },
+          pagination: { pageIndex: currentPage, pageSize: pageSize },
+          filters: { show },
         })
       );
     };
@@ -119,6 +120,12 @@ const ClientGoalsPage = ({ params: { id } }: IPage) => {
     triggerReload.current = !triggerReload.current;
   };
 
+  const onDelete = async () => {
+    await deleteClientGoal(Number(stateClientGoal?.["id"]));
+    setDeleteModalOpen(false);
+    triggerReload.current = !triggerReload.current;
+  };
+
   return (
     <ClientDetailLayout client={client} loading={clientLoading}>
       <div>
@@ -128,11 +135,20 @@ const ClientGoalsPage = ({ params: { id } }: IPage) => {
           clientId={Number(id)}
           clientGoal={stateClientGoal}
         />
-        <DeleteClientGoalModal
+        <DeleteDialog
+          objectId={stateClientGoal?.["id"]}
+          onClose={() => onCloseDeleteModal()}
+          onConfirm={async () => onDelete()}
+          open={deleteModalOpen}
+          title='Delete client goal'
+          message='Are you sure you want to delete this client goal?'
+        />
+
+        {/* <DeleteClientGoalModal
           clientGoalId={stateClientGoal?.["id"]}
           open={deleteModalOpen}
           onClose={() => onCloseDeleteModal()}
-        />
+        /> */}
         <PerformAssessmentModal
           open={assessmentModalOpen}
           onClose={() => onCloseAssessmentModal()}
@@ -267,6 +283,7 @@ const ClientGoalsPage = ({ params: { id } }: IPage) => {
                           variant={"destructive"}
                           type='button'
                           onClick={() => {
+                            console.log("cg", cg);
                             setClientGoal(cg);
                             setDeleteModalOpen(true);
                           }}

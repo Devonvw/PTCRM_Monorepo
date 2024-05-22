@@ -90,6 +90,7 @@ export class ClientGoalsService {
     return await this.clientGoalRepository.findOneBy({ id });
   }
   async findAll(userId: number, query: GetClientGoalsQueryDto): Promise<any> {
+    console.log('query', query);
     //. Make sure the client belongs to the coach (user)
     const client = await this.clientRepository.findOne({
       where: {
@@ -191,13 +192,22 @@ export class ClientGoalsService {
     await this.clientExistsAndBelongsToUser(userId, query.clientId);
 
     //. Return all the clientGoals which are not completed
-    return await this.clientGoalRepository.find({
+    const clientgoals = await this.clientGoalRepository.find({
       where: {
         client: { id: query.clientId },
         completed: false,
       },
       relations: ['goal'],
     });
+
+    const totalRows = await this.clientGoalRepository.count({
+      where: {
+        client: { id: query.clientId },
+        completed: false,
+      },
+    });
+
+    return { data: clientgoals, totalRows };
   }
   async findOne(userId: number, id: number): Promise<any> {
     return await this.clientGoalExistsAndBelongsToUser(userId, id);

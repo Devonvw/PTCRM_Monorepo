@@ -42,7 +42,7 @@ export const useAssessments = create((set: any, get: any) => ({
         },
       });
       set(() => ({
-        clientGoalsToMeasure: data,
+        clientGoalsToMeasure: data?.data,
       }));
       return data?.totalRows;
     } catch (e: any) {
