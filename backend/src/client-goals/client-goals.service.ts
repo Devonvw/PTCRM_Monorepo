@@ -92,6 +92,7 @@ export class ClientGoalsService {
     return await this.clientGoalRepository.findOneBy({ id });
   }
   async findAll(userId: number, query: GetClientGoalsQueryDto): Promise<any> {
+    console.log('query', query);
     //. Make sure the client belongs to the coach (user)
     const client = await this.clientRepository.findOne({
       where: {
@@ -132,6 +133,12 @@ export class ClientGoalsService {
         //. If the show query is all, return all client goals
         condition: query?.show === 'all',
         filter: {},
+      },
+      {
+        condition: !!query?.clientId,
+        filter: {
+          client: { id: query.clientId },
+        },
       },
     ]);
 
