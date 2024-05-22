@@ -8,6 +8,7 @@ import Pagination from 'src/utils/pagination';
 import { Repository } from 'typeorm';
 import { CreateClientGoalDto } from './dtos/CreateClientGoalDto';
 import { GetClientGoalsQueryDto } from './dtos/GetClientGoalsQueryDto';
+import { GetUncompletedClientGoalsDto } from './dtos/GetUncompletedClientGoalsDto';
 import { UpdateClientGoalDto } from './dtos/UpdateClientGoal';
 import { ClientGoal } from './entities/client-goal.entity';
 
@@ -91,6 +92,7 @@ export class ClientGoalsService {
     return await this.clientGoalRepository.findOneBy({ id });
   }
   async findAll(userId: number, query: GetClientGoalsQueryDto): Promise<any> {
+    console.log('query', query);
     //. Make sure the client belongs to the coach (user)
     const client = await this.clientRepository.findOne({
       where: {
@@ -132,6 +134,12 @@ export class ClientGoalsService {
         condition: query?.show === 'all',
         filter: {},
       },
+      {
+        condition: !!query?.clientId,
+        filter: {
+          client: { id: query.clientId },
+        },
+      },
     ]);
 
     //. Get the client goals
@@ -149,7 +157,13 @@ export class ClientGoalsService {
 
     return { data: clientGoals, totalRows };
   }
-
+  async getUncompletedClientGoals(
+    userId: number,
+    query: GetUncompletedClientGoalsDto,
+  ) {
+    //. Make sure the client belongs to the coach (user)
+    await this.clientExistsAndBelongsToUser(userId, query.clientId);
+  }
   async findOne(userId: number, id: number): Promise<any> {
     return await this.clientGoalExistsAndBelongsToUser(userId, id);
   }
@@ -159,6 +173,26 @@ export class ClientGoalsService {
     await this.clientGoalRepository.delete({ id: clientGoal.id });
     return { message: 'Client goal deleted' };
   }
+  private async clientExistsAndBelongsToUser(
+    userId: number,
+    clientId: number,
+  ): Promise<Client> {
+    const client = await this.clientRepository.findOne({
+      where: {
+        id: clientId,
+        user: { id: userId },
+      },
+    });
+
+    if (!client) {
+      throw new NotFoundException(
+        'This client does not exist or does not belong to you.',
+      );
+    }
+
+    return client;
+  }
+
   /// This function checks if the client goal exists and if the client belongs to the user
   private async clientGoalExistsAndBelongsToUser(
     userId: number,

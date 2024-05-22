@@ -10,13 +10,11 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { Public } from 'src/decorators/public.decorator';
-import { Roles } from 'src/decorators/roles.decorator';
 import { LocalGuard } from 'src/guards/local.guard';
-import { EnumRoles } from 'src/types/roles.enums';
-import { AuthService } from './auth.service';
-import { UserResponseDto } from './dto/UserResponse.dto';
 import { SignUpDto } from 'src/users/dtos/SignUp.dto';
 import Success from 'src/utils/success';
+import { AuthService } from './auth.service';
+import { UserResponseDto } from './dto/UserResponse.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -35,11 +33,15 @@ export class AuthController {
   @Public()
   @Post('/signup')
   async signup(@Body() body: SignUpDto) {
-    const res = await this.authService.signup(body);
-    return Success(
-      'You are successfully signed up. You will now be directed to the payment page.',
-      { ...res },
-    );
+    try {
+      const res = await this.authService.signup(body);
+      return Success(
+        'You are successfully signed up. You will now be directed to the payment page.',
+        { ...res },
+      );
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   @UseGuards(LocalGuard)

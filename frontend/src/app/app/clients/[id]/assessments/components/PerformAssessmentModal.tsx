@@ -1,4 +1,13 @@
-import { DialogHeader } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -11,8 +20,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { TextArea } from "@/components/ui/textarea";
 import { useAssessments } from "@/stores/useAssessments";
-import { Button, Dialog } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { BadgeCheck, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -134,92 +143,87 @@ const PerformAssessmentModal = (props: IProps) => {
 
   return (
     //. Dialog shouldn't close when clicking outside of it, hence the empty onClose function (can only be closed by the cancel or submit button)
-    <Dialog open={props.open} onClose={() => {}}>
-      <div className='w-full h-full flex justify-center z-50 absolute  top-0'>
-        <div className='modal max-w-screen-lg max-h-screen bg-slate-600 border rounded-2xl dark:border-slate-800 dark:bg-slate-950 h-fit m-auto relative'>
-          <Dialog.Panel className='mx-8 my-10 bg-inherit'>
-            <DialogHeader className='mb-4'>
-              <h2 className='text-2xl font-bold text-gray-100'>
-                Performing Assessment
-                <small className='text-sm font-normal ms-2'>
-                  ({totalClientGoals}{" "}
-                  {totalClientGoals > 1 ? "measurements" : "measurement"} to
-                  perform)
-                </small>
-              </h2>
-            </DialogHeader>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)}>
-                <div className='grid grid-cols-2 gap-4 mb-4 max-h-112 overflow-y-scroll'>
-                  {clientGoalsToMeasure.map(
-                    (clientGoal: ClientGoal, index: number) => (
-                      // <div key={clientGoal.id}>{clientGoal.id}</div>
-                      <FormField
-                        control={form.control}
-                        key={clientGoal.id}
-                        name={`measurements.${index}.value`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{clientGoal.goal.name}</FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                type='number'
-                                placeholder={clientGoal.currentValue.toString()}
-                                value={field.value || clientGoal.currentValue}
-                              />
-                            </FormControl>
-                            <FormDescription>
-                              {clientGoal.goal.howToMeasure}
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      ></FormField>
-                    )
-                  )}
-                </div>
-                <FormField
-                  control={form.control}
-                  name={`notes`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Notes</FormLabel>
-                      <FormControl>
-                        <TextArea
-                          {...field}
-                          className='h-20'
-                          placeholder='Notes...'
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Add any notes you would like to save with this
-                        assessment.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                ></FormField>
-                <div className=' flex mt-8 col-span-2 justify-end'>
-                  <Button
-                    onClick={props.onClose}
-                    className='inline-flex gap-x-2 items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300 bg-slate-900 text-slate-50 hover:bg-slate-900/90 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90 h-10 px-4 py-2 mr-2'
-                    type='button'
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    className='inline-flex gap-x-2 items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300 bg-light text-black hover:bg-light/90 dark:bg-light dark:text-black dark:hover:bg-light/90 rounded-md h-10 px-4 py-2'
-                    type='submit'
-                  >
-                    Save Assessment
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </Dialog.Panel>
-        </div>
-      </div>
+    <Dialog
+      open={props.open}
+      onOpenChange={() => {
+        props.onClose();
+      }}
+    >
+      <DialogContent className='sm:max-w-3xl'>
+        <DialogHeader>
+          <DialogTitle>Performing Assessment</DialogTitle>
+          <DialogDescription>
+            ({totalClientGoals}{" "}
+            {totalClientGoals > 1 ? "measurements" : "measurement"} to perform)
+          </DialogDescription>
+        </DialogHeader>
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <div className='grid grid-cols-2 gap-4 mb-4 max-h-112 overflow-y-scroll'>
+              {clientGoalsToMeasure.map(
+                (clientGoal: ClientGoal, index: number) => (
+                  // <div key={clientGoal.id}>{clientGoal.id}</div>
+                  <FormField
+                    control={form.control}
+                    key={clientGoal.id}
+                    name={`measurements.${index}.value`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{clientGoal.goal.name}</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type='number'
+                            placeholder={clientGoal.currentValue.toString()}
+                            value={field.value || clientGoal.currentValue}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          {clientGoal.goal.howToMeasure}
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  ></FormField>
+                )
+              )}
+            </div>
+            <FormField
+              control={form.control}
+              name={`notes`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Notes</FormLabel>
+                  <FormControl>
+                    <TextArea
+                      {...field}
+                      className='h-20'
+                      placeholder='Notes...'
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Add any notes you would like to save with this assessment.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            ></FormField>
+            <DialogFooter className='pt-6 justify-end md:col-span-2'>
+              <DialogClose asChild>
+                <Button type='button' variant='secondary' size='sm'>
+                  Cancel
+                  <XCircle className='h-5 w-5' />
+                </Button>
+              </DialogClose>
+              <Button type='submit' size='sm'>
+                Add
+                <BadgeCheck className='h-5 w-5' />
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
     </Dialog>
   );
 };

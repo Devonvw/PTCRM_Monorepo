@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
+import dayjs from "dayjs";
 import { ViewButton } from "./components/ViewButton";
 
 interface IAssessment {
@@ -11,10 +12,6 @@ interface IAssessment {
   notes: string;
   measurements: any;
 }
-
-const getFormattedDate = (date: Date) => {
-  return new Date(date).toLocaleString("en-GB");
-};
 
 export const columns: ColumnDef<IAssessment>[] = [
   {
@@ -27,7 +24,8 @@ export const columns: ColumnDef<IAssessment>[] = [
   },
   {
     id: "performedAt",
-    accessorFn: (row) => `${getFormattedDate(row.performedAt)}`,
+    accessorFn: (row) =>
+      `${dayjs(row.performedAt).format("DD/MM/YYYY, HH:mm")}`,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Performed at' />
     ),
