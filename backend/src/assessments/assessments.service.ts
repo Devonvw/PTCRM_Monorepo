@@ -385,16 +385,16 @@ export class AssessmentsService {
 
     return assessment;
   }
-  determineRelationRetrieval = (getDeepRelations: boolean) => {
-    return getDeepRelations
-      ? [
-          'client',
-          'measurements',
-          'measurements.clientGoal',
-          'measurements.clientGoal.goal',
-        ]
-      : ['measurements', 'client'];
-  };
+  // determineRelationRetrieval = (getDeepRelations: boolean) => {
+  //   return getDeepRelations
+  //     ? [
+  //         'client',
+  //         'measurements',
+  //         'measurements.clientGoal',
+  //         'measurements.clientGoal.goal',
+  //       ]
+  //     : ['measurements', 'client'];
+  // };
 
   //. Check if the client goal has been completed (if the start value is less than the completed value, the goal is completed if the current value is greater than or equal to the completed value, and vice versa)
   clientGoalIsCompleted = (

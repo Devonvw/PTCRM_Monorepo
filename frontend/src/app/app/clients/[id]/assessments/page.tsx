@@ -34,7 +34,6 @@ const ClientAssessmentsPage = ({ params: { id } }) => {
     return getAssessments({ ...changeProps, clientId: id });
   };
   const handleAssessmentCreated = () => {
-    console.log("getting here");
     reload();
     setAddOrUpdateModalOpen(false);
   };

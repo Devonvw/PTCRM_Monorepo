@@ -14,6 +14,7 @@ import { Request } from 'express';
 import { ClientGoalsService } from './client-goals.service';
 import { CreateClientGoalDto } from './dtos/CreateClientGoalDto';
 import { GetClientGoalsQueryDto } from './dtos/GetClientGoalsQueryDto';
+import { GetUncompletedClientGoalsDto } from './dtos/GetUncompletedClientGoalsDto';
 import { UpdateClientGoalDto } from './dtos/UpdateClientGoal';
 
 @Controller('client-goals')
@@ -49,6 +50,18 @@ export class ClientGoalsController {
   ) {
     const userId: number = request.user.id;
     return await this.clientGoalsService.findAll(userId, query);
+  }
+
+  @Get('uncompleted')
+  async getUncompletedClientGoals(
+    @Req() request: Request,
+    @Query() query: GetUncompletedClientGoalsDto,
+  ) {
+    const userId: number = request.user.id;
+    return await this.clientGoalsService.getUncompletedClientGoals(
+      userId,
+      query,
+    );
   }
   @Get(':id')
   async findOne(
