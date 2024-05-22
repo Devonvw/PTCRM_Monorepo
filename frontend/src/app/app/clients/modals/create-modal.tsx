@@ -87,7 +87,10 @@ const CreateClientModal = ({
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values);
-    createClient(values, reload);
+    createClient(values, () => {
+      reload();
+      onOpenChange(false);
+    });
   }
 
   return (

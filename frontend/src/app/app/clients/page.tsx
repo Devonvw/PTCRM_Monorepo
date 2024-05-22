@@ -29,11 +29,14 @@ const Clients = () => {
     <div>
       <PageHeader title="Clients" breadcrumbs={[{ title: "Clients" }]}>
         <PageHeader.Right className="flex items-end justify-end gap-x-2">
-          <Link href="/app/clients/new">
-            <Button size="sm" variant="light" className="">
-              Add <PlusCircle className="h-5 w-5" />
-            </Button>
-          </Link>
+          <Button
+            size="sm"
+            variant="light"
+            className=""
+            onClick={() => setAddModalOpen(true)}
+          >
+            Add <PlusCircle className="h-5 w-5" />
+          </Button>
           <Link href="/app/clients/new-signup">
             <Button size="sm" variant="primary" className="">
               Add by sign up <PlusCircle className="h-5 w-5" />
