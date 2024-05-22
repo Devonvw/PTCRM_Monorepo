@@ -20,11 +20,6 @@ import { UserResponseDto } from './dto/UserResponse.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Delete('/logout')
-  logout(@Req() request: Request) {
-    return this.authService.logout(request);
-  }
-
   @Get('/my-info')
   async getUserAuthData(@Req() request: Request) {
     return await this.authService.getUserAuthData(request.user.id);
@@ -33,23 +28,23 @@ export class AuthController {
   @Public()
   @Post('/signup')
   async signup(@Body() body: SignUpDto) {
-    try {
-      const res = await this.authService.signup(body);
-      return Success(
-        'You are successfully signed up. You will now be directed to the payment page.',
-        { ...res },
-      );
-    } catch (e) {
-      console.log(e);
-    }
+    const res = await this.authService.signup(body);
+    return Success(
+      'You are successfully signed up. You will now be directed to the payment page.',
+      { ...res },
+    );
   }
 
   @UseGuards(LocalGuard)
   @Public()
   @Post('/login')
-  @HttpCode(200)
-  async login(@Body() body: any): Promise<UserResponseDto> {
-    const res = await this.authService.login(body.email);
-    return res;
+  async login(@Body() body: any) {
+    const user = await this.authService.login(body.email);
+    return Success('Login successful', { user });
+  }
+
+  @Delete('/logout')
+  logout(@Req() request: Request) {
+    return this.authService.logout(request);
   }
 }

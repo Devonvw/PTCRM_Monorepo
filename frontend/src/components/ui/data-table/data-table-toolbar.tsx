@@ -66,35 +66,39 @@ export function DataTableToolbar<TData>({
           ))}
         </div>
       </div>
-      <ul className="flex items-center flex-wrap gap-2">
-        <li className="font-bold uppercase text-secondary text-sm">Filters</li>
-        {filters?.map((filter: any) =>
-          !filter?.type ? (
-            filter?.selected?.map((option: any, index: number) => (
-              <li
-                key={index}
-                className="bg-accent/20 text-gray-300 text-sm font-semibold pl-2 rounded flex gap-x-1 items-center justify-center"
-              >
-                {option?.title}
-                <Button
-                  variant="ghost"
-                  className="h-fit p-0"
-                  onClick={() => onChangeFilter(filter, [])}
+      {filters?.length && (
+        <ul className="flex items-center flex-wrap gap-2">
+          <li className="font-bold uppercase text-secondary text-sm">
+            Filters
+          </li>
+          {filters?.map((filter: any) =>
+            !filter?.type ? (
+              filter?.selected?.map((option: any, index: number) => (
+                <li
+                  key={index}
+                  className="bg-accent/20 text-gray-300 text-sm font-semibold pl-2 rounded flex gap-x-1 items-center justify-center"
                 >
-                  <XCircleIcon className="h-3 w-3 text-gray-300 hover:text-accent hover:text-secondary" />
-                </Button>
+                  {option?.title}
+                  <Button
+                    variant="ghost"
+                    className="h-fit p-0"
+                    onClick={() => onChangeFilter(filter, [])}
+                  >
+                    <XCircleIcon className="h-3 w-3 text-gray-300 hover:text-accent hover:text-secondary" />
+                  </Button>
+                </li>
+              ))
+            ) : filter?.value ? (
+              <li
+                key={`V${filter?.id}`}
+                className="bg-accent/20 text-primary text-sm font-semibold px-2 rounded flex gap-x-1"
+              >
+                {filter?.name}: {filter?.value}
               </li>
-            ))
-          ) : filter?.value ? (
-            <li
-              key={`V${filter?.id}`}
-              className="bg-accent/20 text-primary text-sm font-semibold px-2 rounded flex gap-x-1"
-            >
-              {filter?.name}: {filter?.value}
-            </li>
-          ) : null
-        )}
-      </ul>
+            ) : null
+          )}
+        </ul>
+      )}
     </>
   );
 }

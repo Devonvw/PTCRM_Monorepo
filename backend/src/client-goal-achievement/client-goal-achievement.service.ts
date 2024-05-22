@@ -39,7 +39,6 @@ export class ClientGoalAchievementService {
       },
       select: ['currentValue'],
     });
-    console.log('currentValue:', currentValue);
     //. Create a new client goal achievement object
     const achievement = new ClientGoalAchievement({
       ...body,
@@ -130,7 +129,6 @@ export class ClientGoalAchievementService {
         fields: ['achievedAt'],
       },
     ]);
-    console.log('query:', query);
     //. Create the filter
     const filter = Filters(null, [
       {

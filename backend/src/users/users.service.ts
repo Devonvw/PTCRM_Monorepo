@@ -14,6 +14,7 @@ import { SignUpDto } from './dtos/SignUp.dto';
 import { Subscription } from 'src/payment/entities/subscription.entity';
 import { UpdateUserDto } from './dtos/UpdateUser.dto';
 import { PASSWORD_SALT_ROUNDS } from 'src/utils/constants';
+import { SignUpResponseDto } from './dtos/SignUpResponse.dto';
 
 @Injectable()
 export class UsersService {
@@ -30,7 +31,7 @@ export class UsersService {
   async findByEmail(email: string): Promise<User | null> {
     return this.userRepository.findOneBy({ email });
   }
-  async create(body: SignUpDto): Promise<string> {
+  async create(body: SignUpDto): Promise<SignUpResponseDto> {
     const user = new User({
       ...body,
       subscription: { id: body?.subscription } as Subscription,
@@ -49,10 +50,13 @@ export class UsersService {
     //. Save the user in the database
     const savedUser = await this.userRepository.save(user);
 
-    return await this.paymentService.updateInitialUserSubscription(
-      user.subscription.id,
-      savedUser.id,
-    );
+    const checkoutHref =
+      await this.paymentService.updateInitialUserSubscription(
+        user.subscription.id,
+        savedUser.id,
+      );
+
+    return { checkoutHref };
   }
 
   async updateLoggedInUser(id: number, body: UpdateUserDto): Promise<User> {

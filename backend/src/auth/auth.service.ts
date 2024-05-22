@@ -56,15 +56,12 @@ export class AuthService {
   }
 
   async signup(body: SignUpDto): Promise<{ checkoutHref: string }> {
-    const checkoutHref = await this.userService.create(body);
-
-    return { checkoutHref };
+    return await this.userService.create(body);
   }
 
   async getUserAuthData(userId: number): Promise<UserAuthDataDto> {
     const user = await this.userService.findById(userId);
 
-    console.log('user', user);
     return { hasMandate: user.hasMandate, role: user.role };
   }
 }

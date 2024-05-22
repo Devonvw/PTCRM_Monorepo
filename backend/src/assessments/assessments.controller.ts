@@ -15,6 +15,7 @@ import { CreateAssessmentDto } from './dtos/CreateAssessmentDto';
 import { GetAssessmentsQueryDto } from './dtos/GetAssessmentsQueryDto';
 import { InitiateAssessmentDto } from './dtos/InitiateAssessmentDto';
 import { UpdateAssessmentDto } from './dtos/UpdateAssessmentDto';
+import Success from 'src/utils/success';
 
 @Controller('assessments')
 export class AssessmentsController {
@@ -24,13 +25,6 @@ export class AssessmentsController {
   async initiate(@Req() request: Request, @Body() body: InitiateAssessmentDto) {
     const userId = request.user.id;
     return await this.assessmentsService.initiate(userId, body);
-  }
-
-  //. This endpoint is called when a coach completes an assessment for a client. It writes the assessment (and its measurements) to the database.
-  @Post('complete')
-  async create(@Req() request: Request, @Body() body: CreateAssessmentDto) {
-    const userId = request.user.id;
-    return await this.assessmentsService.create(userId, body);
   }
 
   @Get()
@@ -48,6 +42,14 @@ export class AssessmentsController {
     return await this.assessmentsService.findOne(userId, id);
   }
 
+  //. This endpoint is called when a coach completes an assessment for a client. It writes the assessment (and its measurements) to the database.
+  @Post('complete')
+  async create(@Req() request: Request, @Body() body: CreateAssessmentDto) {
+    const userId = request.user.id;
+    const assessment = await this.assessmentsService.create(userId, body);
+    return Success('Assessment created successfully', { assessment });
+  }
+
   @Put(':id')
   async update(
     @Req() request: Request,
@@ -55,13 +57,15 @@ export class AssessmentsController {
     @Body() body: UpdateAssessmentDto,
   ) {
     const userId = request.user.id;
-    return await this.assessmentsService.update(userId, id, body);
+    const assessment = await this.assessmentsService.update(userId, id, body);
+    return Success('Assessment updated successfully', { assessment });
   }
 
   //TODO: This endpoint doesn't work yet
   @Delete(':id')
   async delete(@Req() request: Request, @Param('id') id: number) {
     const userId = request.user.id;
-    return await this.assessmentsService.delete(userId, id);
+    const assessment = await this.assessmentsService.delete(userId, id);
+    return Success('Assessment deleted successfully', { assessment });
   }
 }

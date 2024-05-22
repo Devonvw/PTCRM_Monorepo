@@ -46,16 +46,4 @@ export const usePayments = create((set: any, get: any) => ({
       return 0;
     }
   },
-  sortOptions: [
-    {
-      id: 1,
-      name: "Aantal schepen - Oplopend",
-      meta: { key: "ship_count", direction: "ASC" },
-    },
-    {
-      id: 2,
-      name: "Aantal schepen - Aflopend",
-      meta: { key: "ship_count", direction: "DESC" },
-    },
-  ],
 }));

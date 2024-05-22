@@ -17,6 +17,7 @@ import { MailModule } from './mail/mail.module';
 import { MeasurementsModule } from './measurements/measurements.module';
 import { MollieService } from './mollie/mollie.service';
 import { InvoiceModule } from './invoice/invoice.module';
+import { GeneralModule } from './general/general.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { InvoiceModule } from './invoice/invoice.module';
     AssessmentsModule,
     MeasurementsModule,
     InvoiceModule,
+    GeneralModule,
   ],
   controllers: [AppController],
   providers: [AppService, MollieService],

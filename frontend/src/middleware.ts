@@ -6,7 +6,7 @@ import { API_URL } from "@/constants";
 type roles = "user";
 const auth = {
   validatePath: (path: string) =>
-    !(path.startsWith("/login") || path.startsWith("/signup")),
+    !(path.startsWith("/login") || path.startsWith("/signup") || path == "/"),
   getRolePath: "/auth/my-info",
   roles: {
     user: {
@@ -44,7 +44,7 @@ export async function middleware(request: NextRequest) {
 
     const resObj = await res.json();
     const role = auth?.roles[resObj?.role as roles];
-    console.log(role);
+
     if (!role.validatePath(path) || !auth.validatePath(path)) {
       return NextResponse.redirect(new URL(role.fallbackPath, request.nextUrl));
     }
