@@ -30,7 +30,7 @@ import CreateUpdateClientGoalModal from "./components/CreateEditClientGoal-Modal
 import DeleteClientGoalModal from "./components/DeleteClientGoal";
 import ClientDetailLayout from "../components/layout";
 import { useClients } from "@/stores/useClients";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 const ClientGoalsPage = ({ params: { id } }: IPage) => {
   const router = useRouter();
