@@ -1,30 +1,16 @@
 "use client";
 
-import axios from "axios";
-import { Metadata } from "next";
 import { IPage } from "@/interfaces/page";
 import { useClients } from "@/stores/useClients";
-import { useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { ClipboardList, Goal, ListChecks, SquareCheckBig } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import OverviewCard from "./components/OverviewCard";
 import ClientDetailLayout from "./components/layout";
 
 const ClientDetailPage = ({ params: { id } }: IPage) => {
   const router = useRouter();
-  const {
-    getClient,
-    loading,
-    client,
-    filterOptions,
-    addModalOpen,
-    setAddModalOpen,
-  } = useClients();
+  const { getClient, loading, client } = useClients();
 
   useEffect(() => {
     if (client?.id != id) getClient(id, true, router.push);
@@ -32,106 +18,31 @@ const ClientDetailPage = ({ params: { id } }: IPage) => {
 
   return (
     <ClientDetailLayout client={client} loading={loading}>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Clients</CardTitle>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              className="h-4 w-4 text-muted-foreground"
-            >
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-            </svg>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">10</div>
-            <p className="text-xs text-muted-foreground">
-              +40% from last month
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Achievements
-            </CardTitle>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              className="h-4 w-4 text-muted-foreground"
-            >
-              <rect width="20" height="14" x="2" y="5" rx="2" />
-              <path d="M2 10h20" />
-            </svg>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">340</div>
-            <p className="text-xs text-muted-foreground">
-              +19% from last month
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Achieved Goals
-            </CardTitle>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              className="h-4 w-4 text-muted-foreground"
-            >
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-            </svg>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">32</div>
-            <p className="text-xs text-muted-foreground">
-              +12 since last month
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              className="h-4 w-4 text-muted-foreground"
-            >
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-            </svg>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">€45,231.89</div>
-            <p className="text-xs text-muted-foreground">
-              +20.1% from last month
-            </p>
-          </CardContent>
-        </Card>
+      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+        <OverviewCard
+          title='Total Goals'
+          value={25}
+          extraInfo='Last added '
+          icon={<ClipboardList className='w-4 h-4' />}
+        />
+        <OverviewCard
+          title='Completed goals'
+          value={25}
+          extraInfo='Last completed '
+          icon={<SquareCheckBig className='w-4 h-4' />}
+        />
+        <OverviewCard
+          title='Goals in-progress'
+          value={25}
+          // extraInfo='Last completed at'
+          icon={<Goal className='w-4 h-4' />}
+        />
+        <OverviewCard
+          title='Assessments performed'
+          value={25}
+          extraInfo='Last performed '
+          icon={<ListChecks className='w-4 h-4' />}
+        />
       </div>
     </ClientDetailLayout>
   );
