@@ -1,6 +1,8 @@
 "use client";
 
 import { IPage } from "@/interfaces/page";
+import { useAssessments } from "@/stores/useAssessments";
+import { useClientGoals } from "@/stores/useClientGoals";
 import { useClients } from "@/stores/useClients";
 import { ClipboardList, Goal, ListChecks, SquareCheckBig } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -11,6 +13,8 @@ import ClientDetailLayout from "./components/layout";
 const ClientDetailPage = ({ params: { id } }: IPage) => {
   const router = useRouter();
   const { getClient, loading, client } = useClients();
+  const { getAssessments } = useAssessments();
+  const { getClientGoals } = useClientGoals();
 
   useEffect(() => {
     if (client?.id != id) getClient(id, true, router.push);
