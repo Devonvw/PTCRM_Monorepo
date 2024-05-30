@@ -1,18 +1,13 @@
 "use client";
 
-import axios from "axios";
-import { Metadata } from "next";
 import { IPage } from "@/interfaces/page";
+import { useAssessments } from "@/stores/useAssessments";
+import { useClientGoals } from "@/stores/useClientGoals";
 import { useClients } from "@/stores/useClients";
-import { useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { ClipboardList, Goal, ListChecks, SquareCheckBig } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import OverviewCard from "./components/OverviewCard";
 import ClientDetailLayout from "./components/layout";
 
 const ClientDetailPage = ({ params: { id } }: IPage) => {

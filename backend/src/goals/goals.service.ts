@@ -7,7 +7,7 @@ import Pagination from 'src/utils/pagination';
 import Search from 'src/utils/search';
 import { Equal, IsNull, Or, Repository } from 'typeorm';
 import { CreateUpdateGoalDto } from './dtos/CreateUpdateGoalDto';
-import { GetAllGoalsQueryDto } from './dtos/GetAllGoalsQuery.dto';
+import { GetAllGoalsQueryDto } from './dtos/GetAllGoalsQueryDto';
 import { Goal } from './entities/goal.entity';
 
 @Injectable()
@@ -40,6 +40,22 @@ export class GoalsService {
     return { message: 'Goal deleted' };
   }
   async findAll(query: GetAllGoalsQueryDto, userId: number): Promise<any> {
+    //. If no query was provided, return all goals (global and user goals)
+    let goals;
+    let totalRows;
+    if (!query) {
+      goals = await this.goalRepository.find({
+        where: [{ user: Or(Equal(userId), IsNull()) }],
+        relations: ['user'],
+      });
+
+      //. Get the total number of rows
+      totalRows = await this.goalRepository.count({
+        where: [{ user: Or(Equal(userId), IsNull()) }],
+      });
+
+      return { data: goals, totalRows };
+    }
     const pagination = Pagination(query);
     const orderBy = OrderBy(query, [
       {
@@ -78,14 +94,14 @@ export class GoalsService {
       },
     ]);
     //. Get the goals
-    const goals = await this.goalRepository.find({
+    goals = await this.goalRepository.find({
       ...pagination,
       where: [...filter],
       order: orderBy,
     });
 
     //. Get the total number of rows
-    const totalRows = await this.goalRepository.count({
+    totalRows = await this.goalRepository.count({
       where: [...filter],
     });
 

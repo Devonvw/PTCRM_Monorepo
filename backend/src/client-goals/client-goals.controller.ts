@@ -47,6 +47,7 @@ export class ClientGoalsController {
     @Req() request: Request,
     @Query() query: GetClientGoalsQueryDto,
   ) {
+    console.log('query', query);
     const userId: number = request.user.id;
     return await this.clientGoalsService.findAll(userId, query);
   }

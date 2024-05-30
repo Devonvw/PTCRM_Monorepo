@@ -10,7 +10,7 @@ export const useClientGoals = create((set: any, get: any) => ({
   loading: undefined,
   reload: false,
   getClientGoals: async (modules: {
-    pagination: [pageIndex: number, pageSize: number];
+    pagination: any;
     filters?: any;
     clientId: number;
   }): Promise<number> => {
@@ -21,8 +21,8 @@ export const useClientGoals = create((set: any, get: any) => ({
           // ...modules.pagination,
           ...modules.filters,
           clientId: modules.clientId,
-          pageIndex: modules.pagination[0],
-          pageSize: modules.pagination[1],
+          pageIndex: modules.pagination["pageIndex"],
+          pageSize: modules.pagination["pageSize"],
           show: modules.filters?.show,
         },
       });
