@@ -18,6 +18,9 @@ export class ClientGoal extends AbstractEntity<ClientGoal> {
   @Column()
   completed: boolean = false;
 
+  @Column({ nullable: true })
+  completedAt?: Date = null;
+
   //. A client can have multiple client goals, but a client goal can only belong to one client.
   @ManyToOne(() => Client, (client) => client.clientGoals)
   client: Client;

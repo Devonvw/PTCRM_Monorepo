@@ -88,7 +88,7 @@ const PerformAssessmentModal = (props: IProps) => {
   // const { clientGoals, getClientGoals } = useClientGoals();
   const {
     clientGoalsToMeasure,
-    getClientGoalsToMeasure,
+    getAllUncompletedClientGoals,
     initiateAssessment,
     completeAssessment,
     addOrUpdateModalOpen,
@@ -112,28 +112,22 @@ const PerformAssessmentModal = (props: IProps) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const goals = await getClientGoalsToMeasure({
-        clientId: props.clientId,
-        pagination: [0, 100],
-      });
+      const goals = await getAllUncompletedClientGoals(props.clientId);
       setTotalClientGoals(goals);
-
-      const measurements = clientGoalsToMeasure.map(
-        (clientGoal: ClientGoal) => ({
-          clientGoalId: clientGoal.id,
-          value: clientGoal.currentValue.toString(),
-        })
-      );
-      setMeasurementsToPerform(measurements);
-      form.reset({ measurements });
     };
 
     fetchData();
   }, [addOrUpdateModalOpen]);
 
   useEffect(() => {
-    form.reset({ measurements: measurementsToPerform });
-  }, [measurementsToPerform]);
+    const measurements = clientGoalsToMeasure.map((clientGoal: ClientGoal) => ({
+      clientGoalId: clientGoal.id,
+      value: clientGoal.currentValue.toString(),
+    }));
+    setMeasurementsToPerform(measurements);
+
+    form.reset({ measurements });
+  }, [clientGoalsToMeasure]);
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     await completeAssessment(props.clientId, data.measurements, data.notes);
@@ -149,7 +143,7 @@ const PerformAssessmentModal = (props: IProps) => {
         props.onClose();
       }}
     >
-      <DialogContent className='sm:max-w-3xl'>
+      <DialogContent className="sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>Performing Assessment</DialogTitle>
           <DialogDescription>
@@ -160,7 +154,7 @@ const PerformAssessmentModal = (props: IProps) => {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className='grid grid-cols-2 gap-4 mb-4 max-h-112 overflow-y-scroll'>
+            <div className="grid grid-cols-2 gap-4 mb-4 max-h-112 overflow-y-scroll">
               {clientGoalsToMeasure.map(
                 (clientGoal: ClientGoal, index: number) => (
                   // <div key={clientGoal.id}>{clientGoal.id}</div>
@@ -174,7 +168,7 @@ const PerformAssessmentModal = (props: IProps) => {
                         <FormControl>
                           <Input
                             {...field}
-                            type='number'
+                            type="number"
                             placeholder={clientGoal.currentValue.toString()}
                             value={field.value || clientGoal.currentValue}
                           />
@@ -198,8 +192,8 @@ const PerformAssessmentModal = (props: IProps) => {
                   <FormControl>
                     <TextArea
                       {...field}
-                      className='h-20'
-                      placeholder='Notes...'
+                      className="h-20"
+                      placeholder="Notes..."
                     />
                   </FormControl>
                   <FormDescription>
@@ -209,16 +203,16 @@ const PerformAssessmentModal = (props: IProps) => {
                 </FormItem>
               )}
             ></FormField>
-            <DialogFooter className='pt-6 justify-end md:col-span-2'>
+            <DialogFooter className="pt-6 justify-end md:col-span-2">
               <DialogClose asChild>
-                <Button type='button' variant='secondary' size='sm'>
+                <Button type="button" variant="secondary" size="sm">
                   Cancel
-                  <XCircle className='h-5 w-5' />
+                  <XCircle className="h-5 w-5" />
                 </Button>
               </DialogClose>
-              <Button type='submit' size='sm'>
+              <Button type="submit" size="sm">
                 Add
-                <BadgeCheck className='h-5 w-5' />
+                <BadgeCheck className="h-5 w-5" />
               </Button>
             </DialogFooter>
           </form>

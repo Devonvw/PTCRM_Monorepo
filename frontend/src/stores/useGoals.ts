@@ -28,6 +28,17 @@ export const useGoals = create((set: any, get: any) => ({
       return 0;
     }
   },
+  getAllGoals: async () => {
+    try {
+      const { data } = await axios.get("/backend/goals/all");
+      set((state: any) => ({
+        goals: data?.data,
+      }));
+      return data?.totalRows;
+    } catch (e: any) {
+      toastError(e?.response?.data?.message);
+    }
+  },
   getGoal: async (id: string, initialLoad?: boolean) => {
     if (initialLoad) set({ loading: true });
     try {

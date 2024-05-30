@@ -1,3 +1,4 @@
+import DeleteDialog from "@/components/custom/delete-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,17 +12,24 @@ import {
 import { useAssessments } from "@/stores/useAssessments";
 import dayjs from "dayjs";
 import { Trash, XCircle } from "lucide-react";
-import DeleteAssessmentModal from "./DeleteAssessmentModal";
 
 interface IProps {
   onDataChange: () => void;
 }
 
 const ViewAssessmentModal = (props: IProps) => {
-  const { assessment, viewModalOpen, setViewModalOpen, setDeleteModalOpen } =
-    useAssessments();
+  const {
+    assessment,
+    viewModalOpen,
+    setViewModalOpen,
+    deleteModalOpen,
+    setDeleteModalOpen,
+    deleteAssessment,
+  } = useAssessments();
 
-  const onDeleted = () => {
+  const onDelete = async () => {
+    await deleteAssessment(assessment?.id as number);
+
     //. Refresh the grid
     props.onDataChange();
     setViewModalOpen(false);
@@ -30,7 +38,7 @@ const ViewAssessmentModal = (props: IProps) => {
 
   return (
     <>
-      <DeleteAssessmentModal
+      {/* <DeleteAssessmentModal
         assessmentId={assessment?.id}
         onClose={() => {
           setDeleteModalOpen(false);
@@ -39,6 +47,19 @@ const ViewAssessmentModal = (props: IProps) => {
         onDeleted={() => {
           onDeleted();
         }}
+      /> */}
+      <DeleteDialog
+        objectId={assessment?.id}
+        onClose={() => {
+          setDeleteModalOpen(false);
+          setViewModalOpen(true);
+        }}
+        onConfirm={async () => {
+          onDelete();
+        }}
+        open={deleteModalOpen}
+        title='Delete assessment'
+        message='Are you sure you want to delete this assessment?'
       />
       <Dialog open={viewModalOpen} onOpenChange={() => setViewModalOpen(false)}>
         {/* <div className='w-full h-full flex justify-center z-50 absolute  top-0'>

@@ -128,13 +128,18 @@ export class AssessmentsService {
           clientGoal.currentValue = measurement.value;
 
           //. Check if the client goal has been completed
-          clientGoal.completed = this.clientGoalIsCompleted(
-            clientGoal.currentValue,
-            clientGoal.startValue,
-            clientGoal.completedValue,
-          );
+          if (
+            this.clientGoalIsCompleted(
+              clientGoal.currentValue,
+              clientGoal.startValue,
+              clientGoal.completedValue,
+            )
+          ) {
+            clientGoal.completed = true;
+            clientGoal.completedAt = new Date();
+          }
 
-          //. REMOVED If the goal has not been completed yet, check if any achievements have been made
+          //. REMOVED: If the goal has not been completed yet, check if any achievements have been made
           // else {
           //   if (clientGoal.achievements.length > 0) {
           //     for (const achievement of clientGoal.achievements) {

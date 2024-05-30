@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { CreateUpdateGoalDto } from './dtos/CreateUpdateGoalDto';
-import { GetAllGoalsQueryDto } from './dtos/GetAllGoalsQuery.dto';
+import { GetAllGoalsQueryDto } from './dtos/GetAllGoalsQueryDto';
 import { GoalsService } from './goals.service';
 
 @Controller('goals')
@@ -44,6 +44,11 @@ export class GoalsController {
   async findAll(@Req() request: Request, @Query() query: GetAllGoalsQueryDto) {
     const userId: number = request.user.id;
     return await this.goalsService.findAll(query, userId);
+  }
+  @Get('all')
+  async getAllGoals(@Req() request: Request) {
+    const userId: number = request.user.id;
+    return await this.goalsService.findAll(null, userId);
   }
   @Get(':id')
   async findOne(

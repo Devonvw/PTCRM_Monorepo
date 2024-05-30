@@ -34,6 +34,21 @@ export const useAssessments = create((set: any, get: any) => ({
       set({ loading: false });
     }
   },
+  getAllUncompletedClientGoals: async (clientId: number) => {
+    try {
+      const { data } = await axios.get(`/backend/client-goals/uncompleted/`, {
+        params: {
+          clientId: clientId,
+        },
+      });
+      set(() => ({
+        clientGoalsToMeasure: data?.data,
+      }));
+      return data?.totalRows;
+    } catch (e: any) {
+      toastError(e?.response?.data?.message);
+    }
+  },
   initiateAssessment: async (clientId: number) => {
     set({ loading: true });
     try {
@@ -118,40 +133,7 @@ export const useAssessments = create((set: any, get: any) => ({
       set({ loading: false });
     }
   },
-  filterOptions: [
-    {
-      id: 1,
-      title: "Notes",
-      key: "notes",
-      selected: [],
-      options: [
-        {
-          id: 1,
-          title: "Has notes",
-          meta: { key: "true" },
-        },
-        {
-          id: 2,
-          title: "Does not have notes",
-          meta: { key: "false" },
-        },
-      ],
-    },
-    {
-      id: 2,
-      title: "From date",
-      key: "fromDate",
-      selected: [],
-      options: [],
-    },
-    {
-      id: 3,
-      title: "Till date",
-      key: "tillDate",
-      selected: [],
-      options: [],
-    },
-  ],
+  filterOptions: [],
   addOrUpdateModalOpen: false,
   setAddOrUpdateModalOpen: (open: boolean) =>
     set({ addOrUpdateModalOpen: open }),
