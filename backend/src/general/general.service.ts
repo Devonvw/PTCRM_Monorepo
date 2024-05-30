@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Assessment } from 'src/assessments/entities/assessment.entity';
 import { ClientGoal } from 'src/client-goals/entities/client-goal.entity';
 import { Client } from 'src/clients/entities/client.entity';
@@ -28,6 +32,41 @@ export class GeneralService {
       completedGoalsCount,
       uncompletedGoalsCount,
       assessmentCount,
+    };
+  }
+
+  async getClientDashboard(clientId: number, byUserId: number) {
+    const client = await this.entityManager.findOne(Client, {
+      where: { user: { id: byUserId } },
+    });
+
+    if (!client) {
+      throw new NotFoundException(
+        'This client does not exist or does not belong to you.',
+      );
+    }
+
+    const clientGoalsCount = await this.entityManager.count(ClientGoal, {
+      where: { client: { id: clientId } },
+    });
+
+    const completedGoalsCount = await this.entityManager.count(ClientGoal, {
+      where: { client: { id: clientId }, completed: true },
+    });
+
+    const uncompletedGoalsCount = await this.entityManager.count(ClientGoal, {
+      where: { client: { id: clientId }, completed: false },
+    });
+
+    const clientAssessmentsCount = await this.entityManager.count(Assessment, {
+      where: { client: { id: clientId } },
+    });
+
+    return {
+      clientGoalsCount,
+      completedGoalsCount,
+      uncompletedGoalsCount,
+      clientAssessmentsCount,
     };
   }
 }

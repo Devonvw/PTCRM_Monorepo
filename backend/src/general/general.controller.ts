@@ -1,4 +1,4 @@
-import { Controller, Get, Req } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Req } from '@nestjs/common';
 import { GeneralService } from './general.service';
 import { Request } from 'express';
 
@@ -9,5 +9,13 @@ export class GeneralController {
   @Get('/dashboard')
   async getUserDashboard(@Req() req: Request) {
     return await this.generalService.getUserDashboard(req.user.id);
+  }
+
+  @Get('/client-dashboard/:clientId')
+  async getClientDashboard(
+    @Param('clientId', ParseIntPipe) clientId: number,
+    @Req() req: Request,
+  ) {
+    return await this.generalService.getClientDashboard(clientId, req.user.id);
   }
 }
