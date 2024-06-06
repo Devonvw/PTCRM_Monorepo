@@ -343,12 +343,6 @@ const Signup = () => {
                               <div className="rounded-sm font-light p-2">
                                 <p className="text-white text-base">
                                   <span className="font-bold">
-                                    {subscription?.sessionsPerWeek}
-                                  </span>{" "}
-                                  sessions per week
-                                </p>
-                                <p className="text-white text-base">
-                                  <span className="font-bold">
                                     €{subscription?.totalPrice}
                                   </span>{" "}
                                   per 4 weeks

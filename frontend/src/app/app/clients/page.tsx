@@ -37,11 +37,6 @@ const Clients = () => {
           >
             Add <PlusCircle className="h-5 w-5" />
           </Button>
-          <Link href="/app/clients/new-signup">
-            <Button size="sm" variant="primary" className="">
-              Add by sign up <PlusCircle className="h-5 w-5" />
-            </Button>
-          </Link>
         </PageHeader.Right>
       </PageHeader>
       <DataTable columns={columns} data={clients} {...state} />

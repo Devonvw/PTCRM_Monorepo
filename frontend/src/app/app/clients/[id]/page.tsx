@@ -16,11 +16,9 @@ const ClientDetailPage = ({ params: { id } }: IPage) => {
     useClients();
 
   useEffect(() => {
-    if (client?.id != id) {
-      getClient(id, true, router.push);
-      getClientDashboard(id);
-    }
-  }, [id]);
+    if (client?.id != id) getClient(id, true, router.push);
+    if (id) getClientDashboard(id);
+  }, []);
 
   return (
     <ClientDetailLayout client={client} loading={loading}>
