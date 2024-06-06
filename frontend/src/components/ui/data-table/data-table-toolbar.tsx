@@ -48,7 +48,7 @@ export function DataTableToolbar<TData>({
     <>
       <div className="flex items-center justify-between">
         <div className="flex flex-1 items-center space-x-2">
-          {!noSearch && (
+          {!noSearch ? (
             <DebouncedInput
               placeholder="Search..."
               value={search}
@@ -56,6 +56,8 @@ export function DataTableToolbar<TData>({
               debounce={500}
               className="h-8 w-[150px] lg:w-[250px]"
             />
+          ) : (
+            <></>
           )}
           {filters.map((filter) => (
             <DataTableFilter
@@ -66,7 +68,7 @@ export function DataTableToolbar<TData>({
           ))}
         </div>
       </div>
-      {filters?.length && (
+      {filters?.length ? (
         <ul className="flex items-center flex-wrap gap-2">
           <li className="font-bold uppercase text-secondary text-sm">
             Filters
@@ -98,6 +100,8 @@ export function DataTableToolbar<TData>({
             ) : null
           )}
         </ul>
+      ) : (
+        <div className="h-6"></div>
       )}
     </>
   );

@@ -170,7 +170,7 @@ const PerformAssessmentModal = (props: IProps) => {
                             {...field}
                             type="number"
                             placeholder={clientGoal.currentValue.toString()}
-                            value={field.value || clientGoal.currentValue}
+                            // value={field.value || clientGoal.currentValue}
                           />
                         </FormControl>
                         <FormDescription>
