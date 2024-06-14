@@ -42,24 +42,17 @@ const ClientAssessmentsPage = ({ params: { id } }: IPage) => {
   } = useAssessments();
 
   const { state, reload } = useTable({
-    onChange: ({ pagination, filters, search, sort }) =>
-      getAssessments({
-        pagination,
-        filters,
-        search,
-        sort,
-        clientId: Number(id),
-      }),
+    onChange: getAssessments.bind(null, Number(id)),
     filterOptions,
     sortingDefault: [{ id: "performedAt", desc: true }],
   });
 
   const handleTableChange = (changeProps: IOnChangeProps) => {
-    reload();
-    return getAssessments({ ...changeProps, clientId: Number(id) });
+    // reload();
+    return getAssessments(Number(id), changeProps);
   };
   const handleAssessmentCreated = () => {
-    reload();
+    // reload();
     setAddOrUpdateModalOpen(false);
   };
 
