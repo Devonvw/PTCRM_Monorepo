@@ -1,19 +1,50 @@
 import { IReload } from "@/interfaces/reload";
+import ITableRequest from "@/interfaces/table-request";
 import toastError from "@/utils/toast-error";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { create } from "zustand";
 
-export const useClientGoals = create((set: any, get: any) => ({
-  clientGoal: {} as any,
+interface IClientGoal {
+  [key: string]: any;
+}
+
+interface IUseClientGoalsStore {
+  clientGoal: IClientGoal;
+  clientGoals: IClientGoal[];
+  loading: boolean | undefined;
+  reload: boolean;
+  getClientGoals: (
+    modules: ITableRequest & {
+      clientId: number;
+    }
+  ) => Promise<number>;
+  getClientGoal: (id: number, initialLoad?: boolean) => Promise<void>;
+  createClientGoal: (
+    clientGoal: IClientGoal,
+    reload?: IReload
+  ) => Promise<void>;
+  updateClientGoal: (
+    clientGoal: IClientGoal,
+    reload?: IReload
+  ) => Promise<void>;
+  deleteClientGoal: (id: number, reload?: IReload) => Promise<void>;
+  addOrUpdateModalOpen: boolean;
+  setAddOrUpdateModalOpen: (open: boolean) => void;
+  deleteModalOpen: boolean;
+  setDeleteModalOpen: (open: boolean) => void;
+}
+
+export const useClientGoals = create<IUseClientGoalsStore>((set) => ({
+  clientGoal: {},
   clientGoals: [],
   loading: undefined,
   reload: false,
-  getClientGoals: async (modules: {
-    pagination: any;
-    filters?: any;
-    clientId: number;
-  }): Promise<number> => {
+  getClientGoals: async (
+    modules: ITableRequest & {
+      clientId: number;
+    }
+  ): Promise<number> => {
     set({ loading: true });
     try {
       const { data } = await axios.get("/backend/client-goals", {
@@ -80,20 +111,6 @@ export const useClientGoals = create((set: any, get: any) => ({
       toastError(e?.response?.data?.message);
     }
   },
-  // filterOptions: [
-  //   {
-  //     label: "All",
-  //     value: "all",
-  //   },
-  //   {
-  //     label: "Completed",
-  //     value: "completed",
-  //   },
-  //   {
-  //     label: "Uncompleted",
-  //     value: "uncompleted",
-  //   },
-  // ],
   addOrUpdateModalOpen: false,
   setAddOrUpdateModalOpen: (open: boolean) =>
     set({ addOrUpdateModalOpen: open }),

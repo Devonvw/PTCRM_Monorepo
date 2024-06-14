@@ -28,10 +28,10 @@ export class AuthController {
   @Public()
   @Post('/signup')
   async signup(@Body() body: SignUpDto) {
-    const res = await this.authService.signup(body);
+    const signupRes = await this.authService.signup(body);
     return Success(
       'You are successfully signed up. You will now be directed to the payment page.',
-      { ...res },
+      signupRes,
     );
   }
 

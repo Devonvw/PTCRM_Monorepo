@@ -5,6 +5,7 @@ import { UsersService } from 'src/users/users.service';
 import { UserResponseDto } from './dto/UserResponse.dto';
 import { SignUpDto } from 'src/users/dtos/SignUp.dto';
 import { UserAuthDataDto } from './dto/UserAuthData.dto';
+import { SignUpResponseDto } from 'src/users/dtos/SignUpResponse.dto';
 
 @Injectable()
 export class AuthService {
@@ -46,7 +47,7 @@ export class AuthService {
     return user;
   }
 
-  async logout(request: Request): Promise<any> {
+  async logout(request: Request): Promise<void> {
     request.session.destroy(() => {
       return {
         message: 'Logout successful',
@@ -55,7 +56,7 @@ export class AuthService {
     });
   }
 
-  async signup(body: SignUpDto): Promise<{ checkoutHref: string }> {
+  async signup(body: SignUpDto): Promise<SignUpResponseDto> {
     return await this.userService.create(body);
   }
 

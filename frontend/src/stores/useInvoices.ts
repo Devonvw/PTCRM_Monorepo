@@ -1,20 +1,21 @@
-import { IReload } from "@/interfaces/reload";
-import toastError from "@/utils/toast-error";
+import ITableRequest from "@/interfaces/table-request";
 import axios from "axios";
-import { Router } from "next/router";
-import toast from "react-hot-toast";
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
 
-export const useInvoices = create((set: any, get: any) => ({
-  invoices: [] as any[],
+interface IInvoice {
+  [key: string]: any;
+}
+
+interface IUseInvoicesStore {
+  invoices: IInvoice[];
+  loading: boolean | undefined;
+  getInvoicesByMe: (modules: ITableRequest) => Promise<number>;
+}
+
+export const useInvoices = create<IUseInvoicesStore>((set) => ({
+  invoices: [],
   loading: undefined,
-  getInvoicesByMe: async (modules: {
-    pagination?: any;
-    search?: any;
-    sort?: any;
-    filters?: any;
-  }): Promise<number> => {
+  getInvoicesByMe: async (modules: ITableRequest): Promise<number> => {
     try {
       const { data } = await axios.get(`/backend/invoice/my-invoices`, {
         params: {
@@ -24,9 +25,9 @@ export const useInvoices = create((set: any, get: any) => ({
           ...modules.filters,
         },
       });
-      set((state: any) => ({
+      set({
         invoices: data?.data,
-      }));
+      });
       return data?.totalRows;
     } catch (e: any) {
       return 0;

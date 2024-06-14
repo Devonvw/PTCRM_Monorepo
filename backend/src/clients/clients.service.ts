@@ -4,19 +4,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MailService } from 'src/mail/mail.service';
 import { User } from 'src/users/entities/user.entity';
-import { UsersService } from 'src/users/users.service';
 import Filters from 'src/utils/filter';
 import OrderBy from 'src/utils/order-by';
 import Pagination from 'src/utils/pagination';
 import Search from 'src/utils/search';
 import { EntityManager, Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
-import { CreateSignUpClientDto } from './dtos/CreateSignUpClient.dto';
 import { CreateUpdateClientDto } from './dtos/CreateUpdateClient.dto';
 import { GetAllClientsQueryDto } from './dtos/GetAllClientsQuery.dto';
-import { SignUpDetailsResponseDto } from './dtos/SignUpDetailsResponse.dto';
 import { Client } from './entities/client.entity';
 
 @Injectable()
@@ -24,8 +19,6 @@ export class ClientsService {
   constructor(
     @InjectRepository(Client) private clientRepository: Repository<Client>,
     private readonly entityManager: EntityManager,
-    private mailService: MailService,
-    private userService: UsersService,
   ) {}
 
   async create(body: CreateUpdateClientDto, userId: number) {
@@ -49,56 +42,14 @@ export class ClientsService {
     return client;
   }
 
-  async createSignUp(body: CreateSignUpClientDto, userId: number) {
-    const clientExists = await this.clientRepository.findOneBy({
-      email: body.email,
-    });
-
-    if (clientExists) {
-      throw new ConflictException(
-        'This email is already in use. Please use another one.',
-      );
-    }
-
-    const signupToken = uuidv4();
-
-    const client = new Client({
-      ...body,
-      signupToken,
-      user: { id: userId } as User,
-    });
-
-    await this.entityManager.save(client);
-
-    const user = await this.userService.findById(userId);
-
-    //Send sign up email to client
-    this.mailService.sendClientSignupEmail(
-      body.email,
-      user.company,
-      client,
-      signupToken,
-    );
-
-    return client;
-  }
-
   async update(id: number, body: CreateUpdateClientDto, userId: number) {
-    const client = await this.clientRepository.findOneBy({ id });
-
-    if (!client) {
-      throw new NotFoundException('Client not found');
-    }
+    await this.getClientIfClientBelongsToUser(userId, id);
 
     await this.clientRepository.update({ id }, body);
   }
 
   async delete(id: number, userId: number) {
-    const client = await this.clientRepository.findOneBy({ id });
-
-    if (!client) {
-      throw new NotFoundException('Client not found');
-    }
+    await this.getClientIfClientBelongsToUser(userId, id);
 
     await this.clientRepository.delete({ id });
   }
@@ -167,42 +118,6 @@ export class ClientsService {
     }
 
     return client;
-  }
-
-  async getSignUpDetails(
-    signupToken: string,
-  ): Promise<SignUpDetailsResponseDto> {
-    const client = await this.clientRepository.findOne({
-      where: { signupToken },
-      relations: {
-        user: true,
-      },
-    });
-
-    if (!client) {
-      throw new ConflictException('This is not a valid sign up link.');
-    }
-
-    const user = await this.userService.findById(client.user.id);
-
-    return { client, company: user.company };
-  }
-
-  async signUpClient(body: CreateUpdateClientDto, signupToken: string) {
-    const client = await this.clientRepository.findOne({
-      where: { signupToken },
-    });
-
-    if (!client) {
-      throw new ConflictException('This is not a valid sign up link.');
-    }
-
-    await this.clientRepository.update(
-      { id: client.id },
-      { ...body, signupToken: null },
-    );
-
-    //Send welcome email to client
   }
 
   //. Check if client belongs to the requesting user

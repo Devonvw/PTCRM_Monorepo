@@ -1,10 +1,9 @@
+import { SES, SendRawEmailCommand } from '@aws-sdk/client-ses';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { SES, SendRawEmailCommand } from '@aws-sdk/client-ses';
-import { MailService } from './mail.service';
 import { ReactAdapter } from '@webtre/nestjs-mailer-react-adapter';
+import { MailService } from './mail.service';
 
 @Module({
   imports: [
