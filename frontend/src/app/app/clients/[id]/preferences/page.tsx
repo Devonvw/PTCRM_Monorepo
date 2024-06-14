@@ -18,7 +18,7 @@ const ClientDetailPreferencesPage = ({ params: { id } }: IPage) => {
     useClients();
 
   useEffect(() => {
-    if (client?.id != id) getClient(id);
+    if (client?.id != +id) getClient(id);
   }, [id]);
 
   return <div></div>;

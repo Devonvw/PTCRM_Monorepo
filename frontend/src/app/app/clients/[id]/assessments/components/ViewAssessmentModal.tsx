@@ -58,14 +58,14 @@ const ViewAssessmentModal = (props: IProps) => {
           onDelete();
         }}
         open={deleteModalOpen}
-        title='Delete assessment'
-        message='Are you sure you want to delete this assessment?'
+        title="Delete assessment"
+        message="Are you sure you want to delete this assessment?"
       />
       <Dialog open={viewModalOpen} onOpenChange={() => setViewModalOpen(false)}>
         {/* <div className='w-full h-full flex justify-center z-50 absolute  top-0'>
           <div className='modal min-w-112 max-w-screen-lg max-h-screen bg-slate-600 border rounded-2xl dark:border-slate-800 dark:bg-slate-950 h-fit m-auto relative'> */}
-        <DialogContent className='sm:max-w-xl flex flex-col'>
-          <DialogHeader className=''>
+        <DialogContent className="sm:max-w-xl flex flex-col">
+          <DialogHeader className="">
             <DialogTitle>Viewing assessment</DialogTitle>
             <DialogDescription>
               Performed at:{" "}
@@ -74,7 +74,7 @@ const ViewAssessmentModal = (props: IProps) => {
               Contained {assessment?.measurements?.length} measurements
             </DialogDescription>
           </DialogHeader>
-          {assessment.notes && (
+          {assessment?.notes && (
             <div>
               <br />
               <span>
@@ -83,14 +83,14 @@ const ViewAssessmentModal = (props: IProps) => {
             </div>
           )}
 
-          <div className='max-h-112 overflow-y-scroll'>
-            {assessment.measurements?.map((measurement: any) => (
+          <div className="max-h-112 overflow-y-scroll">
+            {assessment?.measurements?.map((measurement: any) => (
               <div key={measurement?.id}>
                 <br />
-                <h4 className='font-semibold'>
+                <h4 className="font-semibold">
                   {measurement?.clientGoal?.goal?.name}
                 </h4>
-                <div className='grid grid-cols-3 text-center'>
+                <div className="grid grid-cols-3 text-center">
                   <span>Started at</span>
                   <span>Measured</span>
                   <span>Goal</span>
@@ -102,23 +102,23 @@ const ViewAssessmentModal = (props: IProps) => {
               </div>
             ))}
           </div>
-          <DialogFooter className='pt-6 justify-end md:col-span-2'>
+          <DialogFooter className="pt-6 justify-end md:col-span-2">
             <Button
               onClick={() => {
                 setViewModalOpen(false);
                 setDeleteModalOpen(true);
               }}
-              variant='destructive'
-              type='button'
-              size='sm'
+              variant="destructive"
+              type="button"
+              size="sm"
             >
               Delete
-              <Trash className='h-5 w-5' />
+              <Trash className="h-5 w-5" />
             </Button>
             <DialogClose asChild>
-              <Button type='button' variant='secondary' size='sm'>
+              <Button type="button" variant="secondary" size="sm">
                 Cancel
-                <XCircle className='h-5 w-5' />
+                <XCircle className="h-5 w-5" />
               </Button>
             </DialogClose>
           </DialogFooter>

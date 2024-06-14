@@ -8,17 +8,9 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import dayjs from "dayjs";
 import { DownloadIcon } from "lucide-react";
+import { IInvoice } from "@/stores/useInvoices";
 
-interface IPayment {
-  id: number;
-  payment: {
-    totalPrice: number;
-    vatPrice: number;
-    date: string;
-  };
-}
-
-export const columns: ColumnDef<IPayment>[] = [
+export const columns: ColumnDef<IInvoice>[] = [
   {
     accessorKey: "id",
     header: ({ column }) => (

@@ -27,10 +27,6 @@ const useTable = ({ onChange, filterOptions, sortingDefault }: IUseTable) => {
   const [rowCount, setRowCount] = useState<number>(0);
   const [search, setSearch] = useState<string>("");
 
-  useEffect(() => {
-    reload();
-  }, [pagination, filters, search, sorting]);
-
   const reload = useCallback(() => {
     let parsedFilters: any = {};
     filters.forEach((filter) => {
@@ -48,7 +44,11 @@ const useTable = ({ onChange, filterOptions, sortingDefault }: IUseTable) => {
         orderDirection: sorting?.[0]?.desc ? "DESC" : "ASC",
       },
     }).then((totalRows: number) => setRowCount(totalRows));
-  }, [pagination, filters, search, sorting]);
+  }, [onChange, pagination, filters, search, sorting]);
+
+  useEffect(() => {
+    reload();
+  }, [reload, pagination, filters, search, sorting]);
 
   return {
     state: {
