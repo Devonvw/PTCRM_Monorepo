@@ -1,15 +1,14 @@
-import { NestFactory, Reflector } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import session from 'express-session';
 import passport from 'passport';
-import * as process from 'process';
+import { AppModule } from './app.module';
 
-import helmet from 'helmet';
 import { TypeormStore } from 'connect-typeorm';
-import { SessionEntity } from './domain/session.entity';
+import helmet from 'helmet';
 import { DataSource } from 'typeorm';
+import { SessionEntity } from './domain/session.entity';
 import { RolesGuard } from './guards/roles.guard';
 import { GlobalExceptionsFilter } from './utils/global-exception-filter';
 
@@ -21,7 +20,6 @@ async function bootstrap() {
 
   app.use(
     session({
-      //TODO: Get these values from environment variables
       secret: 'riaghuiaelhgiulh#$%^asdfghADRFH',
       resave: false,
       saveUninitialized: false,

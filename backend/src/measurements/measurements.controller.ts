@@ -4,7 +4,6 @@ import { GetMeasurementsQueryDto } from './dtos/GetMeasurementsQueryDto';
 import { UpdateMeasurementDto } from './dtos/UpdateMeasurementDto';
 import { MeasurementsService } from './measurements.service';
 
-//TODO: Test this controller
 @Controller('measurements')
 export class MeasurementsController {
   constructor(private readonly measurementsService: MeasurementsService) {}

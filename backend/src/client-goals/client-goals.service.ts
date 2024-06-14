@@ -237,7 +237,7 @@ export class ClientGoalsService {
     return client;
   }
 
-  /// This function checks if the client goal exists and if the client belongs to the user
+  /// This function checks and returns the client goal if the client goal exists and if the clientgoal's client belongs to the user, and throws an error if not
   private async clientGoalExistsAndBelongsToUser(
     userId: number,
     clientGoalId: number,

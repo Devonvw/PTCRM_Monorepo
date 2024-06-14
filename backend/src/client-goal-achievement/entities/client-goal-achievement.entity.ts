@@ -20,6 +20,7 @@ export class ClientGoalAchievement extends AbstractEntity<ClientGoalAchievement>
   value: number;
 
   //TODO: Add measurement entity
+  //DEPRECATED: Achievements are not implemented for this version of the application
   // @Column()
   // measurement?: Measurement
 }

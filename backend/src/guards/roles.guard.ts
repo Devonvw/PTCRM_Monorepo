@@ -1,15 +1,17 @@
-import {Injectable, CanActivate, ExecutionContext} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import {Observable} from 'rxjs';
-import {Roles} from '../decorators/roles.decorator';
 import { EnumRoles } from 'src/types/roles.enums';
+import { Roles } from '../decorators/roles.decorator';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const isPublic = this.reflector.get<boolean>("isPublic", context.getHandler());
+    const isPublic = this.reflector.get<boolean>(
+      'isPublic',
+      context.getHandler(),
+    );
 
     //. If the route is public, then everyone can access it
     if (isPublic) {
@@ -26,7 +28,7 @@ export class RolesGuard implements CanActivate {
       return request.isAuthenticated();
     }
     const user = request.user;
-    
+
     //. Check if user has the required role
     if (matchRoles(roles, user.role)) {
       return request.isAuthenticated();
@@ -38,5 +40,5 @@ export class RolesGuard implements CanActivate {
 }
 
 function matchRoles(roles: string[], userRole: EnumRoles): boolean {
-  return roles.some(role => userRole === role);
+  return roles.some((role) => userRole === role);
 }

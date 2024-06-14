@@ -12,8 +12,6 @@ import Pagination from 'src/utils/pagination';
 import { Between, LessThan, Repository } from 'typeorm';
 import { CreateAssessmentDto } from './dtos/CreateAssessmentDto';
 import { GetAssessmentsQueryDto } from './dtos/GetAssessmentsQueryDto';
-import { InitiateAssessmentDto } from './dtos/InitiateAssessmentDto';
-import { InitiateAssessmentResponseDto } from './dtos/InitiateAssessmentResponseDto';
 import { UpdateAssessmentDto } from './dtos/UpdateAssessmentDto';
 import { Assessment } from './entities/assessment.entity';
 
@@ -28,35 +26,6 @@ export class AssessmentsService {
     @Inject(ClientGoalsService) private clientGoalService,
   ) {}
 
-  //. This function retrieves all of the measurements that are to be made to make up a new assessment. It is called when a user (aka coach) initiates a new assessment.
-  async initiate(
-    userId: number,
-    body: InitiateAssessmentDto,
-  ): Promise<InitiateAssessmentResponseDto> {
-    //. Make sure the client belongs to the coach (user) (ignore the response, we don't need to client object)
-    await this.clientService.getClientIfClientBelongsToUser(
-      userId,
-      body.clientId,
-    );
-
-    //. Get the client's goals (that are not completed, meaning measurements can still take place for them)
-    const clientGoals: ClientGoal[] = await this.clientGoalRepository.find({
-      where: {
-        client: { id: body.clientId },
-        completed: false,
-      },
-      relations: ['goal'],
-    });
-
-    if (clientGoals.length === 0 || !clientGoals) {
-      throw new NotFoundException(
-        'This client has no goals that are not completed.',
-      );
-    }
-
-    //. Return a list of client goals that are not completed
-    return { clientId: body.clientId, measurementsToPerform: clientGoals };
-  }
   async create(userId: number, body: CreateAssessmentDto): Promise<any> {
     const achievementsObtained: ClientGoalAchievement[] = [];
     //. Create a transaction to ensure that the assessment and all its measurements are saved or none are saved if an error occurs
@@ -171,27 +140,21 @@ export class AssessmentsService {
   async findAll(userId: number, query: GetAssessmentsQueryDto): Promise<any> {
     //. Make sure the client belongs to the coach (user)
     if (query?.clientId) {
+      //. Get the client object if the client belongs to the user
       const client = await this.clientService.getClientIfClientBelongsToUser(
         userId,
         query.clientId,
       );
-      if (!client) {
-        throw new NotFoundException(
-          'This client does not exist or does not belong to you.',
-        );
-      }
+
       return await this.findAllForClient(client.id, query);
     } else if (query?.clientGoalId) {
+      //. Get the client goal object if the client goal belongs to one of the user's client
       const clientGoal =
         await this.clientGoalService.clientGoalExistsAndBelongsToUser(
           userId,
           query.clientGoalId,
         );
-      if (!clientGoal) {
-        throw new NotFoundException(
-          'This client goal does not exist or does not belong to a client of yours.',
-        );
-      }
+
       return await this.findAllForClientGoal(clientGoal.id, query);
     }
     //. If no client or client goal id is provided, throw an error (class-validation will prevent this from happening, but it's good to have a backup)
@@ -385,7 +348,9 @@ export class AssessmentsService {
     });
 
     if (!assessment) {
-      throw new NotFoundException('Assessment not found');
+      throw new NotFoundException(
+        'Assessment does not exist or does not belong to one of your clients',
+      );
     }
 
     return assessment;

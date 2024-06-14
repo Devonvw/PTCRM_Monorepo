@@ -120,7 +120,7 @@ export class ClientsService {
     return client;
   }
 
-  //. Check if client belongs to the requesting user
+  //. Check if client belongs to the requesting user (coach), if not, throw an error
   async getClientIfClientBelongsToUser(
     userId: number,
     clientId: number,
