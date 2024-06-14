@@ -1,15 +1,25 @@
 import toastError from "@/utils/toast-error";
 import axios from "axios";
-import toast from "react-hot-toast";
 import { create } from "zustand";
 
-export const useGeneral = create((set: any, get: any) => ({
-  dashboardData: {} as any,
+interface IDashboardData {
+  [key: string]: any;
+}
+
+interface IUseGeneralStore {
+  dashboardData: IDashboardData;
+  getUserDashboard: () => Promise<void>;
+}
+
+export const useGeneral = create<IUseGeneralStore>((set) => ({
+  dashboardData: {},
   getUserDashboard: async () => {
     try {
       const { data } = await axios.get("/backend/general/dashboard");
 
       set({ dashboardData: data });
-    } catch (error: any) {}
+    } catch (error: any) {
+      toastError(error?.response?.data?.message);
+    }
   },
 }));

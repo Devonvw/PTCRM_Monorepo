@@ -1,23 +1,50 @@
+import IFilterOption from "@/interfaces/filter-option";
+import { IRedirect } from "@/interfaces/redirect";
 import { IReload } from "@/interfaces/reload";
+import ITableRequest from "@/interfaces/table-request";
 import toastError from "@/utils/toast-error";
 import axios from "axios";
-import { Router } from "next/router";
 import toast from "react-hot-toast";
 import { create } from "zustand";
 
-export const useClients = create((set: any, get: any) => ({
-  client: {} as any,
+interface IClient {
+  [key: string]: any;
+}
+
+interface IClientStore {
+  client: IClient;
+  clients: IClient[];
+  loading: boolean | undefined;
+  signUpDetails: IClient;
+  signUpErrorMsg: string;
+  dashboardData: any;
+  getClients: (modules: ITableRequest) => Promise<number>;
+  getClient: (
+    id: string,
+    initialLoad?: boolean,
+    redirect?: IRedirect
+  ) => Promise<void>;
+  createClient: (client: IClient, reload?: IReload) => Promise<void>;
+  createClientSignUp: (client: IClient, reload?: IReload) => Promise<void>;
+  updateClient: (
+    id: string,
+    client: IClient,
+    reload?: IReload
+  ) => Promise<void>;
+  getClientDashboard: (clientId: string) => Promise<void>;
+  filterOptions: Array<IFilterOption>;
+  addModalOpen: boolean;
+  setAddModalOpen: (open: boolean) => void;
+}
+
+export const useClients = create<IClientStore>((set) => ({
+  client: {},
   clients: [],
   loading: undefined,
-  signUpDetails: {} as any,
+  signUpDetails: {},
   signUpErrorMsg: "",
-  dashboardData: {} as any,
-  getClients: async (modules: {
-    pagination?: any;
-    search?: any;
-    sort?: any;
-    filters?: any;
-  }): Promise<number> => {
+  dashboardData: {},
+  getClients: async (modules: ITableRequest): Promise<number> => {
     try {
       const { data } = await axios.get("/backend/clients", {
         params: {
@@ -27,9 +54,9 @@ export const useClients = create((set: any, get: any) => ({
           ...modules.filters,
         },
       });
-      set((state: any) => ({
+      set({
         clients: data?.data,
-      }));
+      });
       return data?.totalRows;
     } catch (e: any) {
       return 0;
@@ -38,14 +65,14 @@ export const useClients = create((set: any, get: any) => ({
   getClient: async (
     id: string,
     initialLoad?: boolean,
-    redirect?: (path: string) => void
+    redirect?: IRedirect
   ) => {
     if (initialLoad) set({ loading: true });
     try {
       const { data } = await axios.get(`/backend/clients/${id}`);
-      set((state: any) => ({
+      set({
         client: data,
-      }));
+      });
     } catch (e: any) {
       if (redirect) redirect("/app/clients");
       toastError(e?.response?.data?.message);
@@ -74,13 +101,13 @@ export const useClients = create((set: any, get: any) => ({
   },
   updateClient: async (id: string, client: any, reload?: IReload) => {
     try {
-      await axios.put(`/backend/clients/${id}`, client);
+      const { data } = await axios.put(`/backend/clients/${id}`, client);
 
       if (reload) reload();
-      set((state: any) => ({
+      set({
         addModalOpen: false,
-      }));
-      toast.success("Client updated successfully.");
+      });
+      toast.success(data?.message);
     } catch (e: any) {
       toastError(e?.response?.data?.message);
     }
@@ -95,18 +122,6 @@ export const useClients = create((set: any, get: any) => ({
       toastError(e?.response?.data?.message);
     }
   },
-  sortOptions: [
-    {
-      id: 1,
-      name: "Naam A-Z",
-      meta: { key: "name", direction: "ASC" },
-    },
-    {
-      id: 2,
-      name: "Naam Z-A",
-      meta: { key: "name", direction: "DESC" },
-    },
-  ],
   filterOptions: [
     {
       id: 1,

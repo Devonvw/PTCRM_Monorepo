@@ -1,34 +1,42 @@
-import { IReload } from "@/interfaces/reload";
+import ITableRequest from "@/interfaces/table-request";
 import toastError from "@/utils/toast-error";
 import axios from "axios";
-import { Router } from "next/router";
-import toast from "react-hot-toast";
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
 
-export const usePayments = create((set: any, get: any) => ({
-  subscriptions: [] as any[],
-  payments: [] as any[],
+interface ISubscription {
+  [key: string]: any;
+}
+
+interface IPayment {
+  [key: string]: any;
+}
+
+interface IUsePaymentsStore {
+  subscriptions: ISubscription[];
+  payments: IPayment[];
+  loading: boolean | undefined;
+  getSubscriptions: (initialLoad?: boolean) => Promise<void>;
+  getPaymentsByMe: (modules: ITableRequest) => Promise<number>;
+}
+
+export const usePayments = create<IUsePaymentsStore>((set) => ({
+  subscriptions: [],
+  payments: [],
   loading: undefined,
   getSubscriptions: async (initialLoad?: boolean) => {
     if (initialLoad) set({ loading: true });
     try {
       const { data } = await axios.get(`/backend/payment/subscriptions`);
-      set((state: any) => ({
+      set({
         subscriptions: data,
-      }));
+      });
     } catch (e: any) {
       toastError(e?.response?.data?.message);
     } finally {
       set({ loading: false });
     }
   },
-  getPaymentsByMe: async (modules: {
-    pagination?: any;
-    search?: any;
-    sort?: any;
-    filters?: any;
-  }): Promise<number> => {
+  getPaymentsByMe: async (modules: ITableRequest): Promise<number> => {
     try {
       const { data } = await axios.get(`/backend/payment/my-payments`, {
         params: {
@@ -38,9 +46,9 @@ export const usePayments = create((set: any, get: any) => ({
           ...modules.filters,
         },
       });
-      set((state: any) => ({
+      set({
         payments: data?.data,
-      }));
+      });
       return data?.totalRows;
     } catch (e: any) {
       return 0;

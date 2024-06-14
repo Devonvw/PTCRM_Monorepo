@@ -82,7 +82,7 @@ export class UsersService {
   }
 
   async getLoggedInUser(userId: number) {
-    const user = await this.userRepository.findOneBy({ id: userId });
+    const user = await this.findById(userId);
     delete user.password;
 
     return user;

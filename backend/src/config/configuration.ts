@@ -1,5 +1,3 @@
-import { from } from 'rxjs';
-
 export default () => ({
   port: 8080,
   database: {

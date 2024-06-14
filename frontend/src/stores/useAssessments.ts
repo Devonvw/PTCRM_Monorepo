@@ -1,11 +1,54 @@
+import IFilterOption from "@/interfaces/filter-option";
 import { IReload } from "@/interfaces/reload";
+import ITableRequest from "@/interfaces/table-request";
 import toastError from "@/utils/toast-error";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { create } from "zustand";
 
-export const useAssessments = create((set: any, get: any) => ({
-  assessment: {} as any,
+interface IAssessment {
+  [key: string]: any;
+}
+
+interface IClientGoal {
+  [key: string]: any;
+}
+
+interface IUseAssessmentsStore {
+  assessment: IAssessment;
+  assessments: IAssessment[];
+  clientGoalsToMeasure: IClientGoal[];
+  loading: boolean | undefined;
+  reload: boolean;
+  getClientGoalsToMeasure: (modules: {
+    pagination: [pageIndex: number, pageSize: number];
+    clientId: number;
+  }) => Promise<number>;
+  getAllUncompletedClientGoals: (clientId: number) => Promise<number | void>;
+  initiateAssessment: (clientId: number) => Promise<void>;
+  completeAssessment: (
+    clientId: number,
+    measurements: { clientGoalId: number; value: string }[],
+    notes?: string
+  ) => Promise<void>;
+  getAssessments: (
+    modules: ITableRequest & {
+      clientId: number;
+    }
+  ) => Promise<number>;
+  getAssessment: (assessmentId: number) => Promise<void>;
+  deleteAssessment: (assessmentId: number, reload?: IReload) => Promise<void>;
+  filterOptions: IFilterOption[];
+  addOrUpdateModalOpen: boolean;
+  setAddOrUpdateModalOpen: (open: boolean) => void;
+  deleteModalOpen: boolean;
+  setDeleteModalOpen: (open: boolean) => void;
+  viewModalOpen: boolean;
+  setViewModalOpen: (open: boolean) => void;
+}
+
+export const useAssessments = create<IUseAssessmentsStore>((set) => ({
+  assessment: {},
   assessments: [],
   clientGoalsToMeasure: [],
   loading: undefined,
@@ -18,7 +61,6 @@ export const useAssessments = create((set: any, get: any) => ({
     try {
       const { data } = await axios.get("/backend/client-goals", {
         params: {
-          // ...modules.pagination,
           clientId: modules.clientId,
           pageIndex: modules.pagination[0],
           pageSize: modules.pagination[1],
@@ -81,13 +123,11 @@ export const useAssessments = create((set: any, get: any) => ({
       set({ loading: false });
     }
   },
-  getAssessments: async (modules: {
-    pagination?: any;
-    search?: any;
-    sort?: any;
-    filters?: any;
-    clientId: number;
-  }): Promise<number> => {
+  getAssessments: async (
+    modules: ITableRequest & {
+      clientId: number;
+    }
+  ): Promise<number> => {
     set({ loading: true });
     try {
       const { data } = await axios.get("/backend/assessments", {

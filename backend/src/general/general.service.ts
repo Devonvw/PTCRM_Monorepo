@@ -1,19 +1,20 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Assessment } from 'src/assessments/entities/assessment.entity';
 import { ClientGoal } from 'src/client-goals/entities/client-goal.entity';
 import { Client } from 'src/clients/entities/client.entity';
-import { Goal } from 'src/goals/entities/goal.entity';
 import { EntityManager } from 'typeorm';
+import { UserDashboardDto } from './dtos/UserDashboard.dto';
+import { ClientDashboardDto } from './dtos/ClientDashboard.dto';
+import { ClientsService } from 'src/clients/clients.service';
 
 @Injectable()
 export class GeneralService {
-  constructor(private readonly entityManager: EntityManager) {}
+  constructor(
+    private readonly entityManager: EntityManager,
+    private clientsService: ClientsService,
+  ) {}
 
-  async getUserDashboard(userId: number) {
+  async getUserDashboard(userId: number): Promise<UserDashboardDto> {
     const clientCount = await this.entityManager.count(Client, {
       where: { user: { id: userId } },
     });
@@ -35,16 +36,14 @@ export class GeneralService {
     };
   }
 
-  async getClientDashboard(clientId: number, byUserId: number) {
-    const client = await this.entityManager.findOne(Client, {
-      where: { user: { id: byUserId } },
-    });
-
-    if (!client) {
-      throw new NotFoundException(
-        'This client does not exist or does not belong to you.',
-      );
-    }
+  async getClientDashboard(
+    clientId: number,
+    byUserId: number,
+  ): Promise<ClientDashboardDto> {
+    await this.clientsService.getClientIfClientBelongsToUser(
+      byUserId,
+      clientId,
+    );
 
     const clientGoalsCount = await this.entityManager.count(ClientGoal, {
       where: { client: { id: clientId } },

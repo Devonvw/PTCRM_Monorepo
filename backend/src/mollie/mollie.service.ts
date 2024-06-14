@@ -1,9 +1,5 @@
+import createMollieClient, { SequenceType } from '@mollie/api-client';
 import { Injectable } from '@nestjs/common';
-import createMollieClient, {
-  PaymentMethod,
-  SequenceType,
-} from '@mollie/api-client';
-import dayjs from 'dayjs';
 import { SUBSCRIPTION_INTERVAL } from 'src/utils/constants';
 
 @Injectable()
@@ -26,60 +22,9 @@ export class MollieService {
   }
 
   async getMandates(customerId: string) {
-    const mandates = await this.mollieClient.customerMandates.page({
+    return await this.mollieClient.customerMandates.page({
       customerId: customerId,
     });
-
-    return mandates;
-  }
-
-  async getMandate(mandateId: string, customerId: string) {
-    const mandate = await this.mollieClient.customerMandates.get(mandateId, {
-      customerId: customerId,
-    });
-
-    return mandate;
-  }
-
-  async createSubscription(
-    customerId: string,
-    mandateId: string,
-    startDate: string,
-    amount: number,
-    description: string,
-  ) {
-    const subscription = await this.mollieClient.customerSubscriptions.create({
-      customerId,
-      mandateId,
-      startDate,
-      amount: {
-        currency: 'EUR',
-        value: Number(amount).toFixed(2),
-      },
-      interval: SUBSCRIPTION_INTERVAL,
-      description,
-      webhookUrl: process.env.BACKEND_URL + '/payment/webhook-mollie',
-    });
-
-    return subscription;
-  }
-
-  async checkUserMandate(customerId: string) {
-    const mandates = await this.getMandates(customerId);
-
-    if (
-      mandates?.length == 0 ||
-      !mandates?.some((man: any) => man?.status == 'valid')
-    )
-      return false;
-
-    return true;
-  }
-
-  public async getPayment(paymentId: string) {
-    const payment = await this.mollieClient.payments.get(paymentId);
-
-    return payment;
   }
 
   async createFirstPayment(
@@ -95,40 +40,47 @@ export class MollieService {
         value: Number(amount).toFixed(2),
       },
       description,
-      redirectUrl: process.env.FRONTEND_URL + `/app`,
-      webhookUrl: process.env.BACKEND_URL + '/payment/webhook-mollie',
+      redirectUrl: `${process.env.FRONTEND_URL}/app`,
+      webhookUrl: `${process.env.BACKEND_URL}/payment/webhook-mollie`,
     });
 
     return res;
   }
 
-  async createRecurringPayment(
+  async createSubscription(
     customerId: string,
+    mandateId: string,
+    startDate: string,
     amount: number,
     description: string,
   ) {
-    if (!(await this.checkUserMandate(customerId))) {
-      throw new Error('No valid mandate found');
-    }
-
-    const res = await this.mollieClient.payments.create({
+    return await this.mollieClient.customerSubscriptions.create({
       customerId,
-      sequenceType: SequenceType.recurring,
+      mandateId,
+      startDate,
       amount: {
         currency: 'EUR',
-        value: amount.toFixed(2),
+        value: Number(amount).toFixed(2),
       },
-      // No Method because its sepa direct debit automatically
-      description: description,
-      webhookUrl: process.env.BACKEND_URL + '/payment/webhook-mollie',
+      interval: SUBSCRIPTION_INTERVAL,
+      description,
+      webhookUrl: `${process.env.BACKEND_URL}/payment/webhook-mollie`,
     });
-
-    return res;
   }
 
-  async cancelPayment(paymentId: string) {
-    const res = await this.mollieClient.payments.cancel(paymentId);
+  async checkUserMandate(customerId: string) {
+    const mandates = await this.getMandates(customerId);
 
-    return res;
+    if (
+      mandates?.length == 0 ||
+      !mandates?.some((man: any) => man?.status == 'valid')
+    )
+      return false;
+
+    return true;
+  }
+
+  public async getPayment(paymentId: string) {
+    return await this.mollieClient.payments.get(paymentId);
   }
 }
