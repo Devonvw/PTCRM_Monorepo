@@ -28,7 +28,7 @@ async function bootstrap() {
       cookie: { maxAge: 604800000 },
       store: new TypeormStore({
         cleanupLimit: 2,
-        limitSubquery: false, // If using MariaDB.
+        limitSubquery: false,
         ttl: 86400,
       }).connect(sessionRepository),
     }),
@@ -45,13 +45,7 @@ async function bootstrap() {
       transformOptions: { enableImplicitConversion: true },
     }),
   );
-  // const config = new DocumentBuilder()
-  //   .setTitle('PTCRM API')
-  //   .setDescription('The PTCRM API')
-  //   .setVersion('1.0')
-  //   .build();
-  // const document = SwaggerModule.createDocument(app, config);
-  // SwaggerModule.setup('api', app, document);
+
   app.use(helmet());
   app.enableCors({
     origin: [

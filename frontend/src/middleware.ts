@@ -1,7 +1,6 @@
-import axios from "axios";
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 import { API_URL } from "@/constants";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 type roles = "user";
 const auth = {
@@ -54,7 +53,8 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/app/account", request.nextUrl));
     }
   } catch (e) {
-    return NextResponse.redirect(new URL("/login", request.nextUrl));
+    if (!auth.validatePath(path))
+      return NextResponse.redirect(new URL("/login", request.nextUrl));
   }
 
   return NextResponse.next();

@@ -1,27 +1,48 @@
-import { API_URL } from "@/constants";
+import IInfoMessage from "@/interfaces/info-message";
+import { IRedirect } from "@/interfaces/redirect";
 import toastError from "@/utils/toast-error";
 import axios from "axios";
-import { Router } from "next/router";
 import toast from "react-hot-toast";
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { persist } from "zustand/middleware";
 
-export const useAuth = create<any>()(
+interface IUser {
+  [key: string]: any;
+}
+
+interface IUseAuthStore {
+  user?: IUser;
+  logout: (redirect: IRedirect) => Promise<void>;
+  login: (
+    user: IUser,
+    redirect: IRedirect,
+    setInfoMessage: (msg: IInfoMessage) => void
+  ) => Promise<void>;
+  signUp: (
+    user: IUser,
+    redirect: IRedirect,
+    setInfoMessage: (msg: IInfoMessage) => void
+  ) => Promise<void>;
+}
+
+export const useAuth = create<IUseAuthStore>()(
   persist(
-    (set, get) => ({
-      user: null,
-      logout: async (redirect: (path: string) => void) => {
+    (set) => ({
+      user: undefined,
+      logout: async (redirect: IRedirect) => {
         try {
           await axios.delete("/backend/auth/logout");
 
-          set({ user: null });
+          set({ user: undefined });
           redirect("/login");
-        } catch (error: any) {}
+        } catch (error: any) {
+          toastError(error?.response?.data?.message);
+        }
       },
       login: async (
-        user: any,
-        redirect: (path: string) => void,
-        setInfoMessage: (msg: any) => void
+        user: IUser,
+        redirect: IRedirect,
+        setInfoMessage: (msg: IInfoMessage) => void
       ) => {
         try {
           const { data } = await axios.post("/backend/auth/login", user);
@@ -33,18 +54,16 @@ export const useAuth = create<any>()(
           toast.success(data?.message);
           redirect("/app");
         } catch (error: any) {
-          set({
-            infoMessage: {
-              message: error?.response?.data?.message,
-              isError: true,
-            },
+          setInfoMessage({
+            message: error?.response?.data?.message,
+            isError: true,
           });
         }
       },
       signUp: async (
-        user: any,
-        redirect: (href: string) => void,
-        setInfoMessage: (msg: any) => void
+        user: IUser,
+        redirect: IRedirect,
+        setInfoMessage: (msg: IInfoMessage) => void
       ) => {
         try {
           // Make the signup request with Axios
@@ -55,7 +74,7 @@ export const useAuth = create<any>()(
           // Redirect to the checkout page after 3 seconds
           setTimeout(() => {
             redirect(data?.checkoutHref);
-            setInfoMessage({});
+            setInfoMessage({ message: "", isError: false });
           }, 3000);
         } catch (error: any) {
           setInfoMessage({

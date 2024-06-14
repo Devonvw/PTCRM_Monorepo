@@ -1,25 +1,25 @@
+import { Payment as MolliePayment, PaymentStatus } from '@mollie/api-client';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Not, Repository } from 'typeorm';
-import { Payment } from './entities/payment.entity';
-import { Subscription } from './entities/subscription.entity';
-import { User } from 'src/users/entities/user.entity';
-import { MollieService } from 'src/mollie/mollie.service';
 import dayjs from 'dayjs';
-import { EnumRoles } from 'src/types/roles.enums';
-import { MollieWebhookDto } from './dtos/MollieWebhook.dto';
-import { Payment as MolliePayment, PaymentStatus } from '@mollie/api-client';
-import { GetPaymentsByUserQueryDto } from './dtos/GetPaymentsByUserQuery.dto';
-import Pagination from 'src/utils/pagination';
-import OrderBy from 'src/utils/order-by';
-import Filters from 'src/utils/filter';
 import { InvoiceService } from 'src/invoice/invoice.service';
 import { MailService } from 'src/mail/mail.service';
+import { MollieService } from 'src/mollie/mollie.service';
+import { EnumRoles } from 'src/types/roles.enums';
+import { User } from 'src/users/entities/user.entity';
 import {
   SUBSCRIPTION_INTERVAL_NUMBER,
   SUBSCRIPTION_INTERVAL_TYPE,
   VAT_PERCENTAGE,
 } from 'src/utils/constants';
+import Filters from 'src/utils/filter';
+import OrderBy from 'src/utils/order-by';
+import Pagination from 'src/utils/pagination';
+import { EntityManager, Repository } from 'typeorm';
+import { GetPaymentsByUserQueryDto } from './dtos/GetPaymentsByUserQuery.dto';
+import { MollieWebhookDto } from './dtos/MollieWebhook.dto';
+import { Payment } from './entities/payment.entity';
+import { Subscription } from './entities/subscription.entity';
 
 @Injectable()
 export class PaymentService {
@@ -34,7 +34,7 @@ export class PaymentService {
   ) {}
 
   async getSubscriptions() {
-    return this.subscriptionRepository.find({});
+    return this.subscriptionRepository.find();
   }
 
   async getPaymentsByUser(
@@ -169,7 +169,7 @@ export class PaymentService {
       !molliePayment?.subscriptionId &&
       molliePayment?.status == PaymentStatus.paid
     ) {
-      await this.handleMandateFullfilled(payment.user.id, payment);
+      await this.handleMandateFulfilled(payment.user.id, payment);
       payment.paidAt = new Date();
     }
 
@@ -214,7 +214,7 @@ export class PaymentService {
     );
   }
 
-  async handleMandateFullfilled(userId: number, payment: Payment) {
+  async handleMandateFulfilled(userId: number, payment: Payment) {
     const user = await this.entityManager.findOne(User, {
       where: { id: userId },
       relations: ['subscription'],
@@ -227,12 +227,14 @@ export class PaymentService {
 
     if (!mandate?.length) return;
 
+    const startDate = dayjs()
+      .add(SUBSCRIPTION_INTERVAL_NUMBER, SUBSCRIPTION_INTERVAL_TYPE)
+      .format('YYYY-MM-DD');
+
     await this.mollieService.createSubscription(
       payment.user.mollieCustomerId,
       mandate?.[0].id,
-      dayjs()
-        .add(SUBSCRIPTION_INTERVAL_NUMBER, SUBSCRIPTION_INTERVAL_TYPE)
-        .format('YYYY-MM-DD'),
+      startDate,
       payment.subscription.totalPrice,
       `Payment for subscription:${payment.subscription.name}`,
     );

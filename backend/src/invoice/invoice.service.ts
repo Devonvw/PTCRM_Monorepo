@@ -19,7 +19,7 @@ export class InvoiceService {
     const latestNumberInvoice = await this.entityManager
       .createQueryBuilder(Invoice, 'invoice')
       .select('MAX(invoice.number)', 'max')
-      .getRawOne();
+      .getRawOne<{ max: number }>();
 
     const invoice = new Invoice({
       user: user,

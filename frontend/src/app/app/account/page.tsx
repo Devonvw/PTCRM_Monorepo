@@ -1,45 +1,24 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarIcon, CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
-import { z } from "zod";
-import axios from "axios";
-import { Metadata } from "next";
-import { IPage } from "@/interfaces/page";
-import { useClients } from "@/stores/useClients";
-import { Suspense, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
-import { BadgeCheck, XCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useUser } from "@/stores/useUser";
-import InfoBox from "../_components/infoBox";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { BadgeCheck } from "lucide-react";
 import Link from "next/link";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import InfoBox from "../_components/infoBox";
 
 const formSchema: any = z.object({
   email: z.string().email("This is not a valid email."),

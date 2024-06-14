@@ -1,13 +1,36 @@
+import IInfoMessage from "@/interfaces/info-message";
+import { IRedirect } from "@/interfaces/redirect";
 import toastError from "@/utils/toast-error";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { create } from "zustand";
 
-export const useUser = create((set: any, get: any) => ({
-  infoMessage: {} as { message: string; isError: boolean },
-  user: {} as any,
-  status: {} as any,
-  setUser: () => (user: any) => set({ user }),
+interface IUser {
+  [key: string]: any;
+}
+
+interface IPaymentStatus {
+  hasMandate: boolean;
+  paymentUrl: string;
+}
+
+interface IUseUserStore {
+  infoMessage: IInfoMessage;
+  user: IUser;
+  status?: IPaymentStatus;
+  setUser: (user: IUser) => void;
+  getLoggedInUser: () => Promise<void>;
+  updateLoggedInUser: (user: IUser) => Promise<void>;
+  getUserPaymentStatus: () => Promise<void>;
+  logout: (redirect: IRedirect) => Promise<void>;
+  signUp: (user: IUser, redirect: IRedirect) => Promise<void>;
+}
+
+export const useUser = create<IUseUserStore>((set) => ({
+  infoMessage: { message: "", isError: false },
+  user: {},
+  status: undefined,
+  setUser: () => (user: IUser) => set({ user }),
   getLoggedInUser: async () => {
     try {
       const { data } = await axios.get("/backend/users/me");
@@ -32,15 +55,15 @@ export const useUser = create((set: any, get: any) => ({
       set({ status: data });
     } catch (error: any) {}
   },
-  logout: async (redirect: (path: string) => void) => {
+  logout: async (redirect: IRedirect) => {
     try {
       await axios.delete("/backend/auth/logout");
 
-      set({ user: null });
+      set({ user: {} });
       redirect("/login");
     } catch (error: any) {}
   },
-  signUp: async (user: any, redirect: (href: string) => void) => {
+  signUp: async (user: any, redirect: IRedirect) => {
     try {
       // Make the signup request with Axios
       const { data } = await axios.post("/backend/auth/signup", user);
@@ -50,7 +73,7 @@ export const useUser = create((set: any, get: any) => ({
       // Redirect to the checkout page after 3 seconds
       setTimeout(() => {
         redirect(data?.checkoutHref);
-        set({ infoMessage: {} });
+        set({ infoMessage: { message: "", isError: false } });
       }, 3000);
     } catch (error: any) {
       set({

@@ -10,22 +10,14 @@ import {
   Req,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { Public } from 'src/decorators/public.decorator';
 import Success from 'src/utils/success';
 import { ClientsService } from './clients.service';
-import { CreateSignUpClientDto } from './dtos/CreateSignUpClient.dto';
 import { CreateUpdateClientDto } from './dtos/CreateUpdateClient.dto';
 import { GetAllClientsQueryDto } from './dtos/GetAllClientsQuery.dto';
 
 @Controller('clients')
 export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
-
-  @Public()
-  @Get('/sign-up/:token')
-  async getSignUpDetails(@Param('token') token: string) {
-    return await this.clientsService.getSignUpDetails(token);
-  }
 
   @Get()
   async findAll(@Req() req: Request, @Query() query: GetAllClientsQueryDto) {
@@ -43,12 +35,6 @@ export class ClientsController {
     return Success('Client created successfully', { client });
   }
 
-  @Post('/sign-up')
-  async createSignUp(@Req() req: Request, @Body() body: CreateSignUpClientDto) {
-    const client = await this.clientsService.createSignUp(body, req.user.id);
-    return Success('Client sign up created successfully', { client });
-  }
-
   @Put(':id')
   async update(
     @Req() req: Request,
@@ -57,15 +43,5 @@ export class ClientsController {
   ) {
     const client = await this.clientsService.update(id, body, req.user.id);
     return Success('Client updated successfully', { client });
-  }
-
-  @Public()
-  @Put('/sign-up/:token')
-  async signUpClient(
-    @Param('token') token: string,
-    @Body() body: CreateUpdateClientDto,
-  ) {
-    await this.clientsService.signUpClient(body, token);
-    return Success('Signed up successfully');
   }
 }
