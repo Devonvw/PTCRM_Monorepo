@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
 import { SignUpDto } from 'src/users/dtos/SignUp.dto';
@@ -14,8 +14,9 @@ export class AuthService {
     const user = await this.userService.findByEmail(email);
 
     if (!user) {
-      //TODO: throw an exception
-      return;
+      throw new BadRequestException(
+        'Email and password combination is incorrect.',
+      );
     }
 
     const passwordMatch: boolean = await this.passwordMatch(
@@ -24,8 +25,9 @@ export class AuthService {
     );
 
     if (!passwordMatch) {
-      //TODO: throw an exception
-      return;
+      throw new BadRequestException(
+        'Email and password combination is incorrect.',
+      );
     }
     //. Remove the password from the user object
     delete user.password;

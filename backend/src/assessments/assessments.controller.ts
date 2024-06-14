@@ -60,7 +60,6 @@ export class AssessmentsController {
     return Success('Assessment updated successfully', { assessment });
   }
 
-  //TODO: This endpoint doesn't work yet
   @Delete(':id')
   async delete(@Req() request: Request, @Param('id') id: number) {
     const userId = request.user.id;

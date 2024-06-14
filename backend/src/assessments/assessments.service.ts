@@ -26,35 +26,6 @@ export class AssessmentsService {
     @Inject(ClientGoalsService) private clientGoalService,
   ) {}
 
-  // //. This function retrieves all of the measurements that are to be made to make up a new assessment. It is called when a user (aka coach) initiates a new assessment.
-  // async initiate(
-  //   userId: number,
-  //   body: InitiateAssessmentDto,
-  // ): Promise<InitiateAssessmentResponseDto> {
-  //   //. Make sure the client belongs to the coach (user) (ignore the response, we don't need to client object)
-  //   await this.clientService.getClientIfClientBelongsToUser(
-  //     userId,
-  //     body.clientId,
-  //   );
-
-  //   //. Get the client's goals (that are not completed, meaning measurements can still take place for them)
-  //   const clientGoals: ClientGoal[] = await this.clientGoalRepository.find({
-  //     where: {
-  //       client: { id: body.clientId },
-  //       completed: false,
-  //     },
-  //     relations: ['goal'],
-  //   });
-
-  //   if (clientGoals.length === 0 || !clientGoals) {
-  //     throw new NotFoundException(
-  //       'This client has no goals that are not completed.',
-  //     );
-  //   }
-
-  //   //. Return a list of client goals that are not completed
-  //   return { clientId: body.clientId, measurementsToPerform: clientGoals };
-  // }
   async create(userId: number, body: CreateAssessmentDto): Promise<any> {
     const achievementsObtained: ClientGoalAchievement[] = [];
     //. Create a transaction to ensure that the assessment and all its measurements are saved or none are saved if an error occurs
