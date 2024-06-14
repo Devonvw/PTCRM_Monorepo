@@ -51,6 +51,7 @@ export class ClientGoalsController {
     return await this.clientGoalsService.findAll(userId, query);
   }
 
+  //. This function is specifically used for the perform assessment functionality. This will retrieve all the uncompleted client goals of a specific client WITHOUT any pagination
   @Get('uncompleted')
   async getUncompletedClientGoals(
     @Req() request: Request,

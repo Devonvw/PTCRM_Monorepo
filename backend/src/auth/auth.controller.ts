@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
   Post,
   Req,
   UseGuards,
@@ -14,7 +13,6 @@ import { LocalGuard } from 'src/guards/local.guard';
 import { SignUpDto } from 'src/users/dtos/SignUp.dto';
 import Success from 'src/utils/success';
 import { AuthService } from './auth.service';
-import { UserResponseDto } from './dto/UserResponse.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -25,6 +23,7 @@ export class AuthController {
     return await this.authService.getUserAuthData(request.user.id);
   }
 
+  //. The public decorator is used to allow access to the signup and login routes without authentication
   @Public()
   @Post('/signup')
   async signup(@Body() body: SignUpDto) {

@@ -72,14 +72,14 @@ const ClientAssessmentsPage = ({ params: { id } }: IPage) => {
           onClose={() => handleAssessmentCreated()}
         />
         <ViewAssessmentModal onDataChange={() => reload()} />
-        <div className="flex justify-end -mb-8">
+        <div className='flex justify-end -mb-8'>
           <Button
             onClick={() => setAddOrUpdateModalOpen(true)}
-            size="sm"
-            variant="light"
-            className=" z-10"
+            size='sm'
+            variant='light'
+            className=' z-10'
           >
-            New assessment <PlusCircle className="h-5 w-5" />
+            New assessment <PlusCircle className='h-5 w-5' />
           </Button>
         </div>
         <DataTable columns={columns} data={assessments} noSearch {...state} />

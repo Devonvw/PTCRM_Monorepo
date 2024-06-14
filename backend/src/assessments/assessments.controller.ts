@@ -10,22 +10,21 @@ import {
   Req,
 } from '@nestjs/common';
 import { Request } from 'express';
+import Success from 'src/utils/success';
 import { AssessmentsService } from './assessments.service';
 import { CreateAssessmentDto } from './dtos/CreateAssessmentDto';
 import { GetAssessmentsQueryDto } from './dtos/GetAssessmentsQueryDto';
-import { InitiateAssessmentDto } from './dtos/InitiateAssessmentDto';
 import { UpdateAssessmentDto } from './dtos/UpdateAssessmentDto';
-import Success from 'src/utils/success';
 
 @Controller('assessments')
 export class AssessmentsController {
   constructor(private readonly assessmentsService: AssessmentsService) {}
   //. This endpoint is called when a coach initiates a new assessment for a client. It returns a list of measurements that need to be made for the assessment, it does not write anything to the database, as it is possible that the coach may cancel the assessment before it is completed.
-  @Get('initiate')
-  async initiate(@Req() request: Request, @Body() body: InitiateAssessmentDto) {
-    const userId = request.user.id;
-    return await this.assessmentsService.initiate(userId, body);
-  }
+  // @Get('initiate')
+  // async initiate(@Req() request: Request, @Body() body: InitiateAssessmentDto) {
+  //   const userId = request.user.id;
+  //   return await this.assessmentsService.initiate(userId, body);
+  // }
 
   @Get()
   async findAll(

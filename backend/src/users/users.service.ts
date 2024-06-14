@@ -1,20 +1,18 @@
 import {
   ConflictException,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import bcrypt from 'bcrypt';
-import { Not, Repository } from 'typeorm';
-import { User } from './entities/user.entity';
-import { PaymentService } from 'src/payment/payment.service';
-import { Payment } from 'src/payment/entities/payment.entity';
-import { SignUpDto } from './dtos/SignUp.dto';
 import { Subscription } from 'src/payment/entities/subscription.entity';
-import { UpdateUserDto } from './dtos/UpdateUser.dto';
+import { PaymentService } from 'src/payment/payment.service';
 import { PASSWORD_SALT_ROUNDS } from 'src/utils/constants';
+import { Not, Repository } from 'typeorm';
+import { SignUpDto } from './dtos/SignUp.dto';
 import { SignUpResponseDto } from './dtos/SignUpResponse.dto';
+import { UpdateUserDto } from './dtos/UpdateUser.dto';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
