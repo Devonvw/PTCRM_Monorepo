@@ -1,21 +1,12 @@
 "use client";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import PageHeader from "@/components/ui/page-header";
-import { DataTable } from "@/components/ui/data-table";
-import { columns } from "./columns";
-import { useClients } from "@/stores/useClients";
 import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
-import CreateClientModal from "./modals/create-modal";
+import { DataTable } from "@/components/ui/data-table";
+import PageHeader from "@/components/ui/page-header";
 import useTable from "@/hooks/useTable";
-import Link from "next/link";
+import { useClients } from "@/stores/useClients";
+import { PlusCircle } from "lucide-react";
+import { columns } from "./columns";
+import CreateClientModal from "./modals/create-modal";
 
 const Clients = () => {
   const { getClients, clients, filterOptions, addModalOpen, setAddModalOpen } =
