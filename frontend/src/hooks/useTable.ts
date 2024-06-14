@@ -44,11 +44,11 @@ const useTable = ({ onChange, filterOptions, sortingDefault }: IUseTable) => {
         orderDirection: sorting?.[0]?.desc ? "DESC" : "ASC",
       },
     }).then((totalRows: number) => setRowCount(totalRows));
-  }, [onChange, pagination, filters, search, sorting]);
+  }, [pagination, filters, search, sorting]);
 
   useEffect(() => {
     reload();
-  }, [reload, pagination, filters, search, sorting]);
+  }, [pagination, filters, search, sorting]);
 
   return {
     state: {

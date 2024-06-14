@@ -34,11 +34,7 @@ interface IUseAssessmentsStore {
     measurements: { clientGoalId: number; value: string }[],
     notes?: string
   ) => Promise<void>;
-  getAssessments: (
-    modules: ITableRequest & {
-      clientId: number;
-    }
-  ) => Promise<number>;
+  getAssessments: (clientId: number, modules: ITableRequest) => Promise<number>;
   getAssessment: (assessmentId: number) => Promise<void>;
   deleteAssessment: (assessmentId: number, reload?: IReload) => Promise<void>;
   filterOptions: IFilterOption[];
@@ -127,19 +123,18 @@ export const useAssessments = create<IUseAssessmentsStore>((set) => ({
     }
   },
   getAssessments: async (
-    modules: ITableRequest & {
-      clientId: number;
-    }
+    clientId: number,
+    modules: ITableRequest
   ): Promise<number> => {
     set({ loading: true });
     try {
       const { data } = await axios.get("/backend/assessments", {
         params: {
-          clientId: modules.clientId,
           ...modules.pagination,
           ...modules.search,
           ...modules.sort,
           ...modules.filters,
+          clientId,
         },
       });
       set((state: any) => ({
