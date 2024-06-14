@@ -7,15 +7,25 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { create } from "zustand";
 
-interface IClient {
-  [key: string]: any;
+export interface IClient {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  street: string;
+  housenumber: string;
+  housenumberExtra: string;
+  zipCode: string;
+  city: string;
+  country: string;
+  active: boolean;
 }
 
 interface IClientStore {
-  client: IClient;
+  client?: IClient;
   clients: IClient[];
   loading: boolean | undefined;
-  signUpDetails: IClient;
   signUpErrorMsg: string;
   dashboardData: any;
   getClients: (modules: ITableRequest) => Promise<number>;
@@ -38,10 +48,9 @@ interface IClientStore {
 }
 
 export const useClients = create<IClientStore>((set) => ({
-  client: {},
+  client: undefined,
   clients: [],
   loading: undefined,
-  signUpDetails: {},
   signUpErrorMsg: "",
   dashboardData: {},
   getClients: async (modules: ITableRequest): Promise<number> => {

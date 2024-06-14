@@ -3,40 +3,41 @@ import toastError from "@/utils/toast-error";
 import axios from "axios";
 import { create } from "zustand";
 
-export const useGoals = create((set: any, get: any) => ({
+export interface IGoal {
+  [key: string]: any;
+}
+
+interface IUseGoalsStore {
+  goal: IGoal;
+  goals: IGoal[];
+  loading: boolean | undefined;
+  getAllGoals: () => Promise<number>;
+  getGoal: (id: string, initialLoad?: boolean) => Promise<void>;
+  createGoal: (goal: IGoal, reload?: IReload) => Promise<void>;
+  updateGoal: (goal: IGoal, reload?: IReload) => Promise<void>;
+  deleteGoal: (id: string, reload?: IReload) => Promise<void>;
+  filterOptions: {
+    label: string;
+    value: string;
+  }[];
+  addModalOpen: boolean;
+  setAddModalOpen: (open: boolean) => void;
+}
+
+export const useGoals = create<IUseGoalsStore>((set: any, get: any) => ({
   goal: {} as any,
   goals: [],
   loading: undefined,
-
-  getGoals: async (modules: {
-    pagination: [pageIndex: number, pageSize: number];
-    filters?: any;
-  }): Promise<number> => {
-    try {
-      const { data } = await axios.get("/backend/goals", {
-        params: {
-          ...modules.filters,
-          pageIndex: modules.pagination[0],
-          pageSize: modules.pagination[1],
-        },
-      });
-      set((state: any) => ({
-        goals: data?.data,
-      }));
-      return data?.totalRows;
-    } catch (e: any) {
-      return 0;
-    }
-  },
   getAllGoals: async () => {
     try {
       const { data } = await axios.get("/backend/goals/all");
-      set((state: any) => ({
+      set({
         goals: data?.data,
-      }));
+      });
       return data?.totalRows;
     } catch (e: any) {
       toastError(e?.response?.data?.message);
+      return 0;
     }
   },
   getGoal: async (id: string, initialLoad?: boolean) => {

@@ -5,12 +5,24 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { create } from "zustand";
 
-interface IClientGoal {
-  [key: string]: any;
+export interface IClientGoal {
+  id: number;
+  startValue: number;
+  currentValue: number;
+  completedValue: number;
+  goal: {
+    id: number;
+    name: string;
+    description: string;
+    howToMeasure: string;
+    unit: string;
+    measurementUnit?: string;
+  };
+  progress?: number;
 }
 
 interface IUseClientGoalsStore {
-  clientGoal: IClientGoal;
+  clientGoal?: IClientGoal;
   clientGoals: IClientGoal[];
   loading: boolean | undefined;
   reload: boolean;
@@ -36,7 +48,7 @@ interface IUseClientGoalsStore {
 }
 
 export const useClientGoals = create<IUseClientGoalsStore>((set) => ({
-  clientGoal: {},
+  clientGoal: undefined,
   clientGoals: [],
   loading: undefined,
   reload: false,

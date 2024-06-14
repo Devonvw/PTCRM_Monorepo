@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { IPage } from "@/interfaces/page";
-import { useClients } from "@/stores/useClients";
+import { IClient, useClients } from "@/stores/useClients";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BadgeCheck } from "lucide-react";
 import { useEffect } from "react";
@@ -62,7 +62,7 @@ const ClientDetailInformationPage = ({ params: { id } }: IPage) => {
   } = useClients();
 
   useEffect(() => {
-    if (client?.id != id) getClient(id, true, router.push);
+    if (client?.id != +id) getClient(id, true, router.push);
   }, [id]);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -85,7 +85,7 @@ const ClientDetailInformationPage = ({ params: { id } }: IPage) => {
   }, [client]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    updateClient(id, values);
+    updateClient(id, values as IClient);
   }
 
   return (

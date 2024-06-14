@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useClientGoals } from "@/stores/useClientGoals";
-import { useGoals } from "@/stores/useGoals";
+import { IGoal, useGoals } from "@/stores/useGoals";
 import { Select } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BadgeCheck, XCircle } from "lucide-react";
@@ -106,7 +106,9 @@ const CreateUpdateClientGoalModal = (props: IProps) => {
   } = useClientGoals();
   const { goals, getAllGoals } = useGoals();
   const [totalRows, setTotalRows] = useState(0);
-  const [selectedGoal, setSelectedGoal] = useState(undefined);
+  const [selectedGoal, setSelectedGoal] = useState<IGoal | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     const fetchData = async () => {
