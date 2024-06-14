@@ -11,6 +11,7 @@ export const useClients = create((set: any, get: any) => ({
   loading: undefined,
   signUpDetails: {} as any,
   signUpErrorMsg: "",
+  dashboardData: {} as any,
   getClients: async (modules: {
     pagination?: any;
     search?: any;
@@ -80,6 +81,16 @@ export const useClients = create((set: any, get: any) => ({
         addModalOpen: false,
       }));
       toast.success("Client updated successfully.");
+    } catch (e: any) {
+      toastError(e?.response?.data?.message);
+    }
+  },
+  getClientDashboard: async (clientId: string) => {
+    try {
+      const { data } = await axios.get(
+        `/backend/general/client-dashboard/${clientId}`
+      );
+      set({ dashboardData: data });
     } catch (e: any) {
       toastError(e?.response?.data?.message);
     }

@@ -90,7 +90,6 @@ export class ClientGoalsService {
     return await this.clientGoalRepository.findOneBy({ id });
   }
   async findAll(userId: number, query: GetClientGoalsQueryDto): Promise<any> {
-    console.log('query', query);
     //. Make sure the client belongs to the coach (user)
     const client = await this.clientRepository.findOne({
       where: {

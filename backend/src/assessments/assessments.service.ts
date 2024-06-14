@@ -334,7 +334,7 @@ export class AssessmentsService {
         });
 
         clientGoal.currentValue = clientGoal.startValue;
-
+        clientGoal.completed = false;
         await this.clientGoalRepository.save(clientGoal);
       }
     }

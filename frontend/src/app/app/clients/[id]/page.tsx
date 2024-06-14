@@ -12,40 +12,36 @@ import ClientDetailLayout from "./components/layout";
 
 const ClientDetailPage = ({ params: { id } }: IPage) => {
   const router = useRouter();
-  const { getClient, loading, client } = useClients();
-  const { getAssessments } = useAssessments();
-  const { getClientGoals } = useClientGoals();
+  const { getClient, getClientDashboard, dashboardData, loading, client } =
+    useClients();
 
   useEffect(() => {
     if (client?.id != id) getClient(id, true, router.push);
-  }, [id]);
+    if (id) getClientDashboard(id);
+  }, []);
 
   return (
     <ClientDetailLayout client={client} loading={loading}>
-      <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <OverviewCard
-          title='Total Goals'
-          value={25}
-          extraInfo='Last added '
-          icon={<ClipboardList className='w-4 h-4' />}
+          title="Total Goals"
+          value={dashboardData?.clientGoalsCount}
+          icon={<ClipboardList className="w-4 h-4" />}
         />
         <OverviewCard
-          title='Completed goals'
-          value={25}
-          extraInfo='Last completed '
-          icon={<SquareCheckBig className='w-4 h-4' />}
+          title="Completed goals"
+          value={dashboardData?.completedGoalsCount}
+          icon={<SquareCheckBig className="w-4 h-4" />}
         />
         <OverviewCard
-          title='Goals in-progress'
-          value={25}
-          // extraInfo='Last completed at'
-          icon={<Goal className='w-4 h-4' />}
+          title="Goals in-progress"
+          value={dashboardData?.uncompletedGoalsCount}
+          icon={<Goal className="w-4 h-4" />}
         />
         <OverviewCard
-          title='Assessments performed'
-          value={25}
-          extraInfo='Last performed '
-          icon={<ListChecks className='w-4 h-4' />}
+          title="Assessments performed"
+          value={dashboardData?.clientAssessmentsCount}
+          icon={<ListChecks className="w-4 h-4" />}
         />
       </div>
     </ClientDetailLayout>

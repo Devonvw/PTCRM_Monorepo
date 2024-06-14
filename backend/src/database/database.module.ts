@@ -21,18 +21,30 @@ interface DatabaseConfig {
               ...configService.get<DatabaseConfig>('database.staging'),
               entities: [__dirname + '/../**/*.entity{.ts,.js}'],
               autoLoadEntities: true,
+              extra: {
+                supportBigNumbers: false,
+                decimalNumbers: true,
+              },
             };
           case 'production':
             return {
               ...configService.get<DatabaseConfig>('database.production'),
               entities: [__dirname + '/../**/*.entity{.ts,.js}'],
               autoLoadEntities: true,
+              extra: {
+                supportBigNumbers: false,
+                decimalNumbers: true,
+              },
             };
           default:
             return {
               ...configService.get<DatabaseConfig>('database.local'),
               autoLoadEntities: true,
               entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+              extra: {
+                supportBigNumbers: false,
+                decimalNumbers: true,
+              },
               synchronize: true, //Setting synchronize: true shouldn't be used in production - otherwise you can lose production data.
             };
         }

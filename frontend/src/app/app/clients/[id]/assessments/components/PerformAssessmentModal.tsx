@@ -113,15 +113,6 @@ const PerformAssessmentModal = (props: IProps) => {
     const fetchData = async () => {
       const goals = await getAllUncompletedClientGoals(props.clientId);
       setTotalClientGoals(goals);
-
-      const measurements = clientGoalsToMeasure.map(
-        (clientGoal: ClientGoal) => ({
-          clientGoalId: clientGoal.id,
-          value: clientGoal.currentValue.toString(),
-        })
-      );
-      // setMeasurementsToPerform(measurements);
-      form.reset({ measurements });
     };
 
     fetchData();
@@ -178,7 +169,7 @@ const PerformAssessmentModal = (props: IProps) => {
                             {...field}
                             type='number'
                             placeholder={clientGoal.currentValue.toString()}
-                            value={field.value || clientGoal.currentValue}
+                            // value={field.value || clientGoal.currentValue}
                           />
                         </FormControl>
                         <FormDescription>
