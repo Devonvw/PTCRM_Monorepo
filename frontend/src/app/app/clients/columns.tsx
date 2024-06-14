@@ -6,21 +6,7 @@ import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-col
 import { DataTableRowActions } from "@/components/ui/data-table/data-table-row-actions";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-
-interface IClient {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  street: string;
-  housenumber: string;
-  housenumberExtra: string;
-  zipCode: string;
-  city: string;
-  country: string;
-  active: boolean;
-}
+import { IClient } from "@/stores/useClients";
 
 export const columns: ColumnDef<IClient>[] = [
   {

@@ -1,9 +1,9 @@
+import { ThemeProvider } from "@/components/theme-provider";
+import axios from "axios";
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
-import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
-import toast, { Toaster } from "react-hot-toast";
-import axios from "axios";
 
 const poppins = Poppins({
   subsets: ["latin"],

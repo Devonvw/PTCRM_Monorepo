@@ -2,8 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import RegisterModal from "../components/modals/register-modal";
 
 export default function Home() {
   return (
@@ -18,10 +16,16 @@ export default function Home() {
               PT<span className="font-thin">CRM</span>
             </Link>
             <div className="flex gap-x-2">
-              <Link href="/login" className="bg-primary text-white py-1 px-5 rounded font-semibold text-lg hover:bg-primary/80">
+              <Link
+                href="/login"
+                className="bg-primary text-white py-1 px-5 rounded font-semibold text-lg hover:bg-primary/80"
+              >
                 Login
               </Link>
-              <Link href="/signup" className="bg-secondary text-white py-1 px-5 rounded font-semibold text-lg hover:bg-primary/80">
+              <Link
+                href="/signup"
+                className="bg-secondary text-white py-1 px-5 rounded font-semibold text-lg hover:bg-primary/80"
+              >
                 Signup
               </Link>
             </div>
@@ -44,7 +48,6 @@ export default function Home() {
           alt="Personal training"
           className="absolute bottom-0 left-0 w-1/3"
         />
-        
       </div>
     </main>
   );

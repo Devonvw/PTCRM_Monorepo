@@ -1,8 +1,6 @@
 "use client";
 
 import { IPage } from "@/interfaces/page";
-import { useAssessments } from "@/stores/useAssessments";
-import { useClientGoals } from "@/stores/useClientGoals";
 import { useClients } from "@/stores/useClients";
 import { ClipboardList, Goal, ListChecks, SquareCheckBig } from "lucide-react";
 import { useRouter } from "next/navigation";

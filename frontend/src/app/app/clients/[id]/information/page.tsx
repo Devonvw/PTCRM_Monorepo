@@ -51,15 +51,7 @@ const formSchema = z.object({
 
 const ClientDetailInformationPage = ({ params: { id } }: IPage) => {
   const router = useRouter();
-  const {
-    getClient,
-    loading,
-    client,
-    filterOptions,
-    addModalOpen,
-    setAddModalOpen,
-    updateClient,
-  } = useClients();
+  const { getClient, loading, client, updateClient } = useClients();
 
   useEffect(() => {
     if (client?.id != +id) getClient(id, true, router.push);

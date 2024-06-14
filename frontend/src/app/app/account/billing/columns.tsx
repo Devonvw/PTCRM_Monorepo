@@ -57,9 +57,4 @@ export const columns: ColumnDef<IInvoice>[] = [
     ),
     enableSorting: false,
   },
-  // },
-  // {
-  //   id: "actions",
-  //   cell: ({ row }) => <DataTableRowActions row={row} />,
-  // },
 ];

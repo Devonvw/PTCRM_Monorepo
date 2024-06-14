@@ -1,6 +1,5 @@
 "use client";
 
-import { IModal } from "@/interfaces/modal";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,23 +10,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { BadgeCheck, XCircle } from "lucide-react";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-
+import { IModal } from "@/interfaces/modal";
+import { BadgeCheck, XCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { IReload } from "@/interfaces/reload";
+import { IClient, useClients } from "@/stores/useClients";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Input } from "@/components/ui/input";
-import { IClient, useClients } from "@/stores/useClients";
-import { IReload } from "@/interfaces/reload";
 
 const formSchema = z.object({
   firstName: z.string().min(2, {
@@ -82,10 +80,7 @@ const CreateClientModal = ({
     },
   });
 
-  // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
     createClient(values as IClient, () => {
       reload();
       onOpenChange(false);

@@ -21,12 +21,10 @@ const sidebarNavItems = [
 
 interface ClientDetailLayoutProps {
   children: React.ReactNode;
-  params: { id: string };
 }
 
 export default async function ClientDetailLayout({
   children,
-  params: { id },
 }: ClientDetailLayoutProps) {
   return (
     <>
