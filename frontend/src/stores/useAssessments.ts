@@ -18,7 +18,6 @@ export const useAssessments = create((set: any, get: any) => ({
     try {
       const { data } = await axios.get("/backend/client-goals", {
         params: {
-          // ...modules.pagination,
           clientId: modules.clientId,
           pageIndex: modules.pagination[0],
           pageSize: modules.pagination[1],

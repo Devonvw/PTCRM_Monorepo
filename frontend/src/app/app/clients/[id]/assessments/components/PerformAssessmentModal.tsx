@@ -89,15 +89,14 @@ const PerformAssessmentModal = (props: IProps) => {
   const {
     clientGoalsToMeasure,
     getAllUncompletedClientGoals,
-    initiateAssessment,
     completeAssessment,
     addOrUpdateModalOpen,
   } = useAssessments();
 
   const [totalClientGoals, setTotalClientGoals] = useState(0);
-  const [measurementsToPerform, setMeasurementsToPerform] = useState<
-    { clientGoalId: number; value: string }[]
-  >([]);
+  // const [measurementsToPerform, setMeasurementsToPerform] = useState<
+  //   { clientGoalId: number; value: string }[]
+  // >([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -121,7 +120,7 @@ const PerformAssessmentModal = (props: IProps) => {
           value: clientGoal.currentValue.toString(),
         })
       );
-      setMeasurementsToPerform(measurements);
+      // setMeasurementsToPerform(measurements);
       form.reset({ measurements });
     };
 
@@ -129,8 +128,14 @@ const PerformAssessmentModal = (props: IProps) => {
   }, [addOrUpdateModalOpen]);
 
   useEffect(() => {
-    form.reset({ measurements: measurementsToPerform });
-  }, [measurementsToPerform]);
+    const measurements = clientGoalsToMeasure.map((clientGoal: ClientGoal) => ({
+      clientGoalId: clientGoal.id,
+      value: clientGoal.currentValue.toString(),
+    }));
+    // setMeasurementsToPerform(measurements);
+
+    form.reset({ measurements });
+  }, [clientGoalsToMeasure]);
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     await completeAssessment(props.clientId, data.measurements, data.notes);
