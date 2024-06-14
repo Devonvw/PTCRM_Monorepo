@@ -2,7 +2,7 @@ import ITableRequest from "@/interfaces/table-request";
 import axios from "axios";
 import { create } from "zustand";
 
-interface IInvoice {
+export interface IInvoice {
   [key: string]: any;
 }
 

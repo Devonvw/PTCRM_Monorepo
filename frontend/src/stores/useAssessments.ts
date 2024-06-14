@@ -6,8 +6,11 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { create } from "zustand";
 
-interface IAssessment {
-  [key: string]: any;
+export interface IAssessment {
+  id: number;
+  performedAt: Date;
+  notes: string;
+  measurements: any;
 }
 
 interface IClientGoal {
@@ -15,7 +18,7 @@ interface IClientGoal {
 }
 
 interface IUseAssessmentsStore {
-  assessment: IAssessment;
+  assessment?: IAssessment;
   assessments: IAssessment[];
   clientGoalsToMeasure: IClientGoal[];
   loading: boolean | undefined;
@@ -48,7 +51,7 @@ interface IUseAssessmentsStore {
 }
 
 export const useAssessments = create<IUseAssessmentsStore>((set) => ({
-  assessment: {},
+  assessment: undefined,
   assessments: [],
   clientGoalsToMeasure: [],
   loading: undefined,

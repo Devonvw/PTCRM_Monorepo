@@ -26,7 +26,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
-import { useClients } from "@/stores/useClients";
+import { IClient, useClients } from "@/stores/useClients";
 import { IReload } from "@/interfaces/reload";
 
 const formSchema = z.object({
@@ -86,7 +86,7 @@ const CreateClientModal = ({
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    createClient(values, () => {
+    createClient(values as IClient, () => {
       reload();
       onOpenChange(false);
     });

@@ -20,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { TextArea } from "@/components/ui/textarea";
 import { useAssessments } from "@/stores/useAssessments";
+import { IClientGoal } from "@/stores/useClientGoals";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BadgeCheck, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -64,20 +65,6 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-interface ClientGoal {
-  id: number;
-  startValue: number;
-  currentValue: number;
-  completedValue: number;
-  goal: {
-    id: number;
-    name: string;
-    description: string;
-    howToMeasure: string;
-    unit: string;
-  };
-}
-
 interface IProps {
   clientId: number;
   onClose: () => void;
@@ -101,7 +88,7 @@ const PerformAssessmentModal = (props: IProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      measurements: clientGoalsToMeasure.map((clientGoal: ClientGoal) => ({
+      measurements: clientGoalsToMeasure.map((clientGoal) => ({
         clientGoalId: clientGoal.id,
         value: clientGoal.currentValue.toString(),
       })),
@@ -112,14 +99,14 @@ const PerformAssessmentModal = (props: IProps) => {
   useEffect(() => {
     const fetchData = async () => {
       const goals = await getAllUncompletedClientGoals(props.clientId);
-      setTotalClientGoals(goals);
+      if (goals || goals == 0) setTotalClientGoals(goals);
     };
 
     fetchData();
   }, [addOrUpdateModalOpen]);
 
   useEffect(() => {
-    const measurements = clientGoalsToMeasure.map((clientGoal: ClientGoal) => ({
+    const measurements = clientGoalsToMeasure.map((clientGoal) => ({
       clientGoalId: clientGoal.id,
       value: clientGoal.currentValue.toString(),
     }));
@@ -155,8 +142,10 @@ const PerformAssessmentModal = (props: IProps) => {
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className='grid grid-cols-2 gap-4 mb-4 max-h-112 overflow-y-scroll'>
               {clientGoalsToMeasure.map(
-                (clientGoal: ClientGoal, index: number) => (
-                  // <div key={clientGoal.id}>{clientGoal.id}</div>
+                (
+                  clientGoal,
+                  index // <div key={clientGoal.id}>{clientGoal.id}</div>
+                ) => (
                   <FormField
                     control={form.control}
                     key={clientGoal.id}
