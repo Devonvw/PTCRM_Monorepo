@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ClientGoalAchievement } from 'src/client-goal-achievement/entities/client-goal-achievement.entity';
 import { ClientGoalsService } from 'src/client-goals/client-goals.service';
@@ -28,113 +33,122 @@ export class AssessmentsService {
 
   async create(userId: number, body: CreateAssessmentDto): Promise<any> {
     const achievementsObtained: ClientGoalAchievement[] = [];
-    //. Create a transaction to ensure that the assessment and all its measurements are saved or none are saved if an error occurs
-    await this.assessmentRepository.manager.transaction(
-      async (entityManager) => {
-        //. Make sure the client belongs to the coach (user)
-        await this.clientService.getClientIfClientBelongsToUser(
-          userId,
-          body.clientId,
-        );
 
-        //. Make sure that all the measurements' client goals exist AND belong to the client
-        for (const measurement of body.measurements) {
-          const clientGoal: ClientGoal = await entityManager.findOne(
-            ClientGoal,
-            {
-              where: {
-                id: measurement.clientGoalId,
-                client: { id: body.clientId },
+    try {
+      //. Create a transaction to ensure that the assessment and all its measurements are saved or none are saved if an error occurs
+      await this.assessmentRepository.manager.transaction(
+        async (entityManager) => {
+          //. Make sure the client belongs to the coach (user)
+          await this.clientService.getClientIfClientBelongsToUser(
+            userId,
+            body.clientId,
+          );
+
+          //. Make sure that all the measurements' client goals exist AND belong to the client
+          for (const measurement of body.measurements) {
+            const clientGoal: ClientGoal = await entityManager.findOne(
+              ClientGoal,
+              {
+                where: {
+                  id: measurement.clientGoalId,
+                  client: { id: body.clientId },
+                },
               },
-            },
-          );
-
-          if (!clientGoal) {
-            throw new NotFoundException(
-              `The client goal with id ${measurement.clientGoalId} does not exist or does not belong to the client.`,
             );
+
+            if (!clientGoal) {
+              throw new NotFoundException(
+                `The client goal with id ${measurement.clientGoalId} does not exist or does not belong to the client.`,
+              );
+            }
           }
-        }
 
-        //. Create a new assessment object
-        const assessment: Assessment = {
-          client: { id: body.clientId } as Client,
-          measurements: null,
-          performedAt: new Date(),
-          notes: body.notes,
-          id: 0,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
+          //. Create a new assessment object
+          const assessment: Assessment = {
+            client: { id: body.clientId } as Client,
+            measurements: null,
+            performedAt: new Date(),
+            notes: body.notes,
+            id: 0,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
 
-        //. Save the assessment object to the database
-        const savedAssessment = await entityManager.save(
-          Assessment,
-          assessment,
-        );
-
-        //. Save the measurements to the database
-        for (const measurement of body.measurements) {
-          //. Create a new measurement object
-          const measurementToSave = new Measurement({
-            ...measurement,
-            assessment: { id: savedAssessment.id } as Assessment,
-            clientGoal: { id: measurement.clientGoalId } as ClientGoal,
-          });
-
-          //. Save the measurement object to the database
-          await entityManager.save(Measurement, measurementToSave);
-
-          //. Update the client goal's current value
-          const clientGoal: ClientGoal = await entityManager.findOne(
-            ClientGoal,
-            {
-              where: { id: measurement.clientGoalId },
-              relations: ['achievements'],
-            },
+          //. Save the assessment object to the database
+          const savedAssessment = await entityManager.save(
+            Assessment,
+            assessment,
           );
 
-          clientGoal.currentValue = measurement.value;
+          //. Save the measurements to the database
+          for (const measurement of body.measurements) {
+            //. Create a new measurement object
+            const measurementToSave = new Measurement({
+              ...measurement,
+              assessment: { id: savedAssessment.id } as Assessment,
+              clientGoal: { id: measurement.clientGoalId } as ClientGoal,
+            });
 
-          //. Check if the client goal has been completed
-          if (
-            this.clientGoalIsCompleted(
-              clientGoal.currentValue,
-              clientGoal.startValue,
-              clientGoal.completedValue,
-            )
-          ) {
-            clientGoal.completed = true;
-            clientGoal.completedAt = new Date();
+            //. Save the measurement object to the database
+            await entityManager.save(Measurement, measurementToSave);
+
+            //. Update the client goal's current value
+            const clientGoal: ClientGoal = await entityManager.findOne(
+              ClientGoal,
+              {
+                where: { id: measurement.clientGoalId },
+                relations: ['achievements'],
+              },
+            );
+
+            clientGoal.currentValue = measurement.value;
+
+            //. Check if the client goal has been completed
+            if (
+              this.clientGoalIsCompleted(
+                clientGoal.currentValue,
+                clientGoal.startValue,
+                clientGoal.completedValue,
+              )
+            ) {
+              clientGoal.completed = true;
+              clientGoal.completedAt = new Date();
+            }
+
+            //. REMOVED: If the goal has not been completed yet, check if any achievements have been made
+            // else {
+            //   if (clientGoal.achievements.length > 0) {
+            //     for (const achievement of clientGoal.achievements) {
+            //       if (
+            //         measurement.value >= achievement.value &&
+            //         !achievement.achieved
+            //       ) {
+            //         achievement.achieved = true;
+            //         achievement.achievedAt = new Date();
+            //         achievementsObtained.push(achievement);
+            //       }
+            //     }
+            //   }
+            // }
+            await entityManager.save(ClientGoal, clientGoal);
           }
+        },
+      );
 
-          //. REMOVED: If the goal has not been completed yet, check if any achievements have been made
-          // else {
-          //   if (clientGoal.achievements.length > 0) {
-          //     for (const achievement of clientGoal.achievements) {
-          //       if (
-          //         measurement.value >= achievement.value &&
-          //         !achievement.achieved
-          //       ) {
-          //         achievement.achieved = true;
-          //         achievement.achievedAt = new Date();
-          //         achievementsObtained.push(achievement);
-          //       }
-          //     }
-          //   }
-          // }
-          await entityManager.save(ClientGoal, clientGoal);
-        }
-      },
-    );
-    //. Return a success message (if any achievements were obtained, list them in the message)
-    if (achievementsObtained.length > 0) {
-      return {
-        message: 'Assessment saved',
-        achievements: achievementsObtained,
-      };
+      //. Return a success message (if any achievements were obtained, list them in the message)
+      if (achievementsObtained.length > 0) {
+        return {
+          message: 'Assessment saved',
+          achievements: achievementsObtained,
+        };
+      }
+      return 'Assessment saved';
+    } catch (error) {
+      // Log the error or handle it as needed
+      throw new InternalServerErrorException(
+        'An error occurred while saving the assessment.',
+      );
     }
-    return 'Assessment saved';
   }
 
   async findAll(userId: number, query: GetAssessmentsQueryDto): Promise<any> {
